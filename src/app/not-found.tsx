@@ -1,4 +1,10 @@
+"use client";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Compass } from "lucide-react";
 import { Button } from "../components/ui/button";
-export default function NotFound() { return <div className="empty-state panel"><Compass size={36} /><h1>Burada bir uygulama bulamadık.</h1><p>Bağlantı değişmiş olabilir. Katalogdan yeni bir keşfe başlayabilirsin.</p><Button asChild><Link href="/explore">Keşfet sayfasına dön</Link></Button></div>; }
+import { contextResetHref } from "../components/core/catalog-query";
+export default function NotFound() {
+  const params = useSearchParams();
+  return <section className="product-panel product-state"><Compass size={30} /><h1>App not found</h1><p>This app identity was not found in the stored catalog. Return to the explorer to discover another app.</p><Button asChild variant="outline"><Link href={contextResetHref("/explore", Object.fromEntries(params))}>Back to App Explorer</Link></Button></section>;
+}

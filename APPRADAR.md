@@ -343,6 +343,22 @@ Altı migration, boş Supabase geliştirme projesine (Tokyo session pooler, Post
   ile `tests/persistence.test.ts` geçti. Çalıştırılmayan: PGlite runner, PostgREST/Supabase,
   çok oturumlu eşzamanlılık, mevcut test paketi, typecheck, lint, build.
 
+### 6.9 Toplama motoru köprüsü
+
+`20261126000700_collection_bridge` `service_role` için T3 tetik yardımcılarını açar ve `private` şemayı dar public sarmalayıcılarla sunar. Sarmalayıcılar `search_path` boş, `SECURITY INVOKER` ve yalnızca `service_role` çalıştırabilir. İş yazmaları canlı lease ister. Ücretli koşunun kimliğini kaydetmek, unknown işaretlemek ve settle lease istemez; yeni ücretli başlangıç veya rezervasyon iadesi yapmazlar.
+
+Günlük ve aylık UTC dönemleri `DAILY_LIMIT_USD` / `MONTHLY_LIMIT_USD` ile idempotent açılır. Aynı pencere tekrar insert edilmez; çakışma tetikleyicisi ikinci insert'i reddettiği için fonksiyon önce mevcut satırı okur. Limit yoksa ücretli başlangıç olmaz. Var olan dönemin limiti yükseltilmez; yapılandırmadan yüksekse çağrı reddedilir. Otomatik settle yalnız doğrulanmış sıfır maliyettedir. Pozitif veya eksik tutar rezervde kalır. `confirm_cost` kanıtla settle eder, rezervasyonu bırakmaz. `confirm_absent` yalnız dış kimliği olmayan unknown başlangıcı bırakır ve yeni koşu başlatmaz. `attach_run` kimliği kaydeder. Charge cap ve doğrulanmamış kapsam `succeeded` sayılmaz.
+
+26 Kasım 2026: migration geliştirme veritabanına uygulandı. İki oturumda claim, süresi dolmuş lease, eski token ve çift reserve doğrulandı. Sahte Apify yanıtlarıyla pozitif maliyet rezervde kaldı, doğrulanmış sıfır settle oldu, eksik tutar ve charge cap `succeeded` sayılmadı. Unknown başlangıç ikinci POST açmadı; kanıtsız release reddedildi. Sentetik satırlar silindi. Otomatik ücretli çalıştırma kapalıdır.
+
+### 6.10 T10 — Tarihsel journal import (dry-run)
+
+`src/lib/import/` yerel `.poc/state.json` kaydını okur. Yalnızca başarılı, doğrulanmış v2 gözlemler adaydır. v1 kimlik alanları uydurulmaz. Yorum içeriği ticari saklama onayı olmadan dışarıda bırakılır. Sentetik fixture satırları elenir. Provider run ve maliyet satırı üretilmez. Uzak yazma kapalıdır; `--execute` açık onay ister ve yine reddedilir.
+
+### 6.11 T8 — Okuma servisleri
+
+`20261126000800_read_services` geliştirme veritabanına uygulandı. Beş `appradar_read_*` fonksiyonu `SECURITY INVOKER`, boş `search_path`, yalnız `service_role` execute. Anon/authenticated reddedilir. Süresi dolmuş listing’ler istatistik ve dağılıma girmez. Sentetik join/filtre/sıralama değişimi SQL oturumunda doğrulanıp geri alındı. PostgREST doğrulaması `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` gerektirir.
+
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
 POC kodu da Bölüm 1'deki plan onayından sonra yazılır. Aşağıdaki eşikler öneridir ve onaylı plana alınmalıdır.

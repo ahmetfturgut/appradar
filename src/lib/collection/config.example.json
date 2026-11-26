@@ -1,0 +1,23 @@
+{
+  "schedulingEnabled": false,
+  "retentionDays": null,
+  "maxAttempts": 2,
+  "schedules": [
+    { "provider": "aurelix", "mode": "charts", "everyMinutes": 1440, "enabled": false,
+      "targets": [{ "store": "ios", "country": "US", "chart": "topFree", "category": "6007", "maxResults": 20 }] },
+    { "provider": "aurelix", "mode": "details", "everyMinutes": 10080, "enabled": false,
+      "targets": [{ "store": "ios", "country": "US", "appIds": ["570060128"] }] },
+    { "provider": "aurelix", "mode": "developers", "everyMinutes": 10080, "enabled": false,
+      "targets": [{ "store": "ios", "country": "US", "developer": { "id": "570060151", "url": "https://apps.apple.com/us/developer/duolingo/id570060151" }, "maxResults": 5 }] },
+    { "provider": "subimpact", "mode": "search", "everyMinutes": 1440, "enabled": false,
+      "targets": [{ "store": "play", "country": "US", "term": "habit tracker", "maxResults": 20 }] },
+    { "provider": "thewolves", "mode": "reviews", "everyMinutes": 1440, "enabled": false,
+      "targets": [{ "store": "ios", "country": "US", "appIds": ["6448311069"], "maxResults": 10 }] },
+    { "provider": "aurelixplayreviews", "mode": "reviews", "everyMinutes": 1440, "enabled": false,
+      "targets": [{ "store": "play", "country": "US", "appIds": ["com.openai.chatgpt"], "maxResults": 100 }] },
+    { "provider": "datatrail", "mode": "charts", "everyMinutes": 1440, "enabled": false,
+      "targets": [{ "store": "ios", "country": "US", "chart": "newFreeApps", "category": "6007", "maxResults": 10 }] },
+    { "provider": "asokeyword", "mode": "keywords", "everyMinutes": 1440, "enabled": false,
+      "targets": [{ "store": "ios", "country": "US", "term": "habit tracker", "maxResults": 10 }] }
+  ]
+}

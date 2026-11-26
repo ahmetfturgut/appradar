@@ -1,40 +1,53 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Compass, Bookmark, SlidersHorizontal, Radar, Radio, FlaskConical, ChevronRight, Monitor } from "lucide-react";
-import { useWatchlist } from "../hooks/use-watchlist";
-import { useCatalog } from "./catalog-provider";
-import { formatObservedAt } from "../lib/live-catalog";
+import { usePathname, useSearchParams } from "next/navigation";
+import { ChartNoAxesCombined, ChevronRight, Compass, Database, LayoutDashboard, Menu, Radar, Search, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
 
 const navigation = [
-  { href: "/explore", label: "Keşfet", icon: Compass },
-  { href: "/watchlist", label: "Takip listem", icon: Bookmark },
-  { href: "/admin", label: "Kaynak durumu", icon: Radio },
-  { href: "/settings", label: "Ayarlar", icon: SlidersHorizontal },
+  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/explore", label: "App Explorer", icon: Compass },
 ];
+
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
-  const watchlist = useWatchlist();
-  const catalog = useCatalog();
-  const demo = catalog.mode === "demo";
-  const active = navigation.find(n => path.startsWith(n.href)) ?? navigation[0]!;
-  const links = navigation.map(item => <Link key={item.href} href={item.href} className={`nav-link ${active.href === item.href ? "nav-active" : ""}`} aria-current={active.href === item.href ? "page" : undefined}><item.icon size={19} /><span>{item.label}</span>{item.href === "/watchlist" && watchlist.items.length > 0 && <span className="nav-count">{watchlist.items.length}</span>}</Link>);
-  return <div className="app-shell">
-    <a className="skip-link" href="#main">İçeriğe geç</a>
-    <aside className="sidebar">
-      <Link href="/explore" className="brand" aria-label="AppRadar ana sayfa"><span className="brand-mark"><Radar size={25} /></span><span>AppRadar<span className="brand-dot">.</span></span></Link>
-      <p className="sidebar-label">ÇALIŞMA ALANI</p>
-      <nav aria-label="Ana menü">{links}</nav>
-      <div className="sidebar-bottom"><div className="sidebar-note"><Radio size={21} /><strong>Verinin izini sür.</strong><p>{demo ? "Örnek uygulamalarla araştırma alanını dene." : "Mağaza verilerini kaynağı ve gözlem tarihiyle incele."}</p><Link href="/admin">Kaynağı incele <ChevronRight size={15} /></Link></div><div className="workspace-user"><span className="avatar">Y</span><span><strong>Yerel çalışma alanı</strong><small>{demo ? "Kişisel demo" : "Kişisel araştırma"}</small></span><Monitor size={17} /></div></div>
+  const params = useSearchParams();
+  const context = new URLSearchParams();
+  for (const key of ["country", "language", "store"]) { const value = params.get(key); if (value) context.set(key, value); }
+  const scoped = (href: string) => `${href}?${context}`;
+  const [open, setOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => { if (open) closeButton.current?.focus(); }, [open]);
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 761px)");
+    const closeOnDesktop = () => { if (desktop.matches) setOpen(false); };
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => desktop.removeEventListener("change", closeOnDesktop);
+  }, []);
+  function closeNavigation() {
+    setOpen(false);
+    requestAnimationFrame(() => menuButton.current?.focus());
+  }
+  const title = path.startsWith("/apps/") ? "App details" : navigation.find(item => item.href === path)?.label ?? "Workspace";
+  return <div className="product-shell" onKeyDown={event => { if (open && event.key === "Escape") closeNavigation(); }}>
+    <a className="skip-link" href="#main">Skip to content</a>
+    {open && <button className="product-sidebar-overlay" aria-label="Dismiss navigation" onClick={closeNavigation} />}
+    <aside id="product-sidebar" className={`product-sidebar ${open ? "is-open" : ""}`}>
+      <div className="product-brand-row"><Link href={scoped("/")} className="product-brand" onClick={() => setOpen(false)}><span><Radar size={22} /></span>AppRadar</Link><button ref={closeButton} className="product-mobile-toggle" aria-label="Close navigation" onClick={closeNavigation}><X size={20} /></button></div>
+      <div className="product-workspace"><span className="product-workspace-avatar">I</span><div><strong>Indie workspace</strong><small>Personal research</small></div><ChevronRight size={14} /></div>
+      <p className="product-nav-label">WORKSPACE</p>
+      <nav aria-label="Main navigation">{navigation.map(item => <Link href={scoped(item.href)} key={item.href} onClick={() => setOpen(false)} className={`product-nav-link ${path === item.href || item.href === "/explore" && path.startsWith("/apps/") ? "is-active" : ""}`} aria-current={path === item.href ? "page" : undefined}><item.icon size={18} />{item.label}</Link>)}</nav>
+      <p className="product-nav-label">RESEARCH SHORTCUTS</p>
+      <nav aria-label="Research shortcuts"><Link className="product-nav-link" href={`${scoped("/")}#trending`} onClick={() => setOpen(false)}><ChartNoAxesCombined size={18} />Trending apps</Link><Link className="product-nav-link" href={`${scoped("/explore")}&sort=releasedAt`} onClick={() => setOpen(false)}><Compass size={18} />New releases</Link></nav>
+      <div className="product-sidebar-bottom"><div className="product-preview-note"><Database size={18} /><strong>Your research starts here</strong><p>Research stored observations with their country, language, and collection context.</p><span>Stored observations</span></div><div className="product-profile"><span>JD</span><div><strong>Indie developer</strong><small>Research workspace</small></div></div></div>
     </aside>
-    <div className="main-shell">
-      <header className="topbar"><div className="breadcrumb"><Radar size={21} className="mobile-brand" /><span>Çalışma alanı</span><ChevronRight size={14} /><strong>{path.startsWith("/apps/") ? "Uygulama detayı" : active.label}</strong></div><span className="environment-badge">{demo ? <FlaskConical size={14} /> : <Radio size={14} />}{demo ? "Yerel demo" : catalog.mode === "live" ? "Apify verisi" : "Veri bekleniyor"}</span></header>
-      <div className={`demo-banner ${demo ? "" : "live-banner"}`}><span className="demo-tag">{demo ? "DEMO" : "APIFY"}</span><p>{demo ? "Keşfet, filtrele, takip et. Gösterilen uygulamalar ve ölçümler örnektir." : catalog.mode === "live" ? `Gerçek mağaza kayıtları · ${catalog.sourceLabel} · Son çekim ${formatObservedAt(catalog.latestCollectedAt)}` : catalog.error ?? "Mağaza verileri hazırlanıyor."}</p></div>
-      <main id="main" className="main-content">{children}</main>
-      <footer className="page-footer"><span>AppRadar · Merakını bir adım ileri taşı.</span><span>{demo ? "Örnek veriyle çalışan yerel sürüm" : "Yerel araştırma · Kaydedilmiş mağaza gözlemleri"}</span></footer>
+    <div className="product-main-shell" inert={open || undefined}>
+      <header className="product-header"><div className="product-breadcrumb"><button ref={menuButton} className="product-mobile-toggle" aria-label="Open navigation" aria-expanded={open} aria-controls="product-sidebar" onClick={() => setOpen(!open)}><Menu size={21} /></button><span>Workspace</span><ChevronRight size={14} /><strong>{title}</strong></div><div className="product-header-actions"><form action="/explore" className="product-header-search"><Search size={15} />{[...context].map(([key, value]) => <input key={key} type="hidden" name={key} value={value} />)}<input aria-label="Search the app catalog" name="q" placeholder="Search apps…" maxLength={100} /></form><span className="product-preview-badge"><span />Research workspace</span></div></header>
+      <main id="main" className="product-main">{children}</main>
+      <footer className="product-footer"><span>AppRadar <span>·</span> A clearer view of the app market.</span><span>Stored observations · No download or revenue estimates</span></footer>
     </div>
-    <nav className="mobile-navigation" aria-label="Mobil menü">{links}</nav>
-    {watchlist.temporary && <div role="status" className="storage-notice">Tarayıcı kaydı kullanılamıyor. Takiplerin yalnızca bu oturumda tutuluyor.</div>}
   </div>;
 }
