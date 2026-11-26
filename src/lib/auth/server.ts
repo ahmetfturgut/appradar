@@ -42,7 +42,8 @@ export const getViewer = cache(async (): Promise<Viewer> => {
   const supabase = await createSupabaseServerClient();
   if (!supabase) return { kind: "unconfigured" };
   const { data, error } = await supabase.auth.getUser();
-  return !error && data.user ? { kind: "user", user: data.user } : { kind: "anonymous" };
+  // Supabase "anonymous sign-ins" are not accounts here, even if the project enables them.
+  return !error && data.user && !data.user.is_anonymous ? { kind: "user", user: data.user } : { kind: "anonymous" };
 });
 
 /**

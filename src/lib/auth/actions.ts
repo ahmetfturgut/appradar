@@ -2,6 +2,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createSupabaseServerClient, getViewer, isGoogleAuthEnabled, siteOrigin } from "./server";
+import { publicAuthConfig } from "./config";
 import { safeNextPath } from "./paths";
 
 /**
@@ -48,6 +49,18 @@ function authMessage(error: { code?: string | undefined; status?: number | undef
   return "Something went wrong. Please try again.";
 }
 
+/** Redacted operator signal: flow and error code only, never an address, token or provider message. */
+function logAuthFailure(flow: string, error: { code?: string | undefined; status?: number | undefined }) {
+  const code = error.code && /^[a-z0-9_]{1,64}$/.test(error.code) ? error.code : String(Number(error.status) || 0);
+  console.warn(`appradar_auth_failed:${flow}:${code}`);
+}
+
+/**
+ * Supabase's per-address email cooldown only fires for addresses that get mail, so reporting it
+ * would reveal which addresses have accounts. Flows that send mail answer it like a success.
+ */
+const isEmailSendLimit = (error: { code?: string | undefined }) => error.code === "over_email_send_rate_limit";
+
 export async function signInWithPassword(_: AuthFormState, data: FormData): Promise<AuthFormState> {
   const parsed = z.object({ email, password: z.string().min(1, "Enter your password.").max(72, "Use 72 characters or fewer.") }).safeParse({ email: field(data, "email"), password: field(data, "password") });
   if (!parsed.success) return { status: "error", fieldErrors: fieldErrors(parsed.error), email: field(data, "email") };
@@ -71,7 +84,10 @@ export async function signUpWithPassword(_: AuthFormState, data: FormData): Prom
     email: parsed.data.email, password: parsed.data.password,
     options: { emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}` },
   });
-  if (error) return { status: "error", message: authMessage(error), email: parsed.data.email };
+  if (error) {
+    logAuthFailure("sign_up", error);
+    if (!isEmailSendLimit(error)) return { status: "error", message: authMessage(error), email: parsed.data.email };
+  }
   // Email confirmation disabled in Supabase: a session exists immediately.
   if (result.session) redirect(next);
   // Same message whether or not the address was already registered (no account enumeration).
@@ -85,7 +101,11 @@ export async function requestPasswordReset(_: AuthFormState, data: FormData): Pr
   const origin = await siteOrigin();
   if (!supabase || !origin) return { ...NOT_CONFIGURED, email: parsed.data.email };
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, { redirectTo: `${origin}/auth/callback?next=${encodeURIComponent("/reset-password")}` });
-  if (error && (error.status === 429 || error.code?.startsWith("over_"))) return { status: "error", message: authMessage(error), email: parsed.data.email };
+  if (error) {
+    logAuthFailure("password_reset", error);
+    // The request limit is per caller, not per address, so it is safe to show.
+    if (!isEmailSendLimit(error) && (error.status === 429 || error.code === "over_request_rate_limit")) return { status: "error", message: authMessage(error), email: parsed.data.email };
+  }
   // Identical response for known and unknown addresses.
   return { status: "success", message: "If an account exists for this address, a password reset link is on its way. The link expires after a short time.", email: parsed.data.email };
 }
@@ -101,6 +121,9 @@ export async function updatePassword(_: AuthFormState, data: FormData): Promise<
   if (!supabase) return NOT_CONFIGURED;
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (error) return { status: "error", message: authMessage(error) };
+  // A new password must end sessions opened with the old one elsewhere; this one stays signed in.
+  const { error: revokeError } = await supabase.auth.signOut({ scope: "others" });
+  if (revokeError) logAuthFailure("revoke_sessions", revokeError);
   redirect("/account?message=password_updated");
 }
 
@@ -111,7 +134,8 @@ export async function signInWithGoogle(data: FormData): Promise<void> {
   const origin = await siteOrigin();
   if (!supabase || !origin || !(await isGoogleAuthEnabled())) redirect(back("oauth_unavailable"));
   const { data: result, error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}` } });
-  if (error || !result.url || !result.url.startsWith(new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).origin)) redirect(back("oauth_failed"));
+  // Compare origins, not prefixes: `https://ref.supabase.co.example` must not pass.
+  if (error || !result.url || new URL(result.url).origin !== new URL(publicAuthConfig()!.url).origin) redirect(back("oauth_failed"));
   redirect(result.url);
 }
 

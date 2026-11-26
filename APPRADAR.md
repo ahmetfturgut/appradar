@@ -543,6 +543,47 @@ RETENTION_CLEANUP_EXECUTION=true node --env-file=.env.local --import tsx src/lib
 - Toplayıcının yazdığı `expires_at` (`retentionDays`) bu politikadan bağımsızdır; politika yalnız temizlikte ek üst sınırdır. Güncel `reviews` satırı, kalan başka gözlemi varsa silinmiş bir gözlemden dolmuş alanı taşıyabilir.
 - Sonuçlanmamış veya uzlaşmamış kayıtlar süresiz kalır; `collection/cli.ts resolve` ile elle uzlaştırılır.
 
+### 6.21 B3 — Üretim ve kimlik doğrulama hazırlığı — 26 Kasım 2026
+
+Üretim projesi, deployment ve uzak ayar **yoktur**; uzak veritabanı, Auth ayarı, ücretli çağrı ve temizlik çalıştırılmadı. İşletim rehberi: `docs/PRODUCTION.md`.
+
+#### Yapılandırma kapısı
+- `src/lib/config/production.ts`: `NODE_ENV=production` iken eksik/geçersiz yapılandırmada proxy tüm istekleri **503** + `private, no-store` ile kapatır (eski `/admin` yine 404). Log yalnız değişken adı ve neden kodu taşır.
+- Zorunlu: `APPRADAR_SUPABASE_PROJECT_REF` (yeni), `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_SITE_URL` (https, yalnız origin, yerel olmayan alan adı). İki Supabase URL'si ve eski JWT anahtarlarının `ref` değeri beyan edilen ref ile eşleşmelidir.
+- `APPRADAR_DEMO_MODE`, `COLLECTION_PAID_EXECUTION`, `APIFY_COLLECTION_ENABLED`, `POC_DATA_USE_CONFIRMED`, `RETENTION_CLEANUP_EXECUTION` boş veya `false` olmalıdır. `NEXT_PUBLIC_*` içinde gizli anahtar veya Apify token'ı reddedilir.
+- Ağsız ön kontrol: `npm run check:env`. Development demo davranışı değişmedi. Yerel `next start` da üretim sayılır.
+- Sınır: `sb_…` anahtarları ref taşımaz; beyan edilen ref'in geliştirme ref'i olup olmadığı anlaşılamaz. İçerik bayrakları (`APPRADAR_STORE_*`, yorum) hak kararıdır, kapı bunları zorlamaz.
+
+#### Doğrulanan ve düzeltilen kusurlar
+- Proxy `/en`, `/tr`, `/forgot-password` gibi sayfalarda oturumu yenilemiyordu; Server Component yenilenen refresh token'ı yazamadığı için oturum düşebilirdi. Artık `/auth/*` dışındaki her sayfada yenilenir.
+- İptal edilmiş ama süresi dolmamış token `/login` ↔ `/dashboard` yönlendirme döngüsü üretebilirdi. Guest-only yönlendirme `getUser()` ile doğrulanır.
+- Parola sıfırlama ve kayıt, adres bazlı e-posta bekleme hatasını göstererek hesabın varlığını açığa çıkarabilirdi. Bu hata başarıyla aynı yanıtı verir ve kodu loglanır.
+- Güvenlik yanıt başlıkları yoktu: CSP, `nosniff`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, üretimde HSTS (`next.config.ts`). CSP nonce kullanmaz; inline script serbesttir.
+- Başarısız katalog okumaları hiç loglanmıyordu; yalnız hata kodu yazılır.
+
+Sıkılaştırma: anonim Supabase kullanıcısı oturumsuz sayılır; parola değişince diğer oturumlar kapatılır; OAuth hedefi önek yerine origin eşitliğiyle denetlenir; okunamayan oturum çerezi oturumsuz sayılır; `/settings` sunucuda `requireViewer` çağırır; `/compare/add` `private, no-store`.
+
+#### İncelenip değiştirilmeyenler
+- `safeNextPath`, callback yönlendirmesi, watchlist yetkisi (doğrulanmış kullanıcı + RLS), `/admin` 404 ve kullanıcıya özel önbellek (paylaşılan veri cache'i yok).
+- İdari RPC izolasyonu: 12 migration bellek içi PGlite'ta Supabase benzeri varsayılan yetkilerle uygulandı; `anon`/`authenticated` hiçbir fonksiyonu çalıştıramıyor, `SECURITY DEFINER` yok, yalnız `authenticated` için `watchlist_items` SELECT/INSERT/DELETE var. Uzak veritabanında yeniden denetlenmedi.
+- Sınırlar: sayfa ≤100 kayıt, offset ≤10.000, karşılaştırma ≤3, watchlist ≤50, market ≤5.000 satır. Web isteği sağlayıcı API'si çağırmaz. Süreç içi rate limit, Redis veya ücretli servis eklenmedi; Supabase ve hosting ayarları gereklidir. Auth çağrıları sunucudan gittiği için Supabase IP limitleri ziyaretçi bazlı değildir.
+
+#### Doğrulama — B3 entegrasyon (26–27 Kasım 2026)
+
+- **Kimlik doğrulama:** yalnızca **mock / izole** senaryolar (`tests/production-readiness.test.ts`, `tests/auth.test.ts` ve ilgili UI testleri). Gerçek Supabase Auth, SMTP, kullanıcı oluşturma veya e-posta **doğrulanmadı** ve yapılandırılmadı.
+- **Üretim kapısı (gerçek `next build` + `next start`):** eksik/geçersiz env ve `APPRADAR_DEMO_MODE=true` → tüm rotalar **503** + `private, no-store` (eski `/admin` ve `/admin/*` yine **404**). İzole fixture değerleriyle geçerli yapılandırma → `/en` `/tr` `/login` **200**, `/dashboard` **307** `/login?next=…` (kapı yanlışlıkla engellemez). Log satırı yalnız `appradar_config_invalid:NAME:reason`. Client `.next/static` içinde `sb_secret_` / `SERVICE_ROLE` / `DATABASE_URL` / `APIFY_TOKEN` yok. Web kapısı collection/retention CLI dosyalarını import etmez; işçiler kendi bayraklarıyla ayrı kalır.
+- **Güvenlik başlıkları:** production yanıtlarında CSP (`script-src 'self' 'unsafe-inline'`, `connect-src 'self'`, `frame-ancestors 'none'`, …), `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, HSTS `max-age=31536000`. Development'ta HSTS yok; CSP'te `'unsafe-eval'` + `ws:` var. **CSP sınırlaması:** nonce yok; inline script serbest bırakıldı (geniş yeniden tasarım yok). Google OAuth canlı CSP akışı denenmedi.
+- **Development tarayıcı:** demo açıkken `/en`, `/login`, `/dashboard` (masaüstü + ~390px); dashboard sentetik “DEVELOPMENT DEMO” verisi gösteriyor. Production fixture `/en` demo katalog işaretleri taşımıyor; `APPRADAR_DEMO_MODE=true` production'da 503 ile demo verisi sunulmaz.
+- **Geliştirme veritabanı defteri:** 12/12 migration. Salt-okunur yetki: `anon`/`authenticated` collection/retention/budget/admin RPC EXECUTE edemez (`has_function_privilege` + retention çağrıları `42501`); `SECURITY DEFINER` yok; `watchlist_items` için `authenticated` SELECT/INSERT/DELETE korundu. Grant değişikliği yapılmadı.
+- **Rate limit:** uygulama içi süreç/Redis yok. Mevcut sınırlar duruyor (sayfa ≤100, offset ≤10k, compare ≤3, watchlist ≤50). Manuel: Supabase Auth rate limits + hosting firewall (`docs/PRODUCTION.md` §7).
+- **Kalite kapısı (tek koşu):** test **180 geçti, 2 atlandı, 0 başarısız** (PGlite yok; `psql` worker atlandı); typecheck OK; lint 0 hata (2 mevcut `<img>` uyarısı); `next build` OK.
+
+#### Değişen dosyalar
+`src/proxy.ts`, `src/lib/config/{production,check}.ts`, `src/lib/auth/{actions,config,server}.ts`, `src/lib/ui/catalog.server.ts`, `src/app/settings/page.tsx`, `src/app/compare/add/route.ts`, `next.config.ts`, `package.json`, `.env.example`, `tests/production-readiness.test.ts`, `docs/{PRODUCTION,AUTH_SETUP}.md`, `APPRADAR.md`.
+
+#### Kalan manuel adımlar ve yayın engelleri
+Kontrol listesi: `docs/PRODUCTION.md` §11. Başlıca engeller: ticari veri kullanım izni; gizlilik politikası, koşullar, iletişim ve hesap silme süreci; **üretim Supabase projesi yok**; migration'ların production'a uygulanması; Auth/SMTP/OAuth yapılandırması ve **gerçek** uçtan uca auth testi; Supabase/hosting rate limit; yedek ve geri yükleme provası; onaylı saklama politikası; deployment.
+
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
 POC kodu da Bölüm 1'deki plan onayından sonra yazılır. Aşağıdaki eşikler öneridir ve onaylı plana alınmalıdır.

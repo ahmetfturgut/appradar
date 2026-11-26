@@ -13,7 +13,7 @@ Set them in `.env.local` for development and in the hosting provider for product
 | `NEXT_PUBLIC_SITE_URL` | Your public origin, e.g. `https://app.example.com` | Required in production. Used for email links and the OAuth callback. |
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Unchanged | Server-only catalog reads. Never prefix with `NEXT_PUBLIC_`. |
 
-Without the two `NEXT_PUBLIC_SUPABASE_*` values, auth pages show "Authentication is not configured", and protected routes redirect to `/login`.
+Without the two `NEXT_PUBLIC_SUPABASE_*` values, auth pages show "Authentication is not configured", and protected routes redirect to `/login`. That is development behaviour: in production the whole app answers 503 until the variables in [PRODUCTION.md](PRODUCTION.md) are complete.
 
 ## 2. Supabase Dashboard
 
@@ -28,7 +28,8 @@ Without the two `NEXT_PUBLIC_SUPABASE_*` values, auth pages show "Authentication
 
    The default templates (`{{ .ConfirmationURL }}`) also work, but only in the browser that started the flow (PKCE).
 4. **Authentication → Emails → SMTP:** configure a custom SMTP provider before launch. The built-in sender is rate-limited and meant for testing only.
-5. **Authentication → Attack Protection:** a minimum password length of 8 or more is recommended. The app enforces 8–72. Consider leaked-password protection and CAPTCHA.
+5. **Authentication → Attack Protection:** a minimum password length of 8 or more is recommended. The app enforces 8–72. Consider leaked-password protection. Do **not** enable CAPTCHA: the forms send no CAPTCHA token yet, so sign-in, sign-up and reset would all fail.
+6. **Authentication → Sign In / Providers:** keep **anonymous sign-ins** off. The app treats anonymous users as signed out.
 
 ## 3. Google OAuth (optional)
 
@@ -44,10 +45,11 @@ The "Continue with Google" button appears only when the Google provider is enabl
 
 ## 4. How it fits together
 
-- `src/proxy.ts` refreshes session cookies (`getClaims()`), redirects signed-out visitors from protected routes to `/login?next=…`, and redirects signed-in users away from `/login` and `/signup`.
+- `src/proxy.ts` refreshes session cookies (`getClaims()`) on every page except `/auth/*`, redirects signed-out visitors from protected routes to `/login?next=…`, and redirects signed-in users away from `/login` and `/signup`.
 - `src/lib/auth/server.ts` verifies identity with `getUser()`. `requireViewer()` guards pages, server actions and **every catalog read** (`src/lib/ui/catalog.server.ts`).
 - `src/lib/auth/paths.ts`: `safeNextPath()` allows only internal app paths, and keeps the query, so country, language and store survive the login round trip.
 - `src/app/auth/callback/route.ts` handles OAuth codes and `token_hash` email links.
+- A successful password change signs out the account's other sessions.
 - **Development demo:** with `NODE_ENV=development` and `APPRADAR_DEMO_MODE=true`, protected pages open without signing in. No fake user or session is created, and data comes from local fixtures only. This bypass is impossible in production.
 
 ## 5. Launch blockers

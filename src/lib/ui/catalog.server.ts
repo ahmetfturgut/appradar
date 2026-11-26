@@ -17,7 +17,12 @@ export async function readResult<T>(load: () => Promise<T>): Promise<ReadResult<
   // Authorization lives at the data source: every catalog read requires a verified Supabase user
   // (or the development-only demo bypass). Outside the try so the login redirect is not swallowed.
   await requireViewer();
-  try { return { state: "ready", data: await load() }; } catch (error) { return readFailure(error); }
+  try { return { state: "ready", data: await load() }; } catch (error) {
+    // The page shows fixed copy; operators get the error code only (no message, query or row content).
+    const code = error && typeof error === "object" && "code" in error ? String(error.code) : "";
+    if (code !== "invalid_input" && code !== "page_out_of_range") console.error(`appradar_read_failed:${/^\w{1,80}$/.test(code) ? code : "unknown"}`);
+    return readFailure(error);
+  }
 }
 export const dashboardData = (scope: Scope) => readResult(async () => toDashboardModel(isDevelopmentDemo() ? (await demoCatalog()).getDashboard(scope) : await getDashboard({ ...scope, recentLimit: 4 })));
 export const categoryData = (scope: Scope) => readResult(async () => isDevelopmentDemo() ? (await demoCatalog()).listCategories(scope) : await listCategories(scope));

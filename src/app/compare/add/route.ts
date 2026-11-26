@@ -21,6 +21,6 @@ export async function GET(request: NextRequest) {
   const target = new URL(`/compare?apps=${ids.join(",")}&country=${country.data}&language=${encodeURIComponent(language.data)}${outcome === "added" ? "" : `&notice=${outcome}`}`, origin);
   const response = NextResponse.redirect(target);
   response.cookies.set(COMPARE_COOKIE, serializeCompareCookie(country.data, language.data, ids), { path: "/", sameSite: "lax", maxAge: 60 * 60 * 24 * 30 });
-  response.headers.set("Cache-Control", "no-store");
+  response.headers.set("Cache-Control", "private, no-store");
   return response;
 }
