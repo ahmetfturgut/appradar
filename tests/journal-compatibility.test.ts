@@ -26,7 +26,7 @@ function legacy(result: NormalizationResult, job: Job) {
   } else {
     value.idempotencyKey = stableHash(["asokeyword", "metrics", value.keyword, value.store, job.country, job.requestedLanguage]);
   }
-  for (const key of ["canonicalAppKey", "collectionContext", "releasedAtPrecision", "listingUpdatedAtPrecision", "canonicalReviewKey", "reviewIdNamespace", "keywordContextKey", "measurementMethod", "relevantFilters", "languageInputSupported"]) delete value[key];
+  for (const key of ["canonicalAppKey", "collectionContext", "releasedAtPrecision", "listingUpdatedAtPrecision", "canonicalReviewKey", "reviewIdNamespace", "keywordContextKey", "measurementMethod", "relevantFilters", "languageInputSupported", "description", "iconUrl", "screenshotUrls"]) delete value[key];
   if (copy.kind !== "valid") delete value.observedAt;
   if (copy.kind === "valid_keyword") delete value.observedTimeBasis;
   assert.equal(PersistedResultSchema.safeParse(copy).success, true);

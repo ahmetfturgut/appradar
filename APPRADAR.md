@@ -272,6 +272,77 @@ normalize genişletme, listing kolonları, provenance birleştirme ve hak/boş
 durum kontrolü. Ticari görsel kullanım dayanağı ayrıca doğrulanmadan
 yayımlanmaz.
 
+### 6.6 T3 — İş, provider run ve bütçe
+
+`supabase/migrations/20261126000200_collection_budget.sql` üç tabloyu `private`
+şemasına koyar: `collection_jobs`, `provider_runs`, `budget_periods`. Ayrı ledger
+yoktur. Rezervasyonun hangi günlük/aylık döneme yazıldığı `provider_runs`
+üzerindeki dönem FK'lerinde tutulur; böylece settlement saat dilimi değişse de
+aynı satırlara döner.
+
+**Job:** `queued → running → ingesting → succeeded|partial|failed`. `failed → queued`
+aynı satırda retry'dir. `queued` ve çalışan durumlar `cancelled` olabilir.
+`succeeded` / `partial` / `cancelled` terminaldir. Aynı `dedupe_key` + `scheduled_for`
+ikinci işi reddeder; farklı `scheduled_for` yeni penceredir.
+
+**Lease:** `claim_collection_job` `FOR UPDATE SKIP LOCKED` ile tek satır alır.
+İlk claim `attempt_count` artırır. Süresi dolmuş `running`/`ingesting` lease
+yeni token ile alınır, attempt artmaz. Aynı token ile güncelleme yalnızca
+`appradar.lease_token` oturum değeri eşleşirse ve süre dolmamışsa geçer.
+Eski token veya süresi dolmuş sahip, yeni worker'ın satırını değiştiremez.
+
+**Provider run:** Actor ID'den önce `external_run_id` null olabilir. `UNIQUE
+(provider, external_run_id)` varsayılan `NULLS DISTINCT`tir. `(job_id,
+attempt_number)` tektir. `execution_status = unknown` yeni ücretli run insert'ini
+ve yeni claim'i kapatır; rezervasyonu silmez. `validation_status` execution'dan
+bağımsızdır. `truncated` satır `accepted` olamaz. Maliyet kolonları
+`numeric(18,6)` ve null'dur; null bilinmeyen, 0 gerçek sıfırdır.
+
+**Bütçe:** Dönem sınırları UTC `date_trunc` gün/ay, `[start, end)`. Limit
+migration'da yoktur; dönem satırı yoksa reserve `budget_not_configured` döner.
+Reserve günlük sonra aylık satırı kilitler; biri aşılırsa ikisi de artmaz.
+Aynı run ve aynı tutar ikinci reserve no-op'tur. Settle reserved tutarı düşer,
+`spent` gerçek tutar kadar artar (limit üstüne çıksa da kısılmaz) ve yalnız
+reserve anındaki dönemlere yazılır. Release yalnız reserved'ı geri alır.
+`cost_status = unknown` veya `execution_status = unknown` iken release/settle
+rezervasyonu tutar. Başarısız fonksiyon exception'ı transaction'ı geri alır.
+
+**FK:** Boş katalogda `app_snapshots (source, source_run_id) → provider_runs
+(provider, external_run_id)` eklenir. Snapshot satırı varsa ve eşleşen run yoksa
+migration uydurma backfill yapmadan durur. Snapshot UPDATE hâlâ kapalıdır.
+
+**T4 bağımlılığı:** Snapshot insert'ten önce dış ID dolu provider run gerekir.
+Ücretli çağrıdan önce reserve, sonuç belli olunca settle veya release çağrılır.
+Unknown start/cost release edilmez. Journal import ve worker bu adımda yoktur.
+
+### 6.7 Paket 1 — Kalıcılık (T4–T7)
+
+Migration'lar `20261126000300_app_persistence` … `000600_keywords`; servisler
+`src/lib/persistence/`. Her veri kümesi tek SQL fonksiyonuyla (`SECURITY INVOKER`,
+yalnızca `service_role`) koşu bazında atomik yazılır. `expires_at` çağırandan gelir;
+saklama süresi seçilmedi. Worker'a bağlanmadı; journal içeri aktarılmadı.
+
+### 6.8 Geliştirme veritabanı — 26 Kasım 2026
+
+Altı migration, boş Supabase geliştirme projesine (Tokyo session pooler, PostgreSQL 17.12) sırayla uygulandı. Uygulanan sürümler `appradar_meta.schema_migrations` içindedir; bu şema istemciye açık değildir. 13 tablo, snapshot→provider run FK ve persist/claim/bütçe fonksiyonları yerinde. Anon ve authenticated bu tablolara ve fonksiyonlara erişemez.
+
+İki ayrı oturumda: eşzamanlı claim tek işi verdi; limit 1 iken ikinci rezervasyon reddedildi ve bakiye 1 kaldı; aynı run için ikinci reserve/settle bakiyeyi değiştirmedi; süresi dolmuş lease ve eski token reddedildi; unknown run yeni insert ve claim açmadı. T4–T7 sentetik testi transaction içinde rollback oldu. Sentetik iş, bütçe ve katalog satırı kalmadı. Otomatik toplama açılmadı. T8 başlatılmadı.
+
+- **Kabul:** `execution_status = succeeded` ve `validation_status = accepted`.
+  Yalnızca discovery ve keyword listeleri `truncated` koşuyu kapsam etiketiyle kabul eder.
+- **Güncel alan önceliği (T4):** Aurelix detay > diğer detay > discovery; eşitlikte
+  yeni gözlem. Null ezmez; fiyat grubu atomiktir. Daha iyi bir `is_free` tutarla
+  çelişirse tutar/para birimi bilinmeyene döner.
+- **Yorum geçmişi (T6):** ülke/dil bağlamında yalnızca içerik değişince yeni satır;
+  aynı içerikte `last_seen_at`/`expires_at` ilerler.
+- **Replay:** yazılmış discovery/keyword snapshot'ı değiştirilmez; farklı içerik `conflicts` sayılır.
+- **Sunum metadata (doğrulanmadı):** DataTrail `description`/`iconUrl`/`screenshots`,
+  Aurelix `icon_url`/`screenshots` herkese açık belgelerden alındı; sabit build'in canlı
+  çıktısıyla doğrulanmadı. Subimpact ve Aurelix description işlenmiyor.
+- **Doğrulama:** geçici yerel PostgreSQL 16'da tüm migration'lar ve `supabase/tests/*.sql`
+  ile `tests/persistence.test.ts` geçti. Çalıştırılmayan: PGlite runner, PostgREST/Supabase,
+  çok oturumlu eşzamanlılık, mevcut test paketi, typecheck, lint, build.
+
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
 POC kodu da Bölüm 1'deki plan onayından sonra yazılır. Aşağıdaki eşikler öneridir ve onaylı plana alınmalıdır.

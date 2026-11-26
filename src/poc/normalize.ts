@@ -74,6 +74,29 @@ const DataTrail = z.object({
   searchTerm: nullable(Text), searchRank: nullable(z.number().int().positive()),
 });
 
+// Presentation metadata is untrusted and optional: a bad value is dropped, never the whole row.
+// Field names come from public Actor docs and are not yet verified against live payloads.
+const MediaUrl = z.url({ protocol: /^https$/ }).max(2048).refine(value => { const url = new URL(value); return !url.username && !url.password; });
+const Description = z.string().trim().min(1).max(20000);
+const ScreenshotUrls = z.array(MediaUrl).min(1).max(30);
+
+function presentation(provider: "subimpact" | "aurelix" | "datatrail", raw: Record<string, unknown>) {
+  const names = provider === "datatrail" ? { description: "description", iconUrl: "iconUrl", screenshotUrls: "screenshots" }
+    : provider === "aurelix" ? { description: null, iconUrl: "icon_url", screenshotUrls: "screenshots" }
+    : { description: null, iconUrl: null, screenshotUrls: null };
+  const read = <T>(name: string | null, schema: z.ZodType<T>): T | null => {
+    const parsed = schema.safeParse(name == null ? undefined : raw[name]);
+    return parsed.success ? parsed.data : null;
+  };
+  const values = {
+    description: read(names.description, Description), iconUrl: read(names.iconUrl, MediaUrl),
+    screenshotUrls: read(names.screenshotUrls, ScreenshotUrls),
+  };
+  const status = Object.fromEntries((Object.keys(values) as (keyof typeof values)[]).map(key =>
+    [key, values[key] != null ? "available" as const : names[key] == null ? "unsupported" as const : "missing" as const]));
+  return { values, status };
+}
+
 function storeDateToIso(value: string | null | undefined): string | null {
   if (value == null || !value.trim()) return null;
   if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return z.iso.date().safeParse(value).success ? `${value}T00:00:00.000Z` : null;
@@ -112,6 +135,9 @@ export interface Observation {
   installsLowerBound: number | null;
   category: string | null;
   version: string | null;
+  description?: string | null;
+  iconUrl?: string | null;
+  screenshotUrls?: string[] | null;
   releasedAt: string | null;
   releasedAtPrecision: "date" | "datetime" | null;
   listingUpdatedAt: string | null;
@@ -238,6 +264,10 @@ const LegacyKeywordObservationSchema = z.object({
 export const ObservationSchema: z.ZodType<Observation> = LegacyObservationSchema.extend({
   schemaVersion: z.literal(2), canonicalAppKey: Hash, collectionContext: CollectionContext,
   releasedAtPrecision: z.enum(["date", "datetime"]).nullable(), listingUpdatedAtPrecision: z.enum(["date", "datetime"]).nullable(),
+  // Absent in earlier v2 journal entries; identity keys are unaffected.
+  description: z.string().min(1).max(20000).nullable().default(null),
+  iconUrl: z.string().max(2048).startsWith("https://").nullable().default(null),
+  screenshotUrls: z.array(z.string().max(2048).startsWith("https://")).min(1).max(30).nullable().default(null),
 }).superRefine((o, ctx) => {
   const canonical = canonicalAppIdentity(o.store, o.storeAppId);
   const key = appObservationKey(o.source, o.sourceRunId, canonical, o.country,
@@ -652,10 +682,12 @@ export function normalizeItem(raw: unknown, job: Job, runId: string, collectedAt
     fieldStatus.listingUpdatedAt = "unsupported";
   }
   if (job.provider !== "subimpact" && job.provider !== "aurelix" && job.provider !== "datatrail") return { kind: "invalid", issues: ["unsupported_provider_for_app_row"] };
+  const media = presentation(job.provider, record.data);
+  Object.assign(fieldStatus, media.status);
   const canonicalAppKey = canonicalAppIdentity(job.store, row.id);
   const collectionContext = { mode: job.mode, context: job.context, category: job.mode === "charts" ? row.rankCategory ?? null : null };
   return { kind: "valid", observation: {
-    ...normalized, canonicalAppKey, collectionContext,
+    ...normalized, ...media.values, canonicalAppKey, collectionContext,
     idempotencyKey: appObservationKey(job.provider, runId, canonicalAppKey, job.country, { requested: job.requestedLanguage, effective: language }, observationRole, collectionContext),
     source: job.provider, sourceRunId: runId, sourceBuild: sources[job.provider].build, schemaVersion: 2,
     store: job.store, storeAppId: row.id, country: job.country, requestedLanguage: job.requestedLanguage, language,

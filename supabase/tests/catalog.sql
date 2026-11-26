@@ -76,9 +76,30 @@ select pg_temp.ok((select rating_count=0 and rating_value=0 and effective_langua
 select pg_temp.ok((select price_amount=6.990001 from public.app_listings where id=2), 'country prices retain numeric precision') as passed;
 select pg_temp.ok((select installs_lower_bound=100000000 from public.app_listings where id=4), 'Play install lower bound supported') as passed;
 
-create function pg_temp.snapshot(patch jsonb) returns bigint language plpgsql as $$
-declare result_id bigint;
+create function pg_temp.ensure_run(p_provider text, p_external text) returns void language plpgsql as $$
+declare job_id uuid;
 begin
+  insert into private.collection_jobs (provider, collection_mode, scope, dedupe_key, scheduled_for)
+  values (p_provider, 'details', '{}'::jsonb, p_provider || ':' || p_external, '2026-11-26T00:00:00Z')
+  on conflict (dedupe_key, scheduled_for) do nothing;
+  select id into job_id from private.collection_jobs
+  where dedupe_key = p_provider || ':' || p_external and scheduled_for = '2026-11-26T00:00:00Z';
+  insert into private.provider_runs (
+    job_id, attempt_number, provider, actor_id, actor_build_id, external_run_id, input_hash, execution_status, validation_status)
+  values (job_id, 1, p_provider, 'test-actor', 'test-build', p_external, repeat('a', 64), 'succeeded', 'accepted')
+  on conflict (provider, external_run_id) do nothing;
+end $$;
+
+create function pg_temp.snapshot(patch jsonb) returns bigint language plpgsql as $$
+declare result_id bigint; base jsonb;
+begin
+  base := jsonb_build_object(
+    'listing_id',1,'store','ios','source','aurelix','source_run_id','Run1','source_build','0.2.23','schema_version',2,
+    'idempotency_key',repeat('a',64),'payload_hash',repeat('b',64),'content_hash',repeat('c',64),'series_key','aurelix-v2',
+    'observation_role','detail','collection_mode','details','collection_context','sample',
+    'observed_at','2026-11-26T00:00:00Z','observed_time_basis','collection','collected_at','2026-11-26T00:00:00Z',
+    'field_status','{}'::jsonb,'expires_at','2026-11-27T00:00:00Z') || patch;
+  perform pg_temp.ensure_run(base->>'source', base->>'source_run_id');
   insert into public.app_snapshots (
     listing_id,store,source,source_run_id,source_build,schema_version,idempotency_key,payload_hash,content_hash,series_key,
     effective_language,observation_role,collection_mode,collection_context,collection_category,rank,
@@ -90,12 +111,7 @@ begin
     observed_at,observed_time_basis,collected_at,price_amount,currency,is_free,rating_value,rating_count,
     review_count,installs_text,installs_lower_bound,released_at,released_at_precision,
     store_updated_at,store_updated_at_precision,field_status,expires_at
-  from jsonb_populate_record(null::public.app_snapshots, jsonb_build_object(
-    'listing_id',1,'store','ios','source','aurelix','source_run_id','Run1','source_build','0.2.23','schema_version',2,
-    'idempotency_key',repeat('a',64),'payload_hash',repeat('b',64),'content_hash',repeat('c',64),'series_key','aurelix-v2',
-    'observation_role','detail','collection_mode','details','collection_context','sample',
-    'observed_at','2026-11-26T00:00:00Z','observed_time_basis','collection','collected_at','2026-11-26T00:00:00Z',
-    'field_status','{}'::jsonb,'expires_at','2026-11-27T00:00:00Z') || patch)
+  from jsonb_populate_record(null::public.app_snapshots, base)
   returning id into result_id;
   return result_id;
 end $$;
