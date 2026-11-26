@@ -4,6 +4,8 @@ import { ReadNotice } from "../../components/core/elements";
 import { contextResetHref, parseExplorer, readFailure, type SearchValues } from "../../components/core/catalog-query";
 import { categoryData, explorerData } from "../../lib/ui/catalog.server";
 import { isDevelopmentDemo } from "../../lib/ui/demo-mode";
+import { savedItemsOrEmpty } from "../../lib/watchlist/server";
+import { watchKey } from "../../lib/watchlist/model";
 
 export const metadata = { title: "App Explorer" };
 
@@ -15,6 +17,6 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
   } catch (error) {
     return <ReadNotice result={readFailure(error)} resetHref={contextResetHref("/explore", params)} />;
   }
-  const [result, categories] = await Promise.all([explorerData(filters), categoryData(filters)]);
-  return <ProductExplorer result={result} categories={categories} filters={filters} demo={isDevelopmentDemo()} />;
+  const [result, categories, saved] = await Promise.all([explorerData(filters), categoryData(filters), savedItemsOrEmpty("/explore")]);
+  return <ProductExplorer result={result} categories={categories} filters={filters} watched={saved.map(watchKey)} demo={isDevelopmentDemo()} />;
 }

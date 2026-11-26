@@ -5,6 +5,9 @@ import { readFailure } from "../../components/core/catalog-query";
 import type { DetailsSections, ExplorerFilters, ReadResult, Scope } from "../../components/core/view-models";
 import { isDevelopmentDemo } from "./demo-mode";
 import { requireViewer } from "../auth/server";
+import { defaultReadClient } from "../read/client";
+import { listingsFor, type ListingSummary } from "../read/shared";
+import { buildCompareModel } from "../intel/compare";
 
 // Selection happens before a read, never inside an error/fallback path. The fixtures
 // have no Supabase client and are only loaded for the explicit development opt-in.
@@ -61,3 +64,33 @@ export const appRankingsData = (appId: string, country: string, language?: strin
 // P2 market research. Same authorization and demo selection as every other catalog read.
 export const marketData = (query: MarketQuery) => readResult(async () => isDevelopmentDemo() ? (await demoCatalog()).getMarketPage(query) : await getMarketPage(query));
 export const opportunityData = (query: OpportunityQuery) => readResult(async () => isDevelopmentDemo() ? (await demoCatalog()).getOpportunities(query) : await getOpportunities(query));
+
+// P3 watchlist / comparison: current listings for exact (app, country, language) contexts.
+export async function listingsForContexts(keys: readonly { appId: string; country: string; language: string }[]): Promise<Map<string, ListingSummary>> {
+  await requireViewer();
+  const out = new Map<string, ListingSummary>();
+  if (isDevelopmentDemo()) {
+    const demo = await demoCatalog();
+    for (const k of keys) { const row = demo.listingFor(k.appId, k.country, k.language); if (row) out.set(`${k.appId}|${k.country}|${k.language}`, row); }
+    return out;
+  }
+  const groups = new Map<string, string[]>();
+  for (const k of keys) groups.set(`${k.country}|${k.language}`, [...(groups.get(`${k.country}|${k.language}`) ?? []), k.appId]);
+  const client = defaultReadClient();
+  for (const [context, ids] of groups) {
+    const [country, language] = context.split("|") as [string, string];
+    for (const [appId, row] of await listingsFor(client, ids, country, language)) out.set(`${appId}|${country}|${language}`, row);
+  }
+  return out;
+}
+
+/** P3 comparison: details + ranking series per app in one country/language context, compared by pure rules. */
+export const compareData = (ids: readonly string[], country: string, language: string) => readResult(async () => {
+  const demo = isDevelopmentDemo() ? await demoCatalog() : null;
+  const inputs = await Promise.all(ids.map(async id => ({
+    id,
+    details: demo ? demo.getAppDetails(id, { country, language }) : await getAppDetails({ appId: id, country, language, historyDays: 90, relatedLimit: 0 }),
+    rankings: demo ? demo.getAppRankings(id, country, language) : await getAppRankings({ appId: id, country, language }),
+  })));
+  return buildCompareModel(country, language, inputs);
+});

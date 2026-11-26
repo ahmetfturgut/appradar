@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ChevronRight, CircleUser, Compass, Database, FlaskConical, LayoutDashboard, LogOut, Menu, Radar, Search, Sparkles, TrendingUp, X, ChartPie, Lightbulb } from "lucide-react";
+import { ChevronRight, CircleUser, Compass, Database, FlaskConical, LayoutDashboard, LogOut, Menu, Radar, Search, Sparkles, TrendingUp, X, ChartPie, Lightbulb, Columns3, Bookmark } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "../lib/utils";
 import { isChromelessPath } from "../lib/auth/paths";
@@ -17,6 +17,10 @@ const navigation = [
 const research = [
   { href: "/markets", label: "Market insights", icon: ChartPie },
   { href: "/opportunities", label: "Opportunity finder", icon: Lightbulb },
+  { href: "/compare", label: "Compare apps", icon: Columns3 },
+];
+const workspace = [
+  { href: "/watchlist", label: "Watchlist", icon: Bookmark },
 ];
 const intelligence = [
   { href: "/trending", label: "Trending apps", icon: TrendingUp },
@@ -47,7 +51,7 @@ export function Shell({ children, demo = false, account = null }: { children: Re
   const isActive = (href: string) => path === href || href === "/explore" && path.startsWith("/apps/");
   // Landing and authentication pages render their own minimal layout.
   if (isChromelessPath(path) || landingLocaleFromPath(path)) return <>{children}</>;
-  const title = path.startsWith("/apps/") ? "App details" : path === "/account" ? "Account" : [...navigation, ...intelligence, ...research].find(item => item.href === path)?.label ?? "Workspace";
+  const title = path.startsWith("/apps/") ? "App details" : path === "/account" ? "Account" : [...navigation, ...intelligence, ...research, ...workspace].find(item => item.href === path)?.label ?? "Workspace";
   return <div className="product-shell flex min-h-screen" onKeyDown={event => { if (open && event.key === "Escape") closeNavigation(); }}>
     <a className="skip-link" href="#main">Skip to content</a>
     {open && <button className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-[1px] lg:hidden" aria-label="Dismiss navigation" onClick={closeNavigation} />}
@@ -73,6 +77,10 @@ export function Shell({ children, demo = false, account = null }: { children: Re
         <SidebarGroup>
           <SidebarGroupLabel>Research</SidebarGroupLabel>
           <nav aria-label="Research"><SidebarMenu>{research.map(item => <SidebarMenuItem key={item.href}><SidebarMenuButton asChild isActive={path === item.href}><Link href={scoped(item.href)} onClick={() => setOpen(false)} aria-current={path === item.href ? "page" : undefined}><item.icon /><span>{item.label}</span></Link></SidebarMenuButton></SidebarMenuItem>)}</SidebarMenu></nav>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>My workspace</SidebarGroupLabel>
+          <nav aria-label="My workspace"><SidebarMenu>{workspace.map(item => <SidebarMenuItem key={item.href}><SidebarMenuButton asChild isActive={path === item.href}><Link href={scoped(item.href)} onClick={() => setOpen(false)} aria-current={path === item.href ? "page" : undefined}><item.icon /><span>{item.label}</span></Link></SidebarMenuButton></SidebarMenuItem>)}</SidebarMenu></nav>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="gap-2 pb-4">

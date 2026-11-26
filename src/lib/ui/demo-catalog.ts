@@ -262,5 +262,7 @@ export function createDemoCatalog(clock = new Date()) {
   };
   const getMarketPage = (query: MarketQuery) => loadMarketPage(query, marketIO);
   const getOpportunities = (query: OpportunityQuery) => loadOpportunities(query, marketIO);
-  return { getDashboard, listCategories, exploreApps, getAppDetails, detailSections, getChartPage, getAppRankings, getRecentReleases, getMarketPage, getOpportunities };
+  /** Current listing for an exact context (watchlist and comparison validation). */
+  const listingFor = (appId: string, country: string, language: string) => listings.find(row => row.appId === appId && row.country === country && row.requestedLanguage === language) ?? null;
+  return { getDashboard, listCategories, exploreApps, getAppDetails, detailSections, getChartPage, getAppRankings, getRecentReleases, getMarketPage, getOpportunities, listingFor };
 }
