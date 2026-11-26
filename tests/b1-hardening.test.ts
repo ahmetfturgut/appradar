@@ -98,8 +98,9 @@ test("forward migration over existing snapshots: field ordering, atomic price, r
   try {
     await db.exec("create role anon nologin; create role authenticated nologin; create role service_role nologin bypassrls; create schema auth; create table auth.users(id uuid primary key); create function auth.uid() returns uuid language sql as $$ select nullif(current_setting('request.jwt.claim.sub', true),'')::uuid $$;");
     const directory = new URL("../supabase/migrations/", import.meta.url);
-    const names = (await readdir(directory)).filter(name => name.endsWith(".sql")).sort();
     const forward = "20261126001100_field_freshness.sql";
+    // Later migrations are outside this B1 upgrade scenario.
+    const names = (await readdir(directory)).filter(name => name.endsWith(".sql") && name <= forward).sort();
     assert.equal(names.at(-1), forward);
     for (const name of names.filter(n => n !== forward)) await db.exec(await readFile(new URL(name, directory), "utf8"));
     const sql = await readFile(new URL("../supabase/tests/field-freshness.sql", import.meta.url), "utf8");

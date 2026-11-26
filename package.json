@@ -19,6 +19,7 @@
     "poc:run": "node --import tsx tools/poc.ts run",
     "poc:resume": "node --import tsx tools/poc.ts resume",
     "poc:report": "node --import tsx tools/poc.ts report",
+    "retention": "node --import tsx src/lib/retention/cli.ts",
     "data:fetch": "node --import tsx tools/local-fetch.ts",
     "data:subimpact": "node --import tsx tools/subimpact-fetch.ts",
     "data:aurelix-charts": "node --import tsx tools/aurelix-charts-fetch.ts",

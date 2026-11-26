@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "categories": {
+    "listing_current": 30,
+    "app_snapshots": 365,
+    "discovery_history": 365,
+    "keyword_history": 365,
+    "reviews": 90,
+    "collection_jobs": 90,
+    "provider_runs": 365,
+    "budget_records": 365
+  },
+  "providers": {},
+  "approval": null
+}

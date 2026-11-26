@@ -461,6 +461,88 @@ Claude (kabuk, Dashboard, Modern Minimal tokenları, paylaşılan primitifler) v
 - UI: `src/components/core/` altında `field-freshness.tsx`, `view-models.ts`, `catalog-mapping.ts`, `elements.tsx`, `dashboard.tsx`, `explorer.tsx`, `app-details.tsx`, `markets.tsx`, `opportunities.tsx`, `research.tsx`, `compare.tsx`, `watchlist.tsx`.
 - Erişim/belge: `src/app/admin/page.tsx`, `src/proxy.ts`, `src/lib/auth/paths.ts`, `APPRADAR.md`.
 
+### 6.20 B2 — Veri yönetişimi ve saklama — 26 Kasım 2026
+
+**Ticari izin durumu: [DOĞRULANMADI].** Hiçbir sağlayıcı (Subimpact, Aurelix, TheWolves, Aurelix Play Reviews, DataTrail, ASO Keyword Intel) veya kaynak mağaza için saklama, gösterim, türetilmiş analiz ya da yeniden dağıtım iznini gösteren kayıt repoda yok. Herkese açık olmak, ücretli actor çağrısı veya ücretsiz beta bu hakları vermez. Aşağıdaki süreler **planlama için teknik varsayılandır, onaylı sağlayıcı saklama izni değildir**; izin daha kısaysa kısa süre uygulanır. Medya, açıklama ve yorum içeriği bayrakları kapalı kalır.
+
+#### Veri kategorileri
+
+| Kategori | Tablolar | Varsayılan süre / yaş çapası | Temizlik davranışı |
+|---|---|---|---|
+| Kanonik kimlik | `apps`, `developers` | Süre yok | Hiç silinmez (geliştirici adı dahil). Açık silme talebi ayrı, elle yürütülen iştir |
+| Güncel listing metadata ve metrik (`listing_current`) | `app_listings` | 30 gün; satır: `last_observed_at`, metrik: kendi provenance `observedAt` | Eski metrik null olur. Süresi dolan satır silinir; kaydedilmiş veya geçmişi olan satırın yalnız içeriği boşaltılır |
+| Tarihsel snapshot (`app_snapshots`) | `app_snapshots` | 365 gün, `collected_at` | Satır bütün olarak silinir; güncellenmez |
+| Keşif ve sıralama (`discovery_history`) | `discovery_snapshots`, `discovery_entries` | 365 gün, `collected_at` | Snapshot ve girdileri birlikte silinir |
+| Anahtar kelime (`keyword_history`) | `keyword_snapshots`, `keyword_entries` | 365 gün, `collected_at` | Snapshot ve girdileri birlikte silinir |
+| Yorum içeriği ve gözlemi (`reviews`) | `reviews`, `review_observations` | 90 gün, `last_seen_at` | Gözlemler silinir; gözlemi kalmayan yorum silinir |
+| Toplama işi (`collection_jobs`) | `private.collection_jobs` | 90 gün, `completed_at` (yoksa `updated_at`) | Yalnız sonuçlanmış iş ve provider run'ı kalmadıysa |
+| Provider run (`provider_runs`) | `private.provider_runs` | 365 gün, `finished_at`/`updated_at` | Yalnız uzlaşmış, hiçbir gözlemin başvurmadığı run |
+| Bütçe kaydı (`budget_records`) | `private.budget_periods` | 365 gün, `period_end` | Rezervasyonu sıfır ve run'ı kalmamış dönem |
+| Kullanıcı takip listesi | `watchlist_items` | Kullanıcı yönetir | Rutin temizlik hiç silmez; yalnız kullanıcı silmesi veya hesap silme |
+
+#### Kurallar
+
+- Bir satır `en erken(expires_at, yaş çapası + politika günü) <= now()` olunca adaydır. Mevcut `expires_at` hiç uzatılmaz; daha uzun politika süresi dolmuş satırı geri getirmez. `expires_at` olmayan tablolarda yalnız yaş kullanılır.
+- Politika dosyasında sekiz kategorinin tümü, `providers` ve `approval` alanları zorunludur (1–730 gün). Kod varsayılanı yoktur; eksik veya tanınmayan değer çalışmayı reddeder. `providers.<ad>.<kategori>` o sağlayıcı için kategori süresinin yerine geçer; `budget_records` sağlayıcıya bölünmez. Listing birden çok sağlayıcının alanını taşıdığından satır süresi en kısa olanıdır.
+- **Takip listesi:** `watchlist_items` listing silinince cascade olur, bu yüzden kaydedilmiş listing silinmez. İçeriği süresi dolunca null yapılır (bilinmeyen, sıfır değil), `expires_at` yalnız öne çekilir; yeni gözlem satırı yeniden doldurur. Silme öncesi satır kilitlenip uygunluk yeniden denetlenir. Rol RLS'yi aşamıyorsa (takip satırlarını göremiyorsa) fonksiyon çalışmayı reddeder.
+- **Sonuçlanmamış kayıt:** `queued`/`running`/`ingesting` veya deneme hakkı kalan `failed` iş; `unknown`/`running` execution; `reserved`/`unknown` maliyet; ücretli başlangıcı istenmiş `pending` run silinmez. Böyle tek bir deneme işin tüm run'larını korur. Başlangıcı hiç istenmemiş `pending` run sonuçlanmış sayılır.
+- **Bütçe bütünlüğü:** bir run ancak günlük ve aylık döneminin ikisi de saklama süresini geçmiş ve rezervasyonsuzsa silinir; tutulan dönemin run'ları eksilmez. Bu yüzden run'lar 365 günden en fazla yaklaşık bir ay daha uzun kalabilir.
+- **FK sırası:** review_observations → reviews → keyword → discovery → app_snapshots (önce `latest_snapshot_id` boşaltılır) → listing metrik → listing içerik → listing → provider_runs → collection_jobs → budget_periods. Gözlemi tutulan run ve run'ı tutulan iş, kendi süresi dolsa da kalır.
+- Tarihsel gözlem güncellenmez. Güncellenen tek şey güncel `app_listings` izdüşümüdür.
+
+#### Uygulama
+
+- Migration `20261126001200_data_retention.sql` (**development Supabase'e uygulandı**, `appradar_meta.schema_migrations` defteri 12/12; `applied_at` 2026-11-26T20:35:07.722Z). Production veritabanına **uygulanmadı**. `private.retention_lock` (tek satırlık kira; RLS açık), `private.retention_*` yardımcıları ve `public.appradar_retention_report` / `_batch` / `_release`. Hepsi `SECURITY INVOKER`, boş `search_path`, yalnız `service_role` EXECUTE. `service_role` için `watchlist_items` SELECT yetkisi açıkça yazıldı. Zamanlama kurmaz.
+- Kod: `src/lib/retention/` (`policy.ts`, `run.ts`, `cli.ts`, `policy.example.json`). `report` `STABLE` fonksiyondur, yazamaz. Her `batch` çağrısı tek adımın en çok 500 satırlık kendi transaction'ıdır. Kira 5 dakikalıktır, her batch yeniler; ikinci çalışma `retention_cleanup_locked` alır.
+- Çıktı yalnız adım, tablo, kategori ve sayılardır; satır içeriği, kimlik, URL veya anahtar yazılmaz.
+
+#### Okunabilirlik (temizlik bağımlılığı)
+
+Politika yaşını aşmış ama `expires_at` henüz dolmamış satırlar, temizlik çalıştırılana kadar okuma katmanında **görünür kalır**. Temizlik satırı silmeden veya içeriği null yapmadan okuma sözleşmesi saklama politikasını uygulamaz. Operasyonel bağımlılık: dry-run ile aday sayısını izle; silme ancak onaylı politika + `RETENTION_CLEANUP_EXECUTION=true` + `--execute` ile yapılır. Geniş okuma-servisi yeniden tasarımı yapılmadı.
+
+#### İşletim
+
+Otomatik temizlik ve zamanlama **yok**. Development migration deftere işlendi. Production uygulaması ve onaylı üretim saklama politikası ayrı kullanıcı onayı ister.
+
+Politika kopyası (git dışı `.poc/` altında):
+
+```bash
+mkdir -p .poc && cp src/lib/retention/policy.example.json .poc/retention-policy.json
+```
+
+Dry-run (varsayılan):
+
+```bash
+npm run retention -- --policy .poc/retention-policy.json
+```
+
+Bu komut ortamda `SUPABASE_URL` ve `SUPABASE_SERVICE_ROLE_KEY` bekler; `.env.local` kendiliğinden okunmaz:
+
+```bash
+node --env-file=.env.local --import tsx src/lib/retention/cli.ts --policy .poc/retention-policy.json
+```
+
+Silme için üç şart birlikte gerekir: politika dosyasında insan kararına dayanan `"approval": { "approvedBy": "…", "approvedAt": "2026-…Z", "evidence": "…" }`, ortamda `RETENTION_CLEANUP_EXECUTION=true` ve `--execute`. Önce aynı politika ile dry-run okunur ve yedek durumu doğrulanır; silme geri alınamaz.
+
+```bash
+RETENTION_CLEANUP_EXECUTION=true node --env-file=.env.local --import tsx src/lib/retention/cli.ts --policy .poc/retention-policy.json --execute --batch-size 100 --max-batches 20
+```
+
+`stillEligible` boş değilse (batch sınırı veya kilitli satır) komut güvenle yeniden çalıştırılır. `completed: false` olursa önceki batch'ler kalıcıdır; hata kodu incelenip yeniden denenir. Dry-run sayıları, daha önceki adımlar uygulanmış varsayılarak verilir; toplamalar arada çalışırsa sayı değişebilir.
+
+#### Doğrulama ve sınırlar — B2 entegrasyon (26 Kasım 2026)
+
+- **Migration:** defter doğrulandı; `20261126001200_data_retention.sql` development'a uygulandı (12 migration). Önceki migration'lar yeniden uygulanmadı. Production dokunulmadı.
+- **Sentetik SQL (development, rollback/izolasyon, TAG `b2ret`):** 27/27 — kategori/sağlayıcı süreleri, `expires_at` uzatmama, fail-closed politika, unapproved batch reddi, dry-run yazmama, onay kapıları, sınırlı batch + silme sırası, FK bütünlüğü, apps/developers/watchlist koruma, listing içerik/metrik temizliği, alan yenileme, snapshot bütün-silme, unresolved/unknown/unsettled/bütçe koruma, idempotent tekrar, anon/authenticated EXECUTE reddi. Geçici kayıtlar silindi; `collection_jobs_guard` yeniden açıldı.
+- **Eşzamanlılık (iki PostgreSQL oturumu):** 10/10 — aktif kira ikinci işçiyi `retention_cleanup_locked` ile keser; süresi dolmuş kira güvenle devralınır; eski holder devam edemez; açık transaction sırasında örtüşme yok; watchlist-first silmeyi engeller; yarışta watchlist+eksik listing durumu oluşmaz; temizleme sonrası ingestion satırı tutarlı doldurur. Kod düzeltmesi gerekmedi.
+- **CLI / PostgREST:** onaysız `policy.example` kopyası ile dry-run OK (`dryRun: true`, kapılar listelenir, kilit/silme yok). `--execute` without `RETENTION_CLEANUP_EXECUTION` → `retention_execution_closed:…`. Flag açık + onaysız politika → `policy_not_approved`. Ücretli API çağrısı yok.
+- **Güvenlik:** içerik bayrakları kapalı (`APPRADAR_STORE_*` / review content). Demo yalnız `NODE_ENV=development` + `APPRADAR_DEMO_MODE=true`. Retention RPC yalnız `service_role`. Loglarda satır içeriği/kimlik/anahtar yok.
+- **Kalite kapısı (tek koşu):** test 165 geçti, 2 atlandı (PGlite retention senaryosu — yerel PGlite yok; `psql` worker), 0 başarısız; typecheck OK; lint 0 hata (2 mevcut img uyarısı); `next build` OK.
+- **PGlite:** bu ortamda `RETENTION_PGLITE_PATH` / paket yok; bellek içi 12/12 önceki B2 biriminde doğrulanmıştı, bu turda tekrarlanamadı.
+- **Kapsam dışı / kalan engeller:** ticari veri kullanım izni doğrulanmadı; onaylı üretim saklama politikası yok; zamanlayıcı kapalı; production DB değişmedi; sağlayıcı outreach yok; yedekler/Apify dataset/yerel journal/Auth hesapları kapsam dışı. Büyük hacimde süre ölçülmedi.
+- Toplayıcının yazdığı `expires_at` (`retentionDays`) bu politikadan bağımsızdır; politika yalnız temizlikte ek üst sınırdır. Güncel `reviews` satırı, kalan başka gözlemi varsa silinmiş bir gözlemden dolmuş alanı taşıyabilir.
+- Sonuçlanmamış veya uzlaşmamış kayıtlar süresiz kalır; `collection/cli.ts resolve` ile elle uzlaştırılır.
+
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
 POC kodu da Bölüm 1'deki plan onayından sonra yazılır. Aşağıdaki eşikler öneridir ve onaylı plana alınmalıdır.
@@ -561,7 +643,7 @@ Tüm operasyon zamanları `timestamptz`/UTC; kullanıcıya gösterimde yerelleş
 9. 429/5xx/geçici ağ hatasında sınırlı, jitter içeren artan bekleme; önerilen en fazla 3 deneme. Kalıcı input/kimlik hatasını otomatik döngüye sokma. Başarısız iş manuel inceleme kuyruğuna gider.
 10. Bütçe durdurma, hata oranı ve sağlayıcı şema değişimi circuit breaker ile yeni başlatmaları kapatabilir. Çalışmakta olan koşuların durması garanti sayılmaz; rezervasyon bırakılır ve maliyet uzlaştırılır.
 
-**[ÖNERİ] Saklama:** normalize günlük snapshot 12 ay, ham payload en fazla 7 gün, operasyon logu 30 gün; gerçek izinler ve bütçe daha kısaysa kısa süre uygulanır. Bunlar henüz kullanıcı kararı değildir. Silme işi test edilir; yedeklerdeki süre ayrıca belgelenir. Uzun vadeli depolama için günlük/haftalık özet önerilebilir fakat kaynak geçmişin üstüne sessizce yazılmaz.
+**[ÖNERİ] Saklama:** normalize günlük snapshot 12 ay, ham payload en fazla 7 gün, operasyon logu 30 gün; gerçek izinler ve bütçe daha kısaysa kısa süre uygulanır. Bunlar henüz kullanıcı kararı değildir (uygulanan saklama mekanizması ve planlama varsayılanları: 6.20). Silme işi test edilir; yedeklerdeki süre ayrıca belgelenir. Uzun vadeli depolama için günlük/haftalık özet önerilebilir fakat kaynak geçmişin üstüne sessizce yazılmaz.
 
 ## 11. Ekranlar ve kullanıcı akışları
 
