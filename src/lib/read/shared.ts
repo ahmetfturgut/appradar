@@ -65,7 +65,7 @@ export const bool = (value: unknown): boolean | null => typeof value === "boolea
 export function sanitizeText(value: unknown, max = 20000): string | null {
   if (typeof value !== "string") return null;
   // eslint-disable-next-line no-control-regex
-  const cleaned = value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F​-‏‪-‮⁦-⁩]/g, "").trim();
+  const cleaned = value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u200B-\u200F\u202A-\u202E\u2066-\u2069]/g, "").trim();
   if (!cleaned) return null;
   return cleaned.length > max ? `${cleaned.slice(0, max)}…` : cleaned;
 }

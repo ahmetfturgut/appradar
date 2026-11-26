@@ -359,6 +359,22 @@ Günlük ve aylık UTC dönemleri `DAILY_LIMIT_USD` / `MONTHLY_LIMIT_USD` ile id
 
 `20261126000800_read_services` geliştirme veritabanına uygulandı. Beş `appradar_read_*` fonksiyonu `SECURITY INVOKER`, boş `search_path`, yalnız `service_role` execute. Anon/authenticated reddedilir. Süresi dolmuş listing’ler istatistik ve dağılıma girmez. Sentetik join/filtre/sıralama değişimi SQL oturumunda doğrulanıp geri alındı. PostgREST doğrulaması `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` gerektirir.
 
+### 6.12 Çekirdek ürün entegrasyonu — 26 Kasım 2026
+
+`SUPABASE_URL` ve `SUPABASE_SERVICE_ROLE_KEY` ile PostgREST üzerinden Dashboard, Explorer ve App Details okuma yolu doğrulandı. Migration yeniden uygulanmadı; ücretli API, otomatik toplama ve journal import çalıştırılmadı; review içeriği ile store media kapalı kaldı.
+
+| Kontrol | Sonuç |
+|---|---|
+| Boş durum | stats/explorer/dashboard sıfır; eksik uygulama `null` |
+| Dolu durum (geçici sentetik) | join, kategori filtresi, sıralama, ranking değişimi, detay+related+history |
+| Media / review | icon/screenshot withhold; mediaEnabled false; review içeriği istenmedi |
+| RPC yetkisi | anon `appradar_read_*` → 401 |
+| Temizlik | sentetik jobs/apps/discovery/developers = 0 |
+| Tarayıcı sırları | `catalog.server.ts` `server-only`; üretim `.next/static` içinde service role / DATABASE_URL / token yok |
+| Kalite kapısı | test 88/88; typecheck OK; lint 0 error (2 `no-img-element` warning); `next build` OK |
+
+Lint düzeltmeleri: `page.tsx` / `explore/page.tsx` try/catch içinde JSX kaldırıldı; `sanitizeText` düzensiz whitespace sınıfı Unicode kaçışlarına alındı.
+
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
 POC kodu da Bölüm 1'deki plan onayından sonra yazılır. Aşağıdaki eşikler öneridir ve onaylı plana alınmalıdır.
