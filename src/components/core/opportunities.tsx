@@ -1,4 +1,5 @@
 "use client";
+import { FieldValue, MetricFreshnessSummary } from "./field-freshness";
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowDown, ArrowUp, ArrowUpDown, ArrowRight, Info, Layers } from "lucide-react";
@@ -104,7 +105,7 @@ function CategoryDetail({ row, table }: { row: OpportunityRow; table: Opportunit
         const ind = row.indicators[key], info = INDICATOR_INFO[key];
         return <section key={key} aria-label={info.title} className="flex flex-col gap-2 rounded-lg border p-4">
           <div className="flex items-start justify-between gap-2"><h3 className="text-sm font-semibold">{info.title}</h3><StatusBadge status={ind.status} /></div>
-          <div className="text-2xl font-semibold tracking-[-0.02em] tabular-nums">{formatIndicator(ind)}</div>
+          <div className="text-2xl font-semibold tracking-[-0.02em] tabular-nums">{formatIndicator(ind)}</div><MetricFreshnessSummary value={ind.freshness} />
           <p className="text-[11px] text-muted-foreground tabular-nums">
             {info.unit === "count" ? `Median of ${ind.denominator} known · 25th pct. ${ind.details.p25 == null ? "—" : count(ind.details.p25 as number)} · 75th pct. ${ind.details.p75 == null ? "—" : count(ind.details.p75 as number)}` : `${ind.numerator ?? "—"} of ${ind.denominator} known`}
             {` · ${ind.unknown} unknown`}{ind.invalid ? ` · ${ind.invalid} invalid` : ""}
@@ -114,7 +115,7 @@ function CategoryDetail({ row, table }: { row: OpportunityRow; table: Opportunit
           <p className="text-xs/relaxed text-muted-foreground">{info.definition(MARKET_THRESHOLDS)} {info.caution}</p>
           {ind.supporting.length > 0 && <ul className="mt-1 flex flex-col gap-1 border-t pt-2 text-xs">{ind.supporting.map(id => { const a = table.apps[id]; return a ? <li key={id} className="flex items-center justify-between gap-2">
             <Link href={appHref(a)} className="min-w-0 truncate font-medium text-foreground hover:text-primary">{a.name ?? "App name unavailable"}</Link>
-            <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">{supportingFact(key, a)}</span>
+            <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums"><FieldValue fields={a.fieldFreshness} field={supportingField[key]}>{supportingFact(key, a)}</FieldValue></span>
           </li> : null; })}</ul>}
         </section>;
       })}
@@ -132,3 +133,5 @@ function supportingFact(key: IndicatorKey, a: OpportunityTable["apps"][string]):
     case "pricing": return priceText(a);
   }
 }
+
+const supportingField = { qualityGap: "rating_value", neglected: "store_updated_at", newcomers: "released_at", concentration: "developer_name", incumbentStrength: "rating_count", pricing: "price" } as const;

@@ -1,4 +1,5 @@
 "use client";
+import { FieldValue } from "./field-freshness";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -124,7 +125,7 @@ export function Dashboard({ result, scope, demo = false }: { result: ReadResult<
         </CardHeader>
         {data?.recent.length ? <CardContent className="grid gap-3 pb-5 sm:grid-cols-2 xl:grid-cols-4">{data.recent.map(app => <article key={app.listingId} className="flex min-w-0 flex-col rounded-lg border p-4 transition-colors hover:border-ring/40">
           <AppIdentity app={app} />
-          <div className="mt-4 flex items-center justify-between gap-2"><span className="truncate rounded-full border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">{app.category}</span><Rating value={app.rating} /></div>
+          <div className="mt-4 flex items-center justify-between gap-2"><span className="truncate rounded-full border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">{app.category}</span><FieldValue fields={app.fieldFreshness} field="rating_value"><Rating value={app.rating} /></FieldValue></div>
           <footer className="mt-3 flex items-center justify-between gap-2 border-t pt-3 text-[11px] text-muted-foreground"><span className="flex min-w-0 items-center gap-2"><StoreLabel store={app.store} /><span aria-hidden="true">·</span><span className="whitespace-nowrap">{dateLabel(app.releasedAt)}</span></span><Link href={detailsHref(app)} aria-label={`View ${app.name} details`} className="grid size-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-primary"><ArrowUpRight className="size-4" /></Link></footer>
         </article>)}</CardContent> : <SectionEmpty icon={<Sparkles />} title={data ? "No recent releases collected" : "Recent releases unavailable"} />}
       </Card>

@@ -19,7 +19,7 @@ export function toMarketApp(row: Record<string, unknown>, now: string): MarketAp
   return {
     appId: l.appId, listingId: l.listingId, name: l.name, store: l.store, country: l.country, requestedLanguage: l.requestedLanguage,
     category: l.category, developerId: str(app.developer_id), developerName: l.developerName, rating: l.rating, ratingCount: l.ratingCount,
-    price: l.price, releasedAt: l.releasedAt, storeUpdatedAt: l.storeUpdatedAt, lastObservedAt: l.freshness.lastObservedAt,
+    price: l.price, releasedAt: l.releasedAt, storeUpdatedAt: l.storeUpdatedAt, lastObservedAt: l.freshness.lastObservedAt, fieldFreshness: l.fieldFreshness ?? {},
   };
 }
 

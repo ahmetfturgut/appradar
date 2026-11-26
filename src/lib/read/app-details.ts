@@ -92,7 +92,7 @@ export async function getAppDetails(input: AppDetailsInput, client: ReadClient =
 
   const descriptionsOn = storeDescriptionEnabled();
   const listingQuery: Record<string, string> = {
-    select: `${LISTING_SELECT},${descriptionsOn ? "description," : ""}screenshot_urls,field_provenance`, app_id: `eq.${appId}`, expires_at: `gt.${now}`,
+    select: `${LISTING_SELECT},${descriptionsOn ? "description," : ""}screenshot_urls`, app_id: `eq.${appId}`, expires_at: `gt.${now}`,
     order: "last_observed_at.desc.nullslast,id.asc", limit: "200",
   };
   const { rows: listingRows } = await client.select("app_listings", listingQuery);

@@ -15,6 +15,9 @@ import { LANDING_LOCALE_COOKIE, LANDING_LOCALE_HEADER, landingHref, landingLocal
  */
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    return new NextResponse(null, { status: 404, headers: { "Cache-Control": "private, no-store", "X-Robots-Tag": "noindex" } });
+  }
   // Public-page localization only. Overwrite incoming values so HTML language is
   // derived from the URL, never from a caller-supplied header or a store filter.
   const landingLocale = landingLocaleFromPath(pathname);

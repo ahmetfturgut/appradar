@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { ReadError, type ReadClient } from "./client.ts";
+import { fieldFreshness, freshness, type FieldFreshness, type Freshness } from "./field-freshness.ts";
+export { freshness, STALE_AFTER_HOURS, type Freshness, type FreshnessStatus } from "./field-freshness.ts";
 
 export const MAX_PAGE_SIZE = 100;
 export const MAX_OFFSET = 10000;
@@ -70,18 +72,6 @@ export function sanitizeText(value: unknown, max = 20000): string | null {
   return cleaned.length > max ? `${cleaned.slice(0, max)}…` : cleaned;
 }
 
-export type FreshnessStatus = "fresh" | "stale" | "unknown";
-export interface Freshness { lastObservedAt: string | null; ageHours: number | null; status: FreshnessStatus; staleAfterHours: number }
-
-/** Proposal default: daily collection, so anything older than 72h carries a stale badge. */
-export const STALE_AFTER_HOURS = 72;
-
-export function freshness(lastObservedAt: string | null, now: string, staleAfterHours = STALE_AFTER_HOURS): Freshness {
-  if (!lastObservedAt) return { lastObservedAt: null, ageHours: null, status: "unknown", staleAfterHours };
-  const ageHours = Math.max(0, (Date.parse(now) - Date.parse(lastObservedAt)) / 3600000);
-  return { lastObservedAt, ageHours: Math.round(ageHours * 10) / 10, status: ageHours > staleAfterHours ? "stale" : "fresh", staleAfterHours };
-}
-
 /** Store media rights are unconfirmed (spec §5.2 / §6.5); icons/screenshots are withheld unless explicitly enabled. */
 export const mediaEnabled = () => process.env.APPRADAR_STORE_MEDIA_ENABLED === "true";
 /** Store description rights are unconfirmed; listing text is withheld unless explicitly enabled. */
@@ -93,7 +83,7 @@ export const LISTING_COLUMNS = [
   "id", "app_id", "store", "country", "requested_language", "effective_language", "name", "developer_name",
   "category_name", "version", "released_at", "released_at_precision", "store_updated_at", "store_updated_at_precision",
   "price_amount", "currency", "is_free", "rating_value", "rating_count", "review_count", "installs_text",
-  "installs_lower_bound", "icon_url", "first_seen_at", "last_observed_at",
+  "installs_lower_bound", "icon_url", "first_seen_at", "last_observed_at", "field_provenance",
 ].join(",");
 export const LISTING_SELECT = `${LISTING_COLUMNS},apps!inner(store_app_id,canonical_url,developer_id)`;
 
@@ -123,6 +113,8 @@ export interface ListingSummary {
   iconUrl: string | null;
   firstSeenAt: string | null;
   freshness: Freshness;
+  /** Absent provenance is unknown; never inferred from the listing timestamp. */
+  fieldFreshness?: FieldFreshness;
 }
 
 export function mapListing(row: Record<string, unknown>, now: string): ListingSummary {
@@ -141,6 +133,7 @@ export function mapListing(row: Record<string, unknown>, now: string): ListingSu
     installs: { text: str(row.installs_text), lowerBound: num(row.installs_lower_bound), supported: store === "play" },
     iconUrl: mediaEnabled() ? str(row.icon_url) : null,
     firstSeenAt: str(row.first_seen_at), freshness: freshness(str(row.last_observed_at), now),
+    fieldFreshness: fieldFreshness(row.field_provenance, now),
   };
 }
 

@@ -1,4 +1,5 @@
 "use client";
+import { FieldValue } from "./field-freshness";
 import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -74,12 +75,12 @@ function CompareBody({ data, watched, removeHref }: { data: CompareModel; watche
   const rows: { label: string; cell: (a: CompareModel["apps"][number]) => React.ReactNode; note?: string | undefined }[] = [
     { label: "Developer", cell: a => a.listing?.developerName ?? "Not available" },
     { label: "Category", cell: a => a.listing?.category ?? "Not available" },
-    { label: "Rating", cell: a => <Rating value={a.listing?.rating ?? null} /> },
-    { label: "Rating count", cell: a => count(a.listing?.ratingCount ?? null) },
-    { label: "Price", cell: a => a.listing ? <>{price({ price: a.listing.price.amount, currency: a.listing.price.currency })}{a.listing.price.currency && a.listing.price.amount ? <span className="ml-1 text-[11px] text-muted-foreground">{a.listing.price.currency}</span> : null}</> : "Not available", note: data.currencies.length > 1 ? `Different currencies (${data.currencies.join(", ")}): prices are not comparable.` : undefined },
-    { label: "Released", cell: a => a.listing ? `${dateLabel(a.listing.releasedAt)}${a.listing.releasedAtPrecision === "date" ? " (date only)" : ""}` : "Not available" },
-    { label: "Last store update", cell: a => dateLabel(a.listing?.storeUpdatedAt ?? null) },
-    { label: "Listing observed", cell: a => a.listing ? <span className={cn(a.listing.freshness.status === "stale" && "text-warning")}>{dateLabel(a.listing.freshness.lastObservedAt)}{a.listing.freshness.status === "stale" ? " · stale" : a.listing.freshness.status === "unknown" ? " · unknown" : ""}</span> : "Not available", note: "Current values above were observed on these dates, not at chart timestamps." },
+    { label: "Rating", cell: a => <FieldValue fields={a.listing?.fieldFreshness} field="rating_value"><Rating value={a.listing?.rating ?? null} /></FieldValue> },
+    { label: "Rating count", cell: a => <FieldValue fields={a.listing?.fieldFreshness} field="rating_count">{count(a.listing?.ratingCount ?? null)}</FieldValue> },
+    { label: "Price", cell: a => a.listing ? <FieldValue fields={a.listing.fieldFreshness} field="price">{price({ price: a.listing.price.amount, currency: a.listing.price.currency })}{a.listing.price.currency && a.listing.price.amount ? <span className="ml-1 text-[11px] text-muted-foreground">{a.listing.price.currency}</span> : null}</FieldValue> : "Not available", note: data.currencies.length > 1 ? `Different currencies (${data.currencies.join(", ")}): prices are not comparable.` : undefined },
+    { label: "Released", cell: a => <FieldValue fields={a.listing?.fieldFreshness} field="released_at">{a.listing ? `${dateLabel(a.listing.releasedAt)}${a.listing.releasedAtPrecision === "date" ? " (date only)" : ""}` : "Not available"}</FieldValue> },
+    { label: "Last store update", cell: a => <FieldValue fields={a.listing?.fieldFreshness} field="store_updated_at">{dateLabel(a.listing?.storeUpdatedAt ?? null)}</FieldValue> },
+    { label: "Listing observed", cell: a => a.listing ? <span className={cn(a.listing.freshness.status === "stale" && "text-warning")}>{dateLabel(a.listing.freshness.lastObservedAt)}{a.listing.freshness.status === "stale" ? " · stale" : a.listing.freshness.status === "unknown" ? " · unknown" : ""}</span> : "Not available", note: "Latest listing observation only. Each retained metric has its own provenance above; it is not dated by a chart or unrelated update." },
     { label: "Best current chart position", cell: a => { const r = best(a.id); return r ? <span className="flex flex-col"><span className="font-medium">#{r.latestPosition}</span><span className="text-[11px] text-muted-foreground">{seriesTitle(r.summary)}</span></span> : <span className="text-muted-foreground">Not in a comparable chart</span>; } },
     { label: "1-day change (comparable)", cell: a => { const r = best(a.id); return r ? <ChangeBadge change={r.change1d} available={r.summary.horizons["1d"]} /> : "—"; } },
   ];

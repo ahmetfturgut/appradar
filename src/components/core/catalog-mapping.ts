@@ -11,7 +11,7 @@ export function toAppViewModel(listing: ListingSummary): AppViewModel {
     rating: listing.rating, ratingCount: listing.ratingCount, price: listing.price.amount, currency: listing.price.currency,
     installsText: listing.installs.supported && listing.store === "play" ? listing.installs.text : null,
     releasedAt: listing.releasedAt, version: listing.version, history: [], sourceLabel: "Stored listing",
-    observedAt: listing.freshness.lastObservedAt, freshness: listing.freshness,
+    observedAt: listing.freshness.lastObservedAt, freshness: listing.freshness, fieldFreshness: listing.fieldFreshness ?? {},
   };
 }
 export function toDashboardModel(data: Dashboard): DashboardModel {

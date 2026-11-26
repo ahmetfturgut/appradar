@@ -332,7 +332,7 @@ Altı migration, boş Supabase geliştirme projesine (Tokyo session pooler, Post
 
 - **Kabul:** `execution_status = succeeded` ve `validation_status = accepted`.
   Yalnızca discovery ve keyword listeleri `truncated` koşuyu kapsam etiketiyle kabul eder.
-- **Güncel alan önceliği (T4):** Aurelix detay > diğer detay > discovery; eşitlikte
+- **İlk T4 alan önceliği (0011 öncesi; B1 için 6.19):** Aurelix detay > diğer detay > discovery; eşitlikte
   yeni gözlem. Null ezmez; fiyat grubu atomiktir. Daha iyi bir `is_free` tutarla
   çelişirse tutar/para birimi bilinmeyene döner.
 - **Yorum geçmişi (T6):** ülke/dil bağlamında yalnızca içerik değişince yeni satır;
@@ -442,6 +442,24 @@ Claude (kabuk, Dashboard, Modern Minimal tokenları, paylaşılan primitifler) v
 - **Demo:** yalnız `NODE_ENV=development` + `APPRADAR_DEMO_MODE=true`; httpOnly çerez; 50 öğe ≈ 2699 bayt (<4KB); geçersiz/aşırı parçalar düşülür; demo Supabase'e yazmaz (`watchlist_items` boş kaldı); production bu dala girmez.
 - **Doğrulama:** tam paket 156/156; typecheck OK; lint 0 hata (2 mevcut img uyarısı); production build OK. Masaüstü + mobil (390×844) Explorer Save/Compare → Compare URL → Watchlist; `/watchlist` ve `/compare/add` `Cache-Control: no-store`. Düzeltmeler: ranking gap metni (eligible-only çizim); Explorer saved-state preload.
 - **Engeller:** gerçek Auth ile uçtan uca watchlist (tarayıcı sign-in); gerçek veri toplama kapalı; production DB'ye dokunulmadı.
+
+### 6.19 B1 — Alan tazeliği ve eski admin erişimi — 26 Kasım 2026
+
+- **Kök neden:** T4 kaynak kalitesini tarihten önce seçiyordu; başka bir alanın gözlemi `last_observed_at` değerini ilerletirken tutulan eski metrikler taze görünebiliyordu. Eski `/admin`, ürünün Supabase okuma geçidi yerine yerel POC/demo kataloğunu okuyordu.
+- **İleri migration (uygulandı, geliştirme Supabase):** `20261126001100_field_freshness.sql` uzak geliştirme projesine tek transaction ile uygulandı ve `appradar_meta.schema_migrations` içine kaydedildi (`applied_at` 2026-11-26T20:05:07.546Z). Önceki migration'lar yeniden uygulanmadı. Yalnız `private.observation_wins` ve `public.appradar_persist_app_observations` değiştirildi; yeni tablo/backfill/yetki genişlemesi yok. Boş katalogda apply sonrası listing/snapshot parmak izi değişmedi. `anon`/`authenticated` EXECUTE yok; yalnız `service_role`.
+- **Kesin birleştirme sırası:** aynı app/ülke/istenen dil alanında önce **detail > discovery**; aynı otorite seviyesinde **observedAt → eşit zamanda Aurelix detail tercihi → collectedAt → source → runId → build**. Eski Aurelix detail daha yeni uyumlu detail'i ezemez; discovery authoritative detail'i ezemez. Temsilci snapshot işaretçisi aynı kurala uyar.
+- **Null/fiyat:** null alan korunur; fiyat/tutar/para birimi atomik; uyumlu bare `is_free` tutulan fiyat provenance'ını yenilemez; çelişkili flag amount+currency'yi birlikte bilinmeyene çevirir. Snapshot immutability ve replay idempotency korunur.
+- **Uzak SQL doğrulama (sentetik kayıtlar, sonra temizlendi):** detail/discovery önceliği; daha yeni uyumlu detail; eşit zamanda Aurelix; out-of-order; bağımsız alan tarihleri; ilgisiz discovery'nin listing zamanını ilerletip metrik zamanını değiştirmemesi; null koruma; atomik fiyat; bare/çelişkili `is_free`; idempotent replay; tarihsel snapshot/seri bütünlüğü; snapshot UPDATE reddi; privilege izolasyonu. TS `fieldFreshness` ile 72s stale / unknown / listing≠metric tutarlılığı doğrulandı.
+- **Okuma/sunum:** listing tazeliği yalnız listing gözlemini belirtir (`Listing observed` / `Listing stale`). Metrikler kendi provenance tarihini taşır (`Metric observed`, UTC ipucu). Markets: `Metric provenance: N stale · …` ve “Listing observations do not refresh retained metrics.” Dashboard, Explorer, Details, Markets, Opportunities, Compare, Watchlist aynı kuralları kullanır; demo aynı freshness helper'larını izler.
+- **Admin:** `/admin` ve alt yolları proxy'de Auth/demo'dan önce **HTTP 404** + `Cache-Control: private, no-store` + `X-Robots-Tag: noindex`; sayfa `notFound()`. Demo tarayıcıda 404 doğrulandı; gövdede POC/journal yok. Post-login hedef listesinden çıkarıldı. CLI `poc:*` / `data:*` scriptleri duruyor.
+- **Doğrulama (entegrasyon):** tam paket **160 pass / 1 skip** (skip: `B1_PGLITE_PATH` yokken yerel PGlite runner; uzak SQL ile ikame edildi) / 0 fail; typecheck OK; lint 0 hata (2 mevcut img uyarısı); production build OK. Masaüstü + mobil Explorer/Markets tazelik göstergeleri ve admin 404 denetlendi.
+- **Sınır:** geçmiş listing değerleri geriye dönük yeniden birleştirilmez. Gerçek Auth oturumuyla admin 404 (authenticated) bu turda yapılandırılmadı; proxy tüm ortamlarda Auth'tan önce 404 döner. Production DB'ye dokunulmadı; ücretli çağrı/toplama yok.
+
+**B1 değişen dosyalar:**
+- SQL/test: `supabase/migrations/20261126001100_field_freshness.sql`, `supabase/tests/field-freshness.sql`, `tests/b1-hardening.test.ts`.
+- Veri: `src/lib/read/field-freshness.ts`, `src/lib/read/shared.ts`, `src/lib/read/app-details.ts`, `src/lib/read/markets.ts`, `src/lib/intel/market.ts`, `src/lib/ui/demo-catalog.ts`.
+- UI: `src/components/core/` altında `field-freshness.tsx`, `view-models.ts`, `catalog-mapping.ts`, `elements.tsx`, `dashboard.tsx`, `explorer.tsx`, `app-details.tsx`, `markets.tsx`, `opportunities.tsx`, `research.tsx`, `compare.tsx`, `watchlist.tsx`.
+- Erişim/belge: `src/app/admin/page.tsx`, `src/proxy.ts`, `src/lib/auth/paths.ts`, `APPRADAR.md`.
 
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 

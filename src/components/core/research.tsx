@@ -3,6 +3,8 @@
  * Reuses the existing tokens and primitives (Card, BarChart from 21st.dev, Empty); no new components.
  */
 "use client";
+import type { FreshnessSummary } from "../../lib/read/field-freshness";
+import { MetricFreshnessSummary } from "./field-freshness";
 import { CircleAlert, CircleHelp, TriangleAlert } from "lucide-react";
 import BarChart from "../ui/bar-chart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
@@ -40,6 +42,7 @@ export function IndicatorCell({ ind, fullStatus = false }: { ind: Indicator; ful
       {unit === "count" ? `n = ${ind.denominator} of ${ind.cohortSize}` : ind.numerator != null ? `${ind.numerator} of ${ind.denominator} known` : `${ind.denominator} of ${ind.cohortSize} known`}
       <StatusBadge status={ind.status} compact={!fullStatus} />
     </span>
+    <MetricFreshnessSummary value={ind.freshness} />
   </div>;
 }
 
@@ -55,10 +58,10 @@ export function Methodology({ keys }: { keys: IndicatorKey[] }) {
   </details>;
 }
 
-export function DistributionCard({ title, description, buckets, unknown, invalid, unit }: { title: string; description: string; buckets: Bucket[]; unknown: number; invalid?: number; unit: string }) {
+export function DistributionCard({ title, description, buckets, unknown, invalid, unit, freshness }: { freshness?: FreshnessSummary | undefined; title: string; description: string; buckets: Bucket[]; unknown: number; invalid?: number; unit: string }) {
   const total = buckets.reduce((sum, b) => sum + b.count, 0);
   return <Card>
-    <CardHeader className="pb-2"><CardTitle role="heading" aria-level={3}>{title}</CardTitle><CardDescription>{description}</CardDescription></CardHeader>
+    <CardHeader className="pb-2"><CardTitle role="heading" aria-level={3}>{title}</CardTitle><CardDescription>{description}</CardDescription><MetricFreshnessSummary value={freshness} /></CardHeader>
     <CardContent className="pb-4">
       {total ? <BarChart orientation="horizontal" animated={false} showValues name={unit} aria-label={title} data={buckets.map(b => b.count)} labels={buckets.map(b => b.label)} defaultIndex={0} color="var(--chart-1)" radius={3}
         formatValueText={(value, index) => `${buckets[index]!.label}: ${value} ${unit}`} /> : <p className="py-6 text-center text-xs text-muted-foreground">No known values in this cohort.</p>}

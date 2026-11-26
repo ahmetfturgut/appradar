@@ -8,7 +8,7 @@ export const GUEST_ONLY_PATHS = ["/login", "/signup"] as const;
 /** Pages that render without the app shell (sidebar/header). */
 export const PUBLIC_CHROMELESS_PATHS = ["/", "/login", "/signup", "/forgot-password", "/reset-password"] as const;
 /** Internal destinations a `next` parameter may point to after authentication. */
-const REDIRECT_TARGETS = [...PROTECTED_PREFIXES, "/reset-password"] as const;
+const REDIRECT_TARGETS = [...PROTECTED_PREFIXES.filter(path => path !== "/admin"), "/reset-password"] as const;
 export const DEFAULT_AFTER_LOGIN = "/dashboard";
 
 const matches = (path: string, prefix: string) => path === prefix || path.startsWith(`${prefix}/`);

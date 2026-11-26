@@ -1,4 +1,5 @@
 "use client";
+import { FieldValue, MetricFreshnessSummary } from "./field-freshness";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Layers } from "lucide-react";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
@@ -69,6 +70,7 @@ function MarketBody({ view, explore }: { view: MarketView; explore: string | nul
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-x-6 gap-y-3 py-4 text-xs sm:grid-cols-4">
         <Fact label="Tracked apps">{count(view.size)}{view.coverage.available != null && view.coverage.available !== view.size ? ` of ${count(view.coverage.available)}` : ""}</Fact>
+        <Fact label="Rating metric provenance"><MetricFreshnessSummary value={view.indicators.qualityGap.freshness} /></Fact>
         <Fact label="Newest listing observation">{dateLabel(view.freshness.newest)}</Fact>
         <Fact label="Oldest listing observation">{dateLabel(view.freshness.oldest)}</Fact>
         <Fact label="Stale or unknown listing freshness">{view.freshness.stale} stale · {view.freshness.unknown} unknown{view.freshness.unknown ? " (missing last-observed time; not assumed fresh)" : ""}</Fact>
@@ -79,15 +81,15 @@ function MarketBody({ view, explore }: { view: MarketView; explore: string | nul
 
     <StatCardGroup aria-label="Cohort summary" className="[&>[data-slot=stat-card]]:basis-[9.5rem]">
       <StatCard className="px-5 py-4" label="Tracked apps" value={view.size} hint={d.kind === "chart" ? "Entries with a current listing" : "Current listings"} />
-      <StatCard className="px-5 py-4" label="Median rating" value={rating.status === "insufficient" || rating.details.medianRating == null ? "Not available" : String(rating.details.medianRating)} hint={`${rating.denominator} of ${view.size} rated`} />
-      <StatCard className="px-5 py-4" label="Median rating count" value={formatIndicator(counts)} hint={counts.value == null ? `${counts.denominator} known` : `25th percentile ${count(counts.details.p25 as number)} · n = ${counts.denominator}`} />
-      <StatCard className="px-5 py-4" label="Free to download" value={formatIndicator(pricing)} hint={`${pricing.denominator} of ${view.size} with a known price`} />
+      <StatCard className="px-5 py-4" label="Median rating" value={rating.status === "insufficient" || rating.details.medianRating == null ? "Not available" : String(rating.details.medianRating)} hint={<>{rating.denominator} of {view.size} rated<MetricFreshnessSummary value={rating.freshness} /></>} />
+      <StatCard className="px-5 py-4" label="Median rating count" value={formatIndicator(counts)} hint={<>{counts.value == null ? `${counts.denominator} known` : `25th percentile ${count(counts.details.p25 as number)} · n = ${counts.denominator}`}<MetricFreshnessSummary value={counts.freshness} /></>} />
+      <StatCard className="px-5 py-4" label="Free to download" value={formatIndicator(pricing)} hint={<>{pricing.denominator} of {view.size} with a known price<MetricFreshnessSummary value={pricing.freshness} /></>} />
     </StatCardGroup>
 
     <div className="grid gap-5 lg:grid-cols-2">
-      <DistributionCard title="Rating distribution" description="Known store ratings. Unrated apps are not low-rated." buckets={view.ratingDistribution.buckets} unknown={view.ratingDistribution.unknown} unit="apps" />
+      <DistributionCard freshness={rating.freshness} title="Rating distribution" description="Known store ratings. Unrated apps are not low-rated." buckets={view.ratingDistribution.buckets} unknown={view.ratingDistribution.unknown} unit="apps" />
       <Card>
-        <CardHeader className="pb-2"><CardTitle role="heading" aria-level={3}>Pricing</CardTitle><CardDescription>Download price only; in-app purchases are not included. Currencies are never combined.</CardDescription></CardHeader>
+        <CardHeader className="pb-2"><CardTitle role="heading" aria-level={3}>Pricing</CardTitle><MetricFreshnessSummary value={pricing.freshness} /><CardDescription>Download price only; in-app purchases are not included. Currencies are never combined.</CardDescription></CardHeader>
         <CardContent className="flex flex-col gap-4 pb-4">
           {view.pricing.free + view.pricing.paid + view.pricing.unknown > 0 && <PartitionBar size="sm" gap={0.75} aria-label="Free, paid and unknown price">
             {[view.pricing.free ? <PartitionBarSegment key="free" num={view.pricing.free} variant="chart-1"><PartitionBarSegmentTitle className="text-xs">Free</PartitionBarSegmentTitle><PartitionBarSegmentValue>{view.pricing.free} apps</PartitionBarSegmentValue></PartitionBarSegment> : null,
@@ -102,8 +104,8 @@ function MarketBody({ view, explore }: { view: MarketView; explore: string | nul
           {view.pricing.paidWithoutCurrency > 0 && <p className="text-[11px] text-muted-foreground">{view.pricing.paidWithoutCurrency} paid app(s) without a currency are excluded from price statistics.</p>}
         </CardContent>
       </Card>
-      <DistributionCard title="Release date" description="Time since the store release date." buckets={view.releaseDistribution.buckets} unknown={view.releaseDistribution.unknown} invalid={view.releaseDistribution.invalid} unit="apps" />
-      <DistributionCard title="Last store update" description="Time since the last store update. Missing dates are not treated as old." buckets={view.updateDistribution.buckets} unknown={view.updateDistribution.unknown} invalid={view.updateDistribution.invalid} unit="apps" />
+      <DistributionCard freshness={ind.newcomers.freshness} title="Release date" description="Time since the store release date." buckets={view.releaseDistribution.buckets} unknown={view.releaseDistribution.unknown} invalid={view.releaseDistribution.invalid} unit="apps" />
+      <DistributionCard freshness={ind.neglected.freshness} title="Last store update" description="Time since the last store update. Missing dates are not treated as old." buckets={view.updateDistribution.buckets} unknown={view.updateDistribution.unknown} invalid={view.updateDistribution.invalid} unit="apps" />
     </div>
 
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
@@ -128,9 +130,9 @@ function MarketBody({ view, explore }: { view: MarketView; explore: string | nul
           <tbody>{view.leading.map((a, i) => <tr key={a.appId} className="border-b last:border-b-0 hover:bg-muted/40">
             <td className="px-4 py-2 text-xs text-muted-foreground tabular-nums">{d.kind === "chart" ? `#${a.position}` : i + 1}</td>
             <td className="max-w-56 px-4 py-2"><span className="block truncate font-medium">{a.name ?? "App name unavailable"}</span><span className="block truncate text-[11px] text-muted-foreground">{a.developerName ?? "Developer unavailable"}</span></td>
-            <td className="px-4 py-2"><Rating value={a.rating} /></td>
-            <td className="px-4 py-2 text-xs tabular-nums text-muted-foreground">{count(a.ratingCount)}</td>
-            <td className="px-4 py-2 text-xs text-muted-foreground">{priceText(a)}</td>
+            <td className="px-4 py-2"><FieldValue fields={a.fieldFreshness} field="rating_value"><Rating value={a.rating} /></FieldValue></td>
+            <td className="px-4 py-2 text-xs tabular-nums text-muted-foreground"><FieldValue fields={a.fieldFreshness} field="rating_count">{count(a.ratingCount)}</FieldValue></td>
+            <td className="px-4 py-2 text-xs text-muted-foreground"><FieldValue fields={a.fieldFreshness} field="price">{priceText(a)}</FieldValue></td>
             <td className="px-4 py-2 text-right"><Link href={appHref(a)} aria-label={`View ${a.name ?? "app"} details`} className="inline-grid size-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-primary"><ArrowUpRight className="size-4" /></Link></td>
           </tr>)}</tbody>
         </table></div>

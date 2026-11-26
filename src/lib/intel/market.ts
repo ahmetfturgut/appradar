@@ -1,3 +1,4 @@
+import { freshness as observationFreshness, retainedFreshness, summarizeFreshness, type FieldFreshness, type FreshnessSummary, type ListingField } from "../read/field-freshness.ts";
 /**
  * Deterministic market indicators (P2: Market Insights, Opportunity Finder).
  * Pure functions over one tracked cohort: one store, one country, one requested language, and either one
@@ -59,6 +60,7 @@ export interface MarketApp {
   releasedAt: string | null;
   storeUpdatedAt: string | null;
   lastObservedAt: string | null;
+  fieldFreshness?: FieldFreshness;
   /** Chart position when the cohort is a chart snapshot. */
   position?: number | null;
 }
@@ -108,6 +110,7 @@ export type SampleStatus = "ok" | "small_sample" | "low_coverage" | "insufficien
 
 export interface Indicator {
   key: IndicatorKey;
+  freshness?: FreshnessSummary;
   /** Primary value (percent 0–100 for shares, a count for incumbent strength); null when withheld or unknown. */
   value: number | null;
   numerator: number | null;
@@ -220,7 +223,21 @@ export function computeIndicators(apps: readonly MarketApp[], now: number, t: Ma
     apps.filter(a => priceClass(a) === "paid" && a.price.currency === main?.currency).sort((a, b) => (b.price.amount ?? 0) - (a.price.amount ?? 0) || byName(a, b)),
     { paidApps: priced.length - free.length, currencies: currencies.length, mainCurrency: main?.currency ?? null, medianPaidPrice: main?.median ?? null, paidWithoutCurrency });
 
-  return { qualityGap, neglected, newcomers, concentration, incumbentStrength, pricing };
+  const result = { qualityGap, neglected, newcomers, concentration, incumbentStrength, pricing };
+  const contributors: Record<IndicatorKey, { apps: readonly MarketApp[]; fields: readonly ListingField[] }> = {
+    qualityGap: { apps: rated, fields: ["rating_value", "rating_count"] },
+    neglected: { apps: updatedKnown.map(u => u.a), fields: ["store_updated_at"] },
+    newcomers: { apps: releasedKnown.map(r => r.a), fields: ["released_at"] },
+    // Canonical developer identity has no field provenance. Do not borrow the name/listing date.
+    concentration: { apps: identified, fields: [] },
+    incumbentStrength: { apps: counted, fields: ["rating_count"] },
+    pricing: { apps: priced, fields: ["price"] },
+  };
+  for (const key of Object.keys(result) as IndicatorKey[]) {
+    const input = contributors[key];
+    result[key].freshness = summarizeFreshness(input.apps.map(a => retainedFreshness(a.fieldFreshness, input.fields)));
+  }
+  return result;
 }
 const round1 = (n: number | null) => n == null ? null : Math.round(n * 10) / 10;
 const round0 = (n: number | null) => n == null ? null : Math.round(n);
@@ -274,9 +291,7 @@ export interface CohortCoverage {
 
 export interface Freshness { newest: string | null; oldest: string | null; stale: number; unknown: number }
 export function cohortFreshness(apps: readonly MarketApp[], now: number, t: MarketThresholds = MARKET_THRESHOLDS): Freshness {
-  const times = apps.flatMap(a => a.lastObservedAt && Number.isFinite(Date.parse(a.lastObservedAt)) ? [a.lastObservedAt] : []).sort();
-  return { newest: times.at(-1) ?? null, oldest: times[0] ?? null,
-    stale: times.filter(v => now - Date.parse(v) > t.staleAfterHours * 3_600_000).length, unknown: apps.length - times.length };
+  return summarizeFreshness(apps.map(a => observationFreshness(a.lastObservedAt, new Date(now).toISOString(), t.staleAfterHours)));
 }
 
 export interface MarketView {

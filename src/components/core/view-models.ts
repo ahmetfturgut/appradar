@@ -1,3 +1,4 @@
+import type { FieldFreshness } from "../../lib/read/field-freshness";
 import type { AppDetails, CatalogStats, Freshness, KeywordSummary, Page, RankingChangeSeries, RatingDistribution, ReviewsResult, HistorySeries, KeywordSeries } from "../../lib/read/index";
 
 export type Country = string;
@@ -11,7 +12,7 @@ export interface AppViewModel {
   description: string | null; rating: number | null; ratingCount: number | null;
   price: number | null; currency: string | null; installsText: string | null;
   releasedAt: string | null; version: string | null; history: HistoryPoint[];
-  sourceLabel: string; observedAt: string | null; freshness: Freshness;
+  sourceLabel: string; observedAt: string | null; freshness: Freshness; fieldFreshness?: FieldFreshness;
 }
 export interface DashboardModel {
   stats: CatalogStats; categories: { category: string | null; appCount: number; listingCount: number }[];

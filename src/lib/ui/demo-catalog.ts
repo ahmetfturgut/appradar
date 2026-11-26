@@ -1,3 +1,4 @@
+import { fieldFreshness, LISTING_FIELDS } from "../read/field-freshness";
 /**
  * Isolated, deterministic UI fixtures. No store content, external assets, network or persistence.
  * Only the server gateway selects this module, after the explicit development-mode check.
@@ -74,6 +75,10 @@ export function createDemoCatalog(clock = new Date()) {
       iconUrl: null, firstSeenAt: at(releaseAge(i)), freshness: fresh(observedAt),
     };
   }));
+  for (const listing of listings) {
+    const stamp = { source: SOURCE, role: "detail", timeBasis: "collection", observedAt: listing.freshness.lastObservedAt };
+    listing.fieldFreshness = fieldFreshness(Object.fromEntries(LISTING_FIELDS.map(key => [key, stamp])), at(0));
+  }
   const scoped = (scope: Scope) => listings.filter(row => row.country === scope.country && (!scope.store || row.store === scope.store) && (!scope.language || row.requestedLanguage === scope.language));
   function listCategories(scope: Scope): Dashboard["categories"] {
     const rows = scoped(scope);
@@ -250,7 +255,7 @@ export function createDemoCatalog(clock = new Date()) {
   const marketApp = (row: ListingSummary): MarketApp => ({
     appId: row.appId, listingId: row.listingId, name: row.name, store: row.store, country: row.country, requestedLanguage: row.requestedLanguage,
     category: row.category, developerId: row.developerName ? `demo-developer:${row.developerName}` : null, developerName: row.developerName,
-    rating: row.rating, ratingCount: row.ratingCount, price: row.price, releasedAt: row.releasedAt, storeUpdatedAt: row.storeUpdatedAt, lastObservedAt: row.freshness.lastObservedAt,
+    rating: row.rating, ratingCount: row.ratingCount, price: row.price, releasedAt: row.releasedAt, storeUpdatedAt: row.storeUpdatedAt, lastObservedAt: row.freshness.lastObservedAt, fieldFreshness: row.fieldFreshness ?? {},
   });
   const marketIO: MarketIO = {
     contextApps: async q => { const apps = scoped({ country: q.country, store: q.store, language: q.language }).filter(row => !q.category || row.category === q.category).map(marketApp); return { apps, available: apps.length, truncated: false }; },
