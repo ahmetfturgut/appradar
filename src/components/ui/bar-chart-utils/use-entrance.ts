@@ -18,7 +18,13 @@ export function useEntrance<T extends Element>({ play }: { play?: boolean | unde
   const observe = useCallback((next: T | null) => setNode(next), []);
 
   useEffect(() => {
-    if (play || phase !== "armed" || !node || typeof IntersectionObserver === "undefined") return;
+    if (play || phase !== "armed") return;
+    // After mount only: browsers without IntersectionObserver skip the entrance.
+    if (typeof IntersectionObserver === "undefined") {
+      const frame = requestAnimationFrame(() => setPhase("static"));
+      return () => cancelAnimationFrame(frame);
+    }
+    if (!node) return;
     const observer = new IntersectionObserver(entries => {
       if (!entries.some(entry => entry.isIntersecting)) return;
       const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -29,6 +35,6 @@ export function useEntrance<T extends Element>({ play }: { play?: boolean | unde
     return () => observer.disconnect();
   }, [node, phase, play]);
 
-  const unsupported = typeof window !== "undefined" && typeof IntersectionObserver === "undefined";
-  return [observe, play || unsupported ? "static" : phase];
+  // First paint matches the server ("armed" unless play is forced). No window checks here.
+  return [observe, play ? "static" : phase];
 }

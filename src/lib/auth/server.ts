@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
 import type { User } from "@supabase/supabase-js";
 import { isDevelopmentDemo } from "../ui/demo-mode";
-import { publicAuthConfig } from "./config";
+import { AUTH_COOKIE_OPTIONS, publicAuthConfig } from "./config";
 import { DEFAULT_AFTER_LOGIN, safeNextPath } from "./paths";
 
 /**
@@ -25,6 +25,7 @@ export async function createSupabaseServerClient() {
   if (!config) return null;
   const store = await cookies();
   return createServerClient(config.url, config.publishableKey, {
+    cookieOptions: AUTH_COOKIE_OPTIONS,
     cookies: {
       getAll: () => store.getAll(),
       setAll(toSet) {
@@ -91,7 +92,7 @@ export async function isGoogleAuthEnabled(): Promise<boolean> {
   const config = publicAuthConfig();
   if (!config) return false;
   if (googleCache && Date.now() - googleCache.at < 5 * 60_000) return googleCache.value;
-  let value = false;
+  let value: boolean;
   try {
     const response = await fetch(new URL("/auth/v1/settings", config.url), { headers: { apikey: config.publishableKey }, cache: "no-store", signal: AbortSignal.timeout(4000) });
     const body: unknown = response.ok ? await response.json() : null;

@@ -52,7 +52,7 @@ export function Dashboard({ result, scope, demo = false }: { result: ReadResult<
 
   return <>
     <PageHeading title="Market overview" description="Find your next idea in the signals behind the apps.">
-      <div className="flex flex-wrap items-end gap-2"><ScopeControls scope={scope} onChange={values => { const next = new URLSearchParams(params.toString()); for (const [key, value] of Object.entries(values)) { if (value) next.set(key, value); else next.delete(key); } startTransition(() => router.replace(`/?${next}`)); }} /><Button asChild><Link href={explore}>Explore apps <ArrowRight size={15} /></Link></Button></div>
+      <div className="flex flex-wrap items-end gap-2"><ScopeControls scope={scope} onChange={values => { const next = new URLSearchParams(params.toString()); for (const [key, value] of Object.entries(values)) { if (value) next.set(key, value); else next.delete(key); } startTransition(() => router.replace(`/dashboard?${next}`)); }} /><Button asChild><Link href={explore}>Explore apps <ArrowRight size={15} /></Link></Button></div>
     </PageHeading>
     {pending ? <DashboardSkeleton /> : <div className="flex flex-col gap-5">
       <ReadNotice result={result} />

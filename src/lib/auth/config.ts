@@ -22,3 +22,9 @@ export function publicAuthConfig(env: Record<string, string | undefined> = proce
   } catch { return null; }
   return { url, publishableKey };
 }
+
+/**
+ * Session cookie attributes. AppRadar only uses server-side Supabase clients, so the auth cookie
+ * can be HttpOnly (not readable by page scripts) on top of the library's SameSite=Lax default.
+ */
+export const AUTH_COOKIE_OPTIONS = { httpOnly: true, sameSite: "lax" as const, secure: process.env.NODE_ENV === "production", path: "/" };

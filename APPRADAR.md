@@ -393,6 +393,18 @@ Claude (kabuk, Dashboard, Modern Minimal tokenları, paylaşılan primitifler) v
 
 **Tema lisansı [DOĞRULANMADI]:** 21st.dev “Modern Minimal” teması (`https://21st.dev/community/themes/modern-minimal`, serafimcloud) `get_theme` ile alındı. Bileşen dosyalarındaki MIT kayıtları duruyor (shadcn sidebar/card/empty/skeleton, Origin/shadcn tablo, StatCard, BarChart, Partition Bar). Tema sayfasının ticari kullanım lisansı bu entegrasyonda doğrulanmadı; tema değerleri `src/app/globals.css` içindedir ve lisans kaydı gelmeden yeni tema kopyalanmaz.
 
+### 6.14 Tanıtım sayfası ve kimlik doğrulama — 26 Kasım 2026
+
+- **Rotalar:** `/` herkese açık tanıtım; Dashboard `/dashboard`'a taşındı. Açık: `/login`, `/signup`, `/forgot-password`, `/reset-password`, `/auth/callback`. Korumalı: `/dashboard`, `/explore`, `/apps/[id]`, `/account` (+ eski `/admin`, `/settings`, `/watchlist`).
+- **Auth:** Supabase Auth, resmi `@supabase/ssr` (0.12.7) + `@supabase/supabase-js` (2.119.0). E-posta/şifre, e-posta doğrulama, şifre sıfırlama, Google OAuth (yalnızca Supabase projesinde etkinse görünür), çıkış, `/account`.
+- **Güvenlik:** `src/proxy.ts` oturumu yeniler ve iyimser yönlendirme yapar; asıl yetki kontrolü `getUser()` ile sunucuda: `lib/auth/server.ts` (`requireViewer`), sayfalar, server action'lar, `/auth/callback` ve tüm katalog okumaları (`lib/ui/catalog.server.ts` → `readResult`). `next` parametresi allowlist ile doğrulanır (open redirect yok). Tarayıcı yalnızca publishable key görür; service-role anahtarı `lib/read` ve `lib/persistence` içinde sunucuda kalır, publishable alanına girilirse reddedilir. Korumalı/auth yanıtlarında `Cache-Control: private, no-store`.
+- **Demo:** kimlik doğrulama atlaması yalnızca `NODE_ENV=development` ve `APPRADAR_DEMO_MODE=true`; sahte kullanıcı/oturum yok, Supabase'e yazım yok; demo katalog gerçek okuma yoluna düşmez. Production'da atlama mümkün değil (`tests/auth.test.ts`, `tests/ui-demo.test.ts`).
+- **Yeni tablo/migration yok.** Profil verisi Supabase Auth'ta kalır.
+- **Kurulum:** ortam değişkenleri `.env.example`; Supabase Dashboard ve Google Cloud adımları `docs/AUTH_SETUP.md`.
+- **Entegrasyon doğrulaması (26 Kasım 2026):** `f5e5ac7` sonrası landing/auth değişiklikleri korundu. Geçici `mock-auth` / scratch launch yapılandırmaları kaldırıldı. Eksik `NEXT_PUBLIC_SUPABASE_*` durumunda login/signup yapılandırılmamış mesajı gösteriyor; formlar disabled. Demo ile dashboard/explorer/account açılıyor; landing chromeless; masaüstü ve 390px kontrolleri geçti. `.next/static` içinde service-role/token yok.
+- **Gerçek Supabase Auth doğrulaması [ERTELENDİ]:** Publishable key, Site URL, e-posta şablonları, SMTP ve Google OAuth bilinçli olarak yapılandırılmadı; gerçek kullanıcı oluşturma, e-posta teslimi ve dış sağlayıcı testi yapılmadı.
+- **Yayın engelleri:** Gizlilik politikası, kullanım koşulları ve iletişim bilgisi yazılmadı/onaylanmadı (footer'da "coming soon"); Supabase e-posta şablonları ve SMTP üretim için ayarlanmalı; gerçek hesapla uçtan uca giriş/çıkış testi ertelendi.
+
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
 POC kodu da Bölüm 1'deki plan onayından sonra yazılır. Aşağıdaki eşikler öneridir ve onaylı plana alınmalıdır.

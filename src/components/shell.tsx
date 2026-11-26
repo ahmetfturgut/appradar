@@ -2,17 +2,20 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ChartNoAxesCombined, ChevronRight, Compass, Database, FlaskConical, LayoutDashboard, Menu, Radar, Search, Sparkles, X } from "lucide-react";
+import { ChartNoAxesCombined, ChevronRight, CircleUser, Compass, Database, FlaskConical, LayoutDashboard, LogOut, Menu, Radar, Search, Sparkles, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "../lib/utils";
+import { isChromelessPath } from "../lib/auth/paths";
+import { signOut } from "../lib/auth/actions";
 import { SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, sidebarMenuButtonVariants } from "./ui/sidebar";
 
 const navigation = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/explore", label: "App Explorer", icon: Compass },
 ];
 
-export function Shell({ children, demo = false }: { children: React.ReactNode; demo?: boolean }) {
+/** `account` is the minimum the client needs: the verified user's email, or null (demo bypass / signed out). */
+export function Shell({ children, demo = false, account = null }: { children: React.ReactNode; demo?: boolean; account?: { email: string | null } | null }) {
   const path = usePathname();
   const params = useSearchParams();
   const context = new URLSearchParams();
@@ -33,14 +36,16 @@ export function Shell({ children, demo = false }: { children: React.ReactNode; d
     requestAnimationFrame(() => menuButton.current?.focus());
   }
   const isActive = (href: string) => path === href || href === "/explore" && path.startsWith("/apps/");
-  const title = path.startsWith("/apps/") ? "App details" : navigation.find(item => item.href === path)?.label ?? "Workspace";
+  // Landing and authentication pages render their own minimal layout.
+  if (isChromelessPath(path)) return <>{children}</>;
+  const title = path.startsWith("/apps/") ? "App details" : path === "/account" ? "Account" : navigation.find(item => item.href === path)?.label ?? "Workspace";
   return <div className="product-shell flex min-h-screen" onKeyDown={event => { if (open && event.key === "Escape") closeNavigation(); }}>
     <a className="skip-link" href="#main">Skip to content</a>
     {open && <button className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-[1px] lg:hidden" aria-label="Dismiss navigation" onClick={closeNavigation} />}
     <aside id="product-sidebar" aria-label="Sidebar" className={cn("fixed inset-y-0 left-0 z-50 w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex lg:w-60", open ? "flex shadow-xl" : "hidden")}>
       <SidebarHeader className="gap-3 pt-4">
         <div className="flex items-center justify-between px-1">
-          <Link href={scoped("/")} onClick={() => setOpen(false)} className="flex items-center gap-2.5 rounded-md px-1 py-1 text-[15px] font-semibold tracking-[-0.02em] text-foreground">
+          <Link href={scoped("/dashboard")} onClick={() => setOpen(false)} className="flex items-center gap-2.5 rounded-md px-1 py-1 text-[15px] font-semibold tracking-[-0.02em] text-foreground">
             <span className="grid size-7 place-items-center rounded-lg bg-primary text-primary-foreground shadow-xs"><Radar className="size-4" strokeWidth={2.2} /></span>AppRadar
           </Link>
           <button ref={closeButton} type="button" className="grid size-9 place-items-center rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-foreground lg:hidden" aria-label="Close navigation" onClick={closeNavigation}><X className="size-4" /></button>
@@ -55,16 +60,20 @@ export function Shell({ children, demo = false }: { children: React.ReactNode; d
         <SidebarGroup>
           <SidebarGroupLabel>Research shortcuts</SidebarGroupLabel>
           <nav aria-label="Research shortcuts"><SidebarMenu>
-            <SidebarMenuItem><SidebarMenuButton asChild><Link href={`${scoped("/")}#trending`} onClick={() => setOpen(false)}><ChartNoAxesCombined /><span>Trending apps</span></Link></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton asChild><Link href={`${scoped("/dashboard")}#trending`} onClick={() => setOpen(false)}><ChartNoAxesCombined /><span>Trending apps</span></Link></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem><SidebarMenuButton asChild><Link href={`${scoped("/explore")}&sort=releasedAt`} onClick={() => setOpen(false)}><Sparkles /><span>New releases</span></Link></SidebarMenuButton></SidebarMenuItem>
           </SidebarMenu></nav>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="pb-4">
+      <SidebarFooter className="gap-2 pb-4">
         <div className="rounded-lg border bg-card p-3 shadow-xs">
           <div className="flex items-center gap-2 text-[13px] font-medium text-foreground">{demo ? <FlaskConical className="size-4 text-warning" /> : <Database className="size-4 text-primary" />}{demo ? "Synthetic demo data" : "Stored observations"}</div>
           <p className="mt-1.5 text-xs/relaxed text-muted-foreground">{demo ? "Every app, ranking and metric is a fixture. No store or database reads." : "Research stored observations with their country, language, and collection context."}</p>
         </div>
+        {account ? <div className="flex items-center gap-1 rounded-lg border bg-card p-1.5 shadow-xs">
+          <Link href="/account" onClick={() => setOpen(false)} aria-current={path === "/account" ? "page" : undefined} className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-1.5 py-1 hover:bg-sidebar-accent"><CircleUser className="size-4 shrink-0 text-muted-foreground" /><span className="grid min-w-0 leading-tight"><span className="text-xs font-medium text-foreground">Account</span><span className="truncate text-[11px] text-muted-foreground">{account.email ?? "Signed in"}</span></span></Link>
+          <form action={signOut}><button type="submit" aria-label="Sign out" title="Sign out" className="grid size-8 place-items-center rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"><LogOut className="size-4" /></button></form>
+        </div> : demo ? <p className="px-1 text-[11px]/relaxed text-muted-foreground">Development demo: authentication is bypassed locally. No user is signed in.</p> : null}
       </SidebarFooter>
     </aside>
     <div className="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-60" inert={open || undefined}>

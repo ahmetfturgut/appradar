@@ -17,6 +17,6 @@ export default function NotFound() {
       <EmptyDescription>{app ? "This app identity was not found in the stored catalog. Return to the explorer to discover another app." : "This address doesn’t match a page in AppRadar. Check the URL or go back to the dashboard."}</EmptyDescription>
     </EmptyHeader><EmptyContent>{app
       ? <Button asChild variant="outline"><Link href={contextResetHref("/explore", params)}>Back to App Explorer</Link></Button>
-      : <Button asChild variant="outline"><Link href={contextResetHref("/", params)}>Go to Dashboard</Link></Button>}</EmptyContent></Empty>
+      : <Button asChild variant="outline"><Link href={contextResetHref("/dashboard", params)}>Go to Dashboard</Link></Button>}</EmptyContent></Empty>
   </section>;
 }

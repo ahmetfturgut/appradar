@@ -4,12 +4,16 @@ import { toAppViewModel, toDashboardModel } from "../../components/core/catalog-
 import { readFailure } from "../../components/core/catalog-query";
 import type { DetailsSections, ExplorerFilters, ReadResult, Scope } from "../../components/core/view-models";
 import { isDevelopmentDemo } from "./demo-mode";
+import { requireViewer } from "../auth/server";
 
 // Selection happens before a read, never inside an error/fallback path. The fixtures
 // have no Supabase client and are only loaded for the explicit development opt-in.
 const demoCatalog = async () => (await import("./demo-catalog")).createDemoCatalog();
 
 export async function readResult<T>(load: () => Promise<T>): Promise<ReadResult<T>> {
+  // Authorization lives at the data source: every catalog read requires a verified Supabase user
+  // (or the development-only demo bypass). Outside the try so the login redirect is not swallowed.
+  await requireViewer();
   try { return { state: "ready", data: await load() }; } catch (error) { return readFailure(error); }
 }
 export const dashboardData = (scope: Scope) => readResult(async () => toDashboardModel(isDevelopmentDemo() ? (await demoCatalog()).getDashboard(scope) : await getDashboard({ ...scope, recentLimit: 4 })));
@@ -21,6 +25,7 @@ export const explorerData = (filters: ExplorerFilters) => readResult(async () =>
 });
 export const appData = (id: string, scope: Scope) => readResult(async () => isDevelopmentDemo() ? (await demoCatalog()).getAppDetails(id, scope) : await getAppDetails({ appId: id, ...scope, historyDays: 30, relatedLimit: 0 }));
 export async function detailSections(input: { appId: string; store: "ios" | "play"; country: string; language: string; tab: string; reviewPage: number; reviewSort: "newest" | "helpful"; keywordPage: number; keyword?: string; keywordSnapshot?: number }): Promise<DetailsSections> {
+  await requireViewer();
   if (isDevelopmentDemo()) return (await demoCatalog()).detailSections(input);
   const result: DetailsSections = { reviews: null, distribution: null, keywords: null, selectedKeyword: null };
   const context = { country: input.country, language: input.language };

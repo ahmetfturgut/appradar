@@ -186,11 +186,15 @@ test("server gateway selects demo without network and never falls back on real-d
     assert.equal((await gateway.appData(app.appId, scope)).state, "ready");
     assert.equal((await gateway.detailSections(sectionInput)).reviews!.state, "ready");
     assert.equal(requests, 0);
+    // Outside the development demo there is no auth bypass: without a verified Supabase user every
+    // catalog read redirects to /login before any data access (and production can never bypass).
+    const toLogin = { message: "NEXT_REDIRECT", digest: /^NEXT_REDIRECT;replace;\/login;/ };
     for (const [environment, flag] of [["production", "true"], ["development", "false"], ["test", "true"]]) {
       Object.assign(process.env, { NODE_ENV: environment, APPRADAR_DEMO_MODE: flag });
-      assert.equal((await gateway.dashboardData(scope)).state, "unavailable");
-      assert.equal((await gateway.explorerData(filters)).state, "unavailable");
-      assert.equal((await gateway.appData(app.appId, scope)).state, "unavailable");
+      await assert.rejects(gateway.dashboardData(scope), toLogin);
+      await assert.rejects(gateway.explorerData(filters), toLogin);
+      await assert.rejects(gateway.appData(app.appId, scope), toLogin);
+      await assert.rejects(gateway.detailSections(sectionInput), toLogin);
     }
     assert.equal(requests, 0);
   } finally {

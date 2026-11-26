@@ -23,7 +23,7 @@ export const isChromelessPath = (path: string) => (PUBLIC_CHROMELESS_PATHS as re
  */
 export function safeNextPath(value: unknown, fallback: string = DEFAULT_AFTER_LOGIN): string {
   if (typeof value !== "string" || value.length === 0 || value.length > 1024) return fallback;
-  if (!value.startsWith("/") || value.startsWith("//") || /[\\\u0000-\u001f\u007f]/.test(value)) return fallback;
+  if (!value.startsWith("/") || value.startsWith("//") || value.includes("\\") || [...value].some(char => char.charCodeAt(0) < 0x20 || char.charCodeAt(0) === 0x7f)) return fallback;
   let url: URL;
   try { url = new URL(value, "https://appradar.invalid"); } catch { return fallback; }
   if (url.origin !== "https://appradar.invalid") return fallback;
