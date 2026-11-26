@@ -5,6 +5,12 @@
  */
 import type { AppDetails, Dashboard, ExplorerResult, HistorySeries, KeywordMetrics, KeywordSummary, ListingSummary, Page, RatingDistribution, ReviewItem } from "../read/index";
 import type { DetailsSections, ExplorerFilters, Scope } from "../../components/core/view-models";
+import { compareSnapshots, isEligible, previousComparable, seriesKey, type SnapshotWithEntries } from "../intel/ranking.ts";
+import { buildAppRankings } from "../intel/views.ts";
+import { loadChartPage, type ChartPageQuery } from "../read/rankings.ts";
+import { demoChartSnapshots, DEMO_CHART_SOURCE } from "./demo-charts.ts";
+import { loadMarketPage, loadOpportunities, type MarketIO, type MarketQuery, type OpportunityQuery } from "../read/markets.ts";
+import type { MarketApp } from "../intel/market.ts";
 
 const DAY = 86_400_000;
 const SOURCE = "Synthetic development demo";
@@ -35,20 +41,34 @@ export function createDemoCatalog(clock = new Date()) {
     const ageHours = observed == null ? null : Math.round((now - Date.parse(observed)) / 360_000) / 10;
     return { lastObservedAt: observed, ageHours, status: ageHours == null ? "unknown" : ageHours > 72 ? "stale" : "fresh", staleAfterHours: 72 };
   };
-  const releaseAge = (i: number) => [2, 6, 12, 24, 38, 95, 210, 365][i % 8]!;
+  // Market scenarios (P2) vary by category: c = category index, k = position within the category.
+  //  Books (5): mixed ages and updates; Food & Drink (6): many unknown update dates; Travel (7): old, rarely updated;
+  //  Education (3): lower ratings; Photo & Video (4): small rating counts; Health & Fitness (2): few developers;
+  //  Finance (1): some unidentified developers. One future update (i=45) and one future release (i=109) are invalid dates.
+  const cat = (i: number) => i % 8, slot = (i: number) => i >> 3;
+  const releaseAge = (i: number) => cat(i) === 5 ? 95 + slot(i) * 40 : cat(i) === 6 ? 210 + slot(i) * 90 : cat(i) === 7 ? 365 + slot(i) * 120 : [2, 6, 12, 24, 38][cat(i)]!;
+  const updateAge = (i: number): number | null => {
+    if (i === 22 || (cat(i) === 6 && (slot(i) % 3 === 0 || slot(i) === 13))) return null;
+    if (i === 45) return -20; // synthetic future update date: excluded as invalid
+    if (cat(i) === 7) return Math.min(releaseAge(i), 400 + (i % 5) * 90);
+    if (cat(i) === 5 && slot(i) % 2 === 1) return Math.min(releaseAge(i), 300 + slot(i) * 20);
+    return Math.min(releaseAge(i), 1 + i % 5);
+  };
+  const developerFor = (i: number): string | null => cat(i) === 2 ? `Demo Wellness Group ${["A", "A", "B", "C"][slot(i) % 4]}` : cat(i) === 1 && slot(i) % 3 === 1 ? null : `Demo Studio ${Math.floor(i / 2)}`;
   const listings: ListingSummary[] = names.flatMap((name, i) => contexts.map((ctx, c) => {
     const store = i < HALF ? "ios" as const : "play" as const;
-    const amount = i % 11 === 10 ? null : i % 3 === 0 ? (ctx.country === "TR" ? 79.99 + i * 5 : 1.99 + (i % 4)) : 0;
+    const euro = i === 59 && ctx.country === "US"; // one synthetic listing priced in another currency
+    const amount = euro ? 2.99 : i % 11 === 10 ? null : i % 3 === 0 ? (ctx.country === "TR" ? 79.99 + i * 5 : 1.99 + (i % 4)) : 0;
     const observedAt = i === 22 ? null : at(i % 7 === 6 ? 5 : 0, 2 + i % 6);
     const installLower = store === "play" && i !== 22 ? [1000, 10000, 100000, 1000000][i % 4]! : null;
     return {
       appId: idFor(i), listingId: (i + 1) * 10 + c, store, storeAppId: `demo.${store}.${i + 1}`, storeUrl: null,
       country: ctx.country, requestedLanguage: ctx.language, effectiveLanguage: i % 9 === 8 ? null : ctx.language,
-      name, developerName: `Demo Studio ${Math.floor(i / 2)}`, category: categories[i % 8]!, version: i === 22 ? null : `1.${i % 6}.${i % 3}`,
-      releasedAt: i === 22 ? null : at(releaseAge(i)), releasedAtPrecision: i === 22 ? null : "date",
-      storeUpdatedAt: i === 22 ? null : at(Math.min(releaseAge(i), 1 + i % 5)), storeUpdatedAtPrecision: i === 22 ? null : "datetime",
-      price: { amount: amount == null ? null : Math.round(amount * 100) / 100, currency: amount == null ? null : ctx.currency, isFree: amount == null ? null : amount === 0 },
-      rating: i === 22 ? null : Number((3.6 + (i % 14) / 10).toFixed(1)), ratingCount: i === 22 ? null : i === 0 ? 0 : 127 + i * i * 871,
+      name, developerName: developerFor(i), category: categories[i % 8]!, version: i === 22 ? null : `1.${i % 6}.${i % 3}`,
+      releasedAt: i === 22 ? null : i === 109 ? at(-15) : at(releaseAge(i)), releasedAtPrecision: i === 22 ? null : "date",
+      storeUpdatedAt: updateAge(i) == null ? null : at(updateAge(i)!), storeUpdatedAtPrecision: updateAge(i) == null ? null : "datetime",
+      price: { amount: amount == null ? null : Math.round(amount * 100) / 100, currency: amount == null ? null : euro ? "EUR" : ctx.currency, isFree: amount == null ? null : amount === 0 },
+      rating: i === 22 ? null : Number((3.6 + (i % 14) / 10 - (cat(i) === 3 ? 0.7 : 0)).toFixed(1)), ratingCount: i === 22 ? null : i === 0 ? 0 : cat(i) === 4 ? 127 + i * 31 : 127 + i * i * 871,
       reviewCount: i === 22 ? null : 18 + i * 67,
       installs: { text: installLower == null ? null : `${installLower.toLocaleString("en-US")}+`, lowerBound: installLower, supported: store === "play" },
       iconUrl: null, firstSeenAt: at(releaseAge(i)), freshness: fresh(observedAt),
@@ -92,14 +112,22 @@ export function createDemoCatalog(clock = new Date()) {
     const unique = [...new Map(rows.map(row => [row.appId, row])).values()];
     const observed = rows.flatMap(row => row.freshness.lastObservedAt ? [row.freshness.lastObservedAt] : []).sort();
     const chartRows = scoped({ ...scope, language: scope.language ?? (scope.country === "TR" ? "tr" : "en") });
-    const rankingChanges: Dashboard["rankingChanges"] = (["ios", "play"] as const).flatMap((store, s) => {
-      const apps = chartRows.filter(row => row.store === store).slice(0, 8);
-      if (!apps.length) return [];
-      return [{ snapshotId: 500 + s, previousSnapshotId: 490 + s, source: SOURCE, store, country: scope.country,
-        requestedLanguage: apps[0]!.requestedLanguage, context: "Synthetic top apps", category: null,
-        coverageStatus: s ? "partial" : "bounded", previousCoverageStatus: "bounded", observedAt: at(0, 2), previousObservedAt: at(1, 2), elapsedHours: 24,
-        entries: apps.map((listing, i) => ({ appId: listing.appId, position: i + 1, previousPosition: i === 3 ? null : Math.max(1, i + 1 + [4, 0, -2, 0, 6, -3, 2, 1][i]!), change: i === 3 ? null : Math.max(1, i + 1 + [4, 0, -2, 0, 6, -3, 2, 1][i]!) - (i + 1), listing })) }];
-    });
+    // Same rule as the fixed SQL pairing: latest eligible snapshot vs the previous eligible one of equal depth.
+    const chartLanguage = scope.language ?? (scope.country === "TR" ? "tr" : "en");
+    const charts = chartSnapshots(scope.country, chartLanguage).filter(row => row.kind === "chart" && (!scope.store || row.store === scope.store));
+    const latestBySeries = new Map<string, SnapshotWithEntries>();
+    for (const row of [...charts].sort((a, b) => Date.parse(b.observedAt) - Date.parse(a.observedAt) || b.id - a.id)) if (isEligible(row) && !latestBySeries.has(seriesKey(row))) latestBySeries.set(seriesKey(row), row);
+    const rankingChanges: Dashboard["rankingChanges"] = [...latestBySeries.values()].flatMap(latest => {
+      const previous = previousComparable(latest, charts);
+      if (!previous) return [];
+      const comparison = compareSnapshots(latest, previous, "1d");
+      const byId = new Map(chartRows.map(row => [row.appId, row]));
+      return [{ snapshotId: latest.id, previousSnapshotId: previous.id, source: DEMO_CHART_SOURCE, store: latest.store, country: latest.country,
+        requestedLanguage: latest.requestedLanguage, context: latest.context, category: latest.category,
+        coverageStatus: latest.coverageStatus, previousCoverageStatus: previous.coverageStatus, observedAt: latest.observedAt, previousObservedAt: previous.observedAt,
+        elapsedHours: Math.round((Date.parse(latest.observedAt) - Date.parse(previous.observedAt)) / 360_000) / 10,
+        entries: comparison.entries.slice(0, 20).map(e => ({ appId: e.appId, position: e.position, previousPosition: e.previousPosition, change: e.change, listing: byId.get(e.appId) ?? null })) }];
+    }).slice(0, 5);
     return {
       stats: { apps: unique.length, listings: rows.length, iosApps: unique.filter(row => row.store === "ios").length, playApps: unique.filter(row => row.store === "play").length,
         developers: new Set(rows.map(row => row.developerName)).size, countries: rows.length ? 1 : 0, categories: new Set(rows.map(row => row.category)).size, uncategorizedListings: 0,
@@ -107,7 +135,7 @@ export function createDemoCatalog(clock = new Date()) {
         keywordSnapshots: new Set(rows.map(row => `${row.store}:${row.requestedLanguage}`)).size * keywords.length * 4,
         latestObservedAt: observed.at(-1) ?? null, oldestObservedAt: observed[0] ?? null, freshness: fresh(observed.at(-1) ?? null) },
       categories: listCategories(scope),
-      recentReleases: scoped({ ...scope, store: scope.store ?? "ios" }).filter(row => row.releasedAt != null).sort((a, b) => b.releasedAt!.localeCompare(a.releasedAt!) || a.listingId - b.listingId).slice(0, 4),
+      recentReleases: scoped({ ...scope, store: scope.store ?? "ios" }).filter(row => row.releasedAt != null && Date.parse(row.releasedAt) <= now).sort((a, b) => b.releasedAt!.localeCompare(a.releasedAt!) || a.listingId - b.listingId).slice(0, 4),
       rankingChanges,
     };
   }
@@ -177,5 +205,62 @@ export function createDemoCatalog(clock = new Date()) {
     }
     return result;
   }
-  return { getDashboard, listCategories, exploreApps, getAppDetails, detailSections };
+  const chartCache = new Map<string, SnapshotWithEntries[]>();
+  /** Synthetic chart history per country/language context (memoised for this catalog instance). */
+  function chartSnapshots(country: string, language: string): SnapshotWithEntries[] {
+    const key = `${country}:${language}`;
+    if (!chartCache.has(key)) {
+      const recentIos = names.map((_, i) => i).filter(i => i < HALF && releaseAge(i) <= 38);
+      chartCache.set(key, contexts.some(ctx => ctx.country === country && ctx.language === language) ? demoChartSnapshots({ now, country, language, idFor, recentIos, releaseAgeDays: releaseAge }) : []);
+    }
+    return chartCache.get(key)!;
+  }
+  const chartFacts = (q: { kind: "chart" | "new_apps"; store?: "ios" | "play"; country: string; language?: string }) =>
+    contexts.filter(ctx => ctx.country === q.country && (!q.language || ctx.language === q.language))
+      .flatMap(ctx => chartSnapshots(ctx.country, ctx.language))
+      .filter(row => row.kind === q.kind && (!q.store || row.store === q.store))
+      .map(row => { const facts: Omit<SnapshotWithEntries, "entries"> & { entries?: unknown } = { ...row }; delete facts.entries; return facts; });
+  function getChartPage(query: ChartPageQuery) {
+    const all = contexts.flatMap(ctx => chartSnapshots(ctx.country, ctx.language));
+    return loadChartPage(query, {
+      facts: async q => chartFacts(q),
+      entries: async ids => new Map(ids.map(id => [id, all.find(row => row.id === id)?.entries ?? []])),
+      listings: async (ids, country, language) => new Map(listings.filter(row => ids.includes(row.appId) && row.country === country && row.requestedLanguage === language).map(row => [row.appId, row])),
+      now: () => now,
+    });
+  }
+  function getAppRankings(appId: string, country: string, language: string | undefined) {
+    const own = contexts.filter(ctx => ctx.country === country && (!language || ctx.language === language))
+      .flatMap(ctx => chartSnapshots(ctx.country, ctx.language))
+      .filter(row => row.entries.some(e => e.appId === appId)).map(row => `${seriesKey(row)}`);
+    const keys = new Set(own);
+    const snapshots = contexts.filter(ctx => ctx.country === country && (!language || ctx.language === language))
+      .flatMap(ctx => chartSnapshots(ctx.country, ctx.language)).filter(row => keys.has(seriesKey(row)))
+      .map(row => ({ ...row, entries: row.entries.filter(e => e.appId === appId) }));
+    return buildAppRankings(snapshots, appId, now);
+  }
+  function getRecentReleases(q: { store: "ios" | "play"; country: string; language?: string; category?: string; days: number; page: number; pageSize: number }): Page<ListingSummary> & { since: string } {
+    const since = new Date(now - q.days * DAY).toISOString();
+    const rows = scoped({ country: q.country, store: q.store, ...(q.language ? { language: q.language } : {}) })
+      .filter(row => row.releasedAt != null && row.releasedAt >= since && Date.parse(row.releasedAt) <= now && (!q.category || row.category === q.category))
+      .sort((a, b) => b.releasedAt!.localeCompare(a.releasedAt!) || a.listingId - b.listingId);
+    return { ...page(rows, q.page, q.pageSize), since };
+  }
+  /** Same mapping as the real read service: developer identity is the (synthetic) studio. */
+  const marketApp = (row: ListingSummary): MarketApp => ({
+    appId: row.appId, listingId: row.listingId, name: row.name, store: row.store, country: row.country, requestedLanguage: row.requestedLanguage,
+    category: row.category, developerId: row.developerName ? `demo-developer:${row.developerName}` : null, developerName: row.developerName,
+    rating: row.rating, ratingCount: row.ratingCount, price: row.price, releasedAt: row.releasedAt, storeUpdatedAt: row.storeUpdatedAt, lastObservedAt: row.freshness.lastObservedAt,
+  });
+  const marketIO: MarketIO = {
+    contextApps: async q => { const apps = scoped({ country: q.country, store: q.store, language: q.language }).filter(row => !q.category || row.category === q.category).map(marketApp); return { apps, available: apps.length, truncated: false }; },
+    categories: async q => listCategories({ country: q.country, store: q.store, language: q.language }),
+    chartFacts: async q => chartFacts({ kind: "chart", store: q.store, country: q.country, language: q.language }),
+    entries: async ids => { const all = contexts.flatMap(ctx => chartSnapshots(ctx.country, ctx.language)); return new Map(ids.map(id => [id, all.find(row => row.id === id)?.entries ?? []])); },
+    marketApps: async (ids, country, language) => new Map(listings.filter(row => ids.includes(row.appId) && row.country === country && row.requestedLanguage === language).map(row => [row.appId, marketApp(row)])),
+    now: () => now,
+  };
+  const getMarketPage = (query: MarketQuery) => loadMarketPage(query, marketIO);
+  const getOpportunities = (query: OpportunityQuery) => loadOpportunities(query, marketIO);
+  return { getDashboard, listCategories, exploreApps, getAppDetails, detailSections, getChartPage, getAppRankings, getRecentReleases, getMarketPage, getOpportunities };
 }

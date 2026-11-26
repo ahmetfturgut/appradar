@@ -95,7 +95,10 @@ test("dashboard counts, categories, ranking deltas and freshness agree with fixt
   assert.equal(model.stats.apps, 120); assert.equal(model.stats.listings, 240);
   assert.equal(model.stats.iosApps, 60); assert.equal(model.stats.playApps, 60);
   assert.equal(model.categories.reduce((total, row) => total + row.appCount, 0), 120);
-  assert.equal(model.rankingChanges.length, 2); assert.equal(model.recent.length, 4);
+  // Ranking changes now come from the synthetic chart history and the shared comparability rule:
+  // four series have a comparable pair; the series without run provenance is excluded.
+  assert.equal(model.rankingChanges.length, 4); assert.equal(model.recent.length, 4);
+  assert.ok(!model.rankingChanges.some(series => series.category === "6000"));
   const deltas = model.rankingChanges.flatMap(series => series.entries.map(entry => entry.change));
   assert.ok(deltas.some(n => n != null && n > 0)); assert.ok(deltas.some(n => n != null && n < 0));
   assert.ok(deltas.includes(0)); assert.ok(deltas.includes(null));

@@ -2,7 +2,7 @@
 // Pure functions only: no Supabase or Next imports, so it is unit-testable.
 
 /** Signed-in area. Legacy screens (admin/settings/watchlist) are included so nothing is left open. */
-export const PROTECTED_PREFIXES = ["/dashboard", "/explore", "/apps", "/account", "/admin", "/settings", "/watchlist"] as const;
+export const PROTECTED_PREFIXES = ["/dashboard", "/explore", "/trending", "/new-releases", "/markets", "/opportunities", "/apps", "/account", "/admin", "/settings", "/watchlist"] as const;
 /** Signed-in users are sent away from these. */
 export const GUEST_ONLY_PATHS = ["/login", "/signup"] as const;
 /** Pages that render without the app shell (sidebar/header). */

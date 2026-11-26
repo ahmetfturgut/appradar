@@ -1,5 +1,5 @@
 import "server-only";
-import { getAppDetails, getDashboard, exploreApps, listCategories, listReviews, getReviewRatingDistribution, listKeywords, getKeywordHistory, getKeywordRankings } from "../read/index";
+import { getAppDetails, getDashboard, exploreApps, listCategories, listReviews, getReviewRatingDistribution, listKeywords, getKeywordHistory, getKeywordRankings, getChartPage, getAppRankings, getRecentReleases, getMarketPage, getOpportunities, type ChartPageQuery, type MarketQuery, type OpportunityQuery } from "../read/index";
 import { toAppViewModel, toDashboardModel } from "../../components/core/catalog-mapping";
 import { readFailure } from "../../components/core/catalog-query";
 import type { DetailsSections, ExplorerFilters, ReadResult, Scope } from "../../components/core/view-models";
@@ -48,3 +48,16 @@ export async function detailSections(input: { appId: string; store: "ios" | "pla
   }
   return result;
 }
+
+// P1 ranking intelligence. Same authorization and demo selection as every other catalog read.
+export const trendingData = (query: Omit<ChartPageQuery, "kind">) => readResult(async () => isDevelopmentDemo() ? (await demoCatalog()).getChartPage({ ...query, kind: "chart" }) : await getChartPage({ ...query, kind: "chart" }));
+export type ReleasesQuery = { store: "ios" | "play"; country: string; language?: string; category?: string; days: number; page: number; pageSize: number };
+export const newAppChartData = (query: Omit<ChartPageQuery, "kind" | "store">) => readResult(async () => isDevelopmentDemo() ? (await demoCatalog()).getChartPage({ ...query, kind: "new_apps", store: "ios" }) : await getChartPage({ ...query, kind: "new_apps", store: "ios" }));
+export const knownReleasesData = (query: ReleasesQuery) => readResult(async () => isDevelopmentDemo() ? (await demoCatalog()).getRecentReleases(query) : await getRecentReleases(query));
+export const appRankingsData = (appId: string, country: string, language?: string) => readResult(async () => isDevelopmentDemo()
+  ? (await demoCatalog()).getAppRankings(appId, country, language)
+  : await getAppRankings({ appId, country, ...(language ? { language } : {}) }));
+
+// P2 market research. Same authorization and demo selection as every other catalog read.
+export const marketData = (query: MarketQuery) => readResult(async () => isDevelopmentDemo() ? (await demoCatalog()).getMarketPage(query) : await getMarketPage(query));
+export const opportunityData = (query: OpportunityQuery) => readResult(async () => isDevelopmentDemo() ? (await demoCatalog()).getOpportunities(query) : await getOpportunities(query));

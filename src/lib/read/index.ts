@@ -10,3 +10,5 @@ export {
 export { listReviews, getReviewRatingDistribution, type ReviewItem, type ReviewsResult, type RatingDistribution } from "./reviews.ts";
 export { listKeywords, getKeywordHistory, getKeywordRankings, type KeywordMetrics, type KeywordSummary, type KeywordSeries, type KeywordRankingEntry } from "./keywords.ts";
 export { getDashboard, getCatalogStats, getRankingChanges, type Dashboard, type CatalogStats, type RankingChangeSeries, type RankingChange } from "./dashboard.ts";
+export { getChartPage, getAppRankings, getChartFacts, loadChartPage, RANKING_WINDOW_DAYS, type ChartPageQuery } from "./rankings.ts";
+export { getMarketPage, getOpportunities, getContextApps, loadMarketPage, loadOpportunities, MARKET_ROW_CAP, type MarketQuery, type OpportunityQuery, type MarketPageModel, type MarketIO } from "./markets.ts";

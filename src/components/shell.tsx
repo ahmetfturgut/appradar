@@ -2,16 +2,25 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ChartNoAxesCombined, ChevronRight, CircleUser, Compass, Database, FlaskConical, LayoutDashboard, LogOut, Menu, Radar, Search, Sparkles, X } from "lucide-react";
+import { ChevronRight, CircleUser, Compass, Database, FlaskConical, LayoutDashboard, LogOut, Menu, Radar, Search, Sparkles, TrendingUp, X, ChartPie, Lightbulb } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "../lib/utils";
 import { isChromelessPath } from "../lib/auth/paths";
+import { landingLocaleFromPath } from "../lib/landing/locale";
 import { signOut } from "../lib/auth/actions";
 import { SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, sidebarMenuButtonVariants } from "./ui/sidebar";
 
 const navigation = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/explore", label: "App Explorer", icon: Compass },
+];
+const research = [
+  { href: "/markets", label: "Market insights", icon: ChartPie },
+  { href: "/opportunities", label: "Opportunity finder", icon: Lightbulb },
+];
+const intelligence = [
+  { href: "/trending", label: "Trending apps", icon: TrendingUp },
+  { href: "/new-releases", label: "New releases", icon: Sparkles },
 ];
 
 /** `account` is the minimum the client needs: the verified user's email, or null (demo bypass / signed out). */
@@ -37,8 +46,8 @@ export function Shell({ children, demo = false, account = null }: { children: Re
   }
   const isActive = (href: string) => path === href || href === "/explore" && path.startsWith("/apps/");
   // Landing and authentication pages render their own minimal layout.
-  if (isChromelessPath(path)) return <>{children}</>;
-  const title = path.startsWith("/apps/") ? "App details" : path === "/account" ? "Account" : navigation.find(item => item.href === path)?.label ?? "Workspace";
+  if (isChromelessPath(path) || landingLocaleFromPath(path)) return <>{children}</>;
+  const title = path.startsWith("/apps/") ? "App details" : path === "/account" ? "Account" : [...navigation, ...intelligence, ...research].find(item => item.href === path)?.label ?? "Workspace";
   return <div className="product-shell flex min-h-screen" onKeyDown={event => { if (open && event.key === "Escape") closeNavigation(); }}>
     <a className="skip-link" href="#main">Skip to content</a>
     {open && <button className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-[1px] lg:hidden" aria-label="Dismiss navigation" onClick={closeNavigation} />}
@@ -58,11 +67,12 @@ export function Shell({ children, demo = false, account = null }: { children: Re
           <nav aria-label="Main navigation"><SidebarMenu>{navigation.map(item => <SidebarMenuItem key={item.href}><SidebarMenuButton asChild isActive={isActive(item.href)}><Link href={scoped(item.href)} onClick={() => setOpen(false)} aria-current={path === item.href ? "page" : undefined}><item.icon /><span>{item.label}</span></Link></SidebarMenuButton></SidebarMenuItem>)}</SidebarMenu></nav>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Research shortcuts</SidebarGroupLabel>
-          <nav aria-label="Research shortcuts"><SidebarMenu>
-            <SidebarMenuItem><SidebarMenuButton asChild><Link href={`${scoped("/dashboard")}#trending`} onClick={() => setOpen(false)}><ChartNoAxesCombined /><span>Trending apps</span></Link></SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton asChild><Link href={`${scoped("/explore")}&sort=releasedAt`} onClick={() => setOpen(false)}><Sparkles /><span>New releases</span></Link></SidebarMenuButton></SidebarMenuItem>
-          </SidebarMenu></nav>
+          <SidebarGroupLabel>Intelligence</SidebarGroupLabel>
+          <nav aria-label="Intelligence"><SidebarMenu>{intelligence.map(item => <SidebarMenuItem key={item.href}><SidebarMenuButton asChild isActive={path === item.href}><Link href={scoped(item.href)} onClick={() => setOpen(false)} aria-current={path === item.href ? "page" : undefined}><item.icon /><span>{item.label}</span></Link></SidebarMenuButton></SidebarMenuItem>)}</SidebarMenu></nav>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Research</SidebarGroupLabel>
+          <nav aria-label="Research"><SidebarMenu>{research.map(item => <SidebarMenuItem key={item.href}><SidebarMenuButton asChild isActive={path === item.href}><Link href={scoped(item.href)} onClick={() => setOpen(false)} aria-current={path === item.href ? "page" : undefined}><item.icon /><span>{item.label}</span></Link></SidebarMenuButton></SidebarMenuItem>)}</SidebarMenu></nav>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="gap-2 pb-4">

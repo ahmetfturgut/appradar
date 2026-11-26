@@ -5,6 +5,9 @@ import { Shell } from "../components/shell";
 import { CatalogProvider } from "../components/catalog-provider";
 import { isDevelopmentDemo } from "../lib/ui/demo-mode";
 import { getViewer } from "../lib/auth/server";
+import { headers } from "next/headers";
+import { LANDING_LOCALE_HEADER, preferredLandingLocale } from "../lib/landing/locale";
+import { dictionaries } from "../lib/landing/dictionaries";
 import "./globals.css";
 import "../components/core/product.css";
 
@@ -20,5 +23,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   // Verified identity (getUser). Only the email reaches the client; tokens never do.
   const viewer = await getViewer();
   const account = viewer.kind === "user" ? { email: viewer.user.email ?? null } : null;
-  return <html lang="en" data-scroll-behavior="smooth" className={inter.variable}><body><CatalogProvider catalog={catalog}><Suspense fallback={<main className="product-main p-8 text-sm text-muted-foreground">{demo ? "Loading synthetic development demo…" : "Loading workspace…"}</main>}><Shell demo={demo} account={account}>{children}</Shell></Suspense></CatalogProvider></body></html>;
+  const locale = preferredLandingLocale((await headers()).get(LANDING_LOCALE_HEADER));
+  return <html lang={locale} data-scroll-behavior="smooth" className={inter.variable}><body><CatalogProvider catalog={catalog}><Suspense fallback={<main className="product-main p-8 text-sm text-muted-foreground">{locale === "tr" ? dictionaries.tr.loading : demo ? "Loading synthetic development demo…" : "Loading workspace…"}</main>}><Shell demo={demo} account={account}>{children}</Shell></Suspense></CatalogProvider></body></html>;
 }

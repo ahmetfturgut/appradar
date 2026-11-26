@@ -74,6 +74,7 @@ export function Dashboard({ result, scope, demo = false }: { result: ReadResult<
           <CardHeader className={cn(data && series && "border-b")}>
             <CardTitle role="heading" aria-level={2}>Trending apps</CardTitle>
             <CardDescription>Position changes between two comparable chart snapshots</CardDescription>
+            <CardAction><Link className="product-text-link" href={`/trending?${scopeQuery(scope)}`}>View all <ArrowRight size={14} /></Link></CardAction>
           </CardHeader>
           {data && series ? <>
             <div className="flex flex-col gap-2 border-b bg-muted/40 px-5 py-3">
