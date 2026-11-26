@@ -1,0 +1,217 @@
+{
+  "job": {
+    "id": "ab646c66724b03e3acf5",
+    "provider": "subimpact",
+    "store": "ios",
+    "country": "US",
+    "mode": "search",
+    "context": "Habit Tracker",
+    "input": {
+      "mode": "search",
+      "store": "ios",
+      "searchTerms": [
+        "Habit Tracker"
+      ],
+      "country": "us",
+      "language": "en",
+      "maxItems": 5,
+      "fullDetails": true,
+      "proxy": {
+        "useApifyProxy": false
+      }
+    }
+  },
+  "run": {
+    "id": "QWMxt7LlNXnffiVG7",
+    "status": "SUCCEEDED",
+    "buildNumber": "0.1.1",
+    "usageTotalUsd": 0.0014999999999999998,
+    "chargedEventCounts": {
+      "app": 5
+    }
+  },
+  "redactedRows": [
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "1438388363",
+        "name": "Habit Tracker",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 1,
+        "rankContext": "Habit Tracker",
+        "rankCategory": null,
+        "ratingValue": 4.79042,
+        "ratingCount": 149214,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "2.15.14",
+        "source": "subimpact"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6443918070",
+        "name": "Habit Tracker - HabitKit",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 2,
+        "rankContext": "Habit Tracker",
+        "rankCategory": null,
+        "ratingValue": 4.84105,
+        "ratingCount": 2630,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "1.19.3",
+        "source": "subimpact"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "1547137474",
+        "name": "Onrise: Habit Tracker & Focus",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 3,
+        "rankContext": "Habit Tracker",
+        "rankCategory": null,
+        "ratingValue": 4.83859,
+        "ratingCount": 2627,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "1.1.9",
+        "source": "subimpact"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "1528595748",
+        "name": "Finch: Self-Care Pet",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 4,
+        "rankContext": "Habit Tracker",
+        "rankCategory": null,
+        "ratingValue": 4.94723,
+        "ratingCount": 779642,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Health & Fitness",
+        "version": "3.73.242",
+        "source": "subimpact"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "1450486923",
+        "name": "Routine Planner, Habit Tracker",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 5,
+        "rankContext": "Habit Tracker",
+        "rankCategory": null,
+        "ratingValue": 4.71478,
+        "ratingCount": 18235,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "3.30.9",
+        "source": "subimpact"
+      }
+    }
+  ],
+  "redactedSamples": [
+    {
+      "store": "ios",
+      "appId": "1438388363",
+      "appTitle": "Habit Tracker",
+      "price": 0,
+      "currency": "USD",
+      "isFree": true,
+      "rating": 4.79042,
+      "ratingCount": 149214,
+      "reviewCount": null,
+      "genre": "Productivity",
+      "version": "2.15.14",
+      "appUrl": "https://apps.apple.com/us/app/habit-tracker/id1438388363",
+      "searchTerm": "Habit Tracker",
+      "searchRank": 1,
+      "chartCollection": null,
+      "chartCategory": null,
+      "chartRank": null,
+      "country": "us",
+      "language": "en",
+      "detailLevel": "full",
+      "source": "itunes-search",
+      "scrapedAt": "2026-11-26T07:16:49.926Z",
+      "status": null
+    },
+    {
+      "store": "ios",
+      "appId": "6443918070",
+      "appTitle": "Habit Tracker - HabitKit",
+      "price": 0,
+      "currency": "USD",
+      "isFree": true,
+      "rating": 4.84105,
+      "ratingCount": 2630,
+      "reviewCount": null,
+      "genre": "Productivity",
+      "version": "1.19.3",
+      "appUrl": "https://apps.apple.com/us/app/habit-tracker-habitkit/id6443918070",
+      "searchTerm": "Habit Tracker",
+      "searchRank": 2,
+      "chartCollection": null,
+      "chartCategory": null,
+      "chartRank": null,
+      "country": "us",
+      "language": "en",
+      "detailLevel": "full",
+      "source": "itunes-search",
+      "scrapedAt": "2026-11-26T07:16:49.926Z",
+      "status": null
+    },
+    {
+      "store": "ios",
+      "appId": "1547137474",
+      "appTitle": "Onrise: Habit Tracker & Focus",
+      "price": 0,
+      "currency": "USD",
+      "isFree": true,
+      "rating": 4.83859,
+      "ratingCount": 2627,
+      "reviewCount": null,
+      "genre": "Productivity",
+      "version": "1.1.9",
+      "appUrl": "https://apps.apple.com/us/app/onrise-habit-tracker-focus/id1547137474",
+      "searchTerm": "Habit Tracker",
+      "searchRank": 3,
+      "chartCollection": null,
+      "chartCategory": null,
+      "chartRank": null,
+      "country": "us",
+      "language": "en",
+      "detailLevel": "full",
+      "source": "itunes-search",
+      "scrapedAt": "2026-11-26T07:16:49.926Z",
+      "status": null
+    }
+  ]
+}

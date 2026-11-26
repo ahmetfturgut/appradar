@@ -1,0 +1,650 @@
+{
+  "retrievedAt": "2026-11-26T08:11:18.114939Z",
+  "sources": {
+    "metadata": "https://api.apify.com/v2/acts/thewolves~appstore-reviews-scraper",
+    "openapi": "https://api.apify.com/v2/acts/thewolves~appstore-reviews-scraper/builds/default/openapi.json"
+  },
+  "actorId": "4qRgh5vXXsv0bKa1l",
+  "actorSlug": "thewolves~appstore-reviews-scraper",
+  "taggedBuilds": {
+    "latest": {
+      "buildId": "MHfNUQWkb1bIq1UKN",
+      "finishedAt": "2026-11-26T02:00:34.618Z",
+      "buildNumberInt": 1057,
+      "buildNumber": "0.0.1057"
+    }
+  },
+  "pricingInfos": [
+    {
+      "pricingModel": "PRICE_PER_DATASET_ITEM",
+      "reasonForChange": null,
+      "pricePerUnitUsd": 0.0001,
+      "unitName": "reviews",
+      "createdAt": "2024-02-21T13:44:05.859Z",
+      "startedAt": "2024-02-21T13:44:05.859Z",
+      "apifyMarginPercentage": 0.2
+    },
+    {
+      "pricingModel": "PAY_PER_EVENT",
+      "createdAt": "2026-02-16T15:05:29.351Z",
+      "startedAt": "2026-02-16T15:05:29.351Z",
+      "apifyMarginPercentage": 0.2,
+      "isPriceChangeNotificationSuppressed": true,
+      "reasonForChange": "Migration from Pay Per Result to Pay Per Event with apify-default-dataset-item event",
+      "pricingPerEvent": {
+        "actorChargeEvents": {
+          "apify-default-dataset-item": {
+            "eventTitle": "review",
+            "eventDescription": "Single review in the default dataset.",
+            "isPrimaryEvent": true,
+            "eventPriceUsd": 0.0001
+          }
+        }
+      },
+      "forceContainsSignificantPriceChange": false
+    }
+  ],
+  "openapi": {
+    "openapi": "3.0.1",
+    "info": {
+      "title": "App Store Reviews Scraper API | $0.10/1K Reviews",
+      "description": "App Store Reviews Scraper is your ultimate tool to retrieve the reviews directly from the Apple Store. With extremely capable information retrieval, the lowest price, and lightning speed, this actor is unbeatable. It's priced at just $0.10 per 1000 reviews!",
+      "version": "0.0",
+      "x-build-id": "MHfNUQWkb1bIq1UKN"
+    },
+    "servers": [
+      {
+        "url": "https://api.apify.com/v2"
+      }
+    ],
+    "paths": {
+      "/acts/thewolves~appstore-reviews-scraper/run-sync-get-dataset-items": {
+        "post": {
+          "operationId": "run-sync-get-dataset-items-thewolves-appstore-reviews-scraper",
+          "x-openai-isConsequential": false,
+          "summary": "Executes an Actor, waits for its completion, and returns Actor's dataset items in response.",
+          "tags": [
+            "Run Actor"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inputSchema"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "token",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "Enter your Apify token here"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/acts/thewolves~appstore-reviews-scraper/runs": {
+        "post": {
+          "operationId": "runs-sync-thewolves-appstore-reviews-scraper",
+          "x-openai-isConsequential": false,
+          "summary": "Executes an Actor and returns information about the initiated run in response.",
+          "tags": [
+            "Run Actor"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inputSchema"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "token",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "Enter your Apify token here"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/runsResponseSchema"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/acts/thewolves~appstore-reviews-scraper/run-sync": {
+        "post": {
+          "operationId": "run-sync-thewolves-appstore-reviews-scraper",
+          "x-openai-isConsequential": false,
+          "summary": "Executes an Actor, waits for completion, and returns the OUTPUT from Key-value store in response.",
+          "tags": [
+            "Run Actor"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inputSchema"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "token",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "Enter your Apify token here"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "appIds": {
+              "title": "App Store IDs",
+              "type": "array",
+              "description": "App Store IDs you want to retrieve the data from. They can be found at the end of the URL of the app in the App Store. It should be without `id`.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "country": {
+              "title": "Country",
+              "enum": [
+                "us",
+                "af",
+                "al",
+                "dz",
+                "ao",
+                "ai",
+                "ag",
+                "ar",
+                "am",
+                "au",
+                "at",
+                "az",
+                "bs",
+                "bh",
+                "bb",
+                "by",
+                "be",
+                "bz",
+                "bj",
+                "bm",
+                "bt",
+                "bo",
+                "ba",
+                "bw",
+                "br",
+                "vg",
+                "bn",
+                "bg",
+                "bf",
+                "kh",
+                "cm",
+                "ca",
+                "cv",
+                "ky",
+                "td",
+                "cl",
+                "cn",
+                "co",
+                "cd",
+                "cg",
+                "cr",
+                "ci",
+                "hr",
+                "cy",
+                "cz",
+                "dk",
+                "dm",
+                "do",
+                "ec",
+                "eg",
+                "sv",
+                "ee",
+                "sz",
+                "fj",
+                "fi",
+                "fr",
+                "ga",
+                "gm",
+                "ge",
+                "de",
+                "gh",
+                "gr",
+                "gd",
+                "gt",
+                "gw",
+                "gy",
+                "hn",
+                "hk",
+                "hu",
+                "is",
+                "in",
+                "id",
+                "iq",
+                "ie",
+                "il",
+                "it",
+                "jm",
+                "jp",
+                "jo",
+                "kz",
+                "ke",
+                "kr",
+                "xk",
+                "kw",
+                "kg",
+                "la",
+                "lv",
+                "lb",
+                "lr",
+                "ly",
+                "lt",
+                "lu",
+                "mo",
+                "mg",
+                "mw",
+                "my",
+                "mv",
+                "ml",
+                "mt",
+                "mr",
+                "mu",
+                "mx",
+                "fm",
+                "md",
+                "mn",
+                "me",
+                "ms",
+                "ma",
+                "mz",
+                "mm",
+                "na",
+                "nr",
+                "np",
+                "nl",
+                "nz",
+                "ni",
+                "ne",
+                "ng",
+                "mk",
+                "no",
+                "om",
+                "pk",
+                "pw",
+                "pa",
+                "pg",
+                "py",
+                "pe",
+                "ph",
+                "pl",
+                "pt",
+                "qa",
+                "ro",
+                "ru",
+                "rw",
+                "st",
+                "sa",
+                "sn",
+                "rs",
+                "sc",
+                "sl",
+                "sg",
+                "sk",
+                "si",
+                "sb",
+                "za",
+                "es",
+                "lk",
+                "kn",
+                "lc",
+                "vc",
+                "sr",
+                "se",
+                "ch",
+                "tw",
+                "tj",
+                "tz",
+                "th",
+                "to",
+                "tt",
+                "tn",
+                "tr",
+                "tm",
+                "tc",
+                "ug",
+                "ua",
+                "ae",
+                "gb",
+                "uy",
+                "uz",
+                "vu",
+                "ve",
+                "vn",
+                "ye",
+                "zm",
+                "zw"
+              ],
+              "type": "string",
+              "description": "The App Store country that you would like to get the reviews from.",
+              "default": "us"
+            },
+            "startUrls": {
+              "title": "Start URLs",
+              "type": "array",
+              "description": "URLs to start with. It should be an application URL",
+              "items": {
+                "type": "string"
+              }
+            },
+            "maxItems": {
+              "title": "Maximum number of items on output",
+              "type": "integer",
+              "description": "Maximum number of items that you want as output."
+            },
+            "customMapFunction": {
+              "title": "Custom map function",
+              "type": "string",
+              "description": "JavaScript function to transform each output review. Use to add computed fields, modify values, or remove unnecessary data. NOT intended for filtering - filtering may result in automatic bans. Must be a single synchronous function, e.g. (object) => { return {...object} }. It runs in a sandbox with plain JavaScript only (no network or require) and about 1 second per item. Leave empty if you do not need to transform the output - an unusable function is ignored and the original items are saved instead."
+            },
+            "outputConnector": {
+              "title": "Send results to Notion, Todoist, \u2026 (optional)",
+              "type": "string",
+              "description": "Pick an MCP connector you authorized in Console \u2192 Settings \u2192 API & Integrations \u2192 MCP connectors (e.g. Notion, Todoist \u2014 any service whose MCP server offers non-destructive write tools works best-effort). The scraped results are written through your own connector \u2014 the Actor never sees your third-party credentials. Only non-destructive write tools are used; it can never delete or overwrite your existing data."
+            },
+            "deliverTarget": {
+              "title": "Destination target",
+              "type": "string",
+              "description": "Where to write into the connector \u2014 paste the URL or ID. Notion example: https://www.notion.so/My-Posts-24f8a1b2c3d44e5f8a9b0c1d2e3f4a5b. Leave empty for services that need no target (e.g. Todoist Inbox, Slack). For Notion, share the page or database with your connector first (Notion's \u2022\u2022\u2022 \u2192 Connections menu), and point at a PAGE for structured columns (the Actor builds the database for you) \u2014 an empty database receives only the title (the rest of each record goes to the row's body)."
+            },
+            "deliverMode": {
+              "title": "Write mode",
+              "enum": [
+                "perPost",
+                "summary"
+              ],
+              "type": "string",
+              "description": "perPost writes one record per scraped item; summary writes a single roll-up for the run.",
+              "default": "perPost"
+            },
+            "deliverMaxItems": {
+              "title": "Max records to deliver \u2014 perPost only (optional)",
+              "minimum": 1,
+              "type": "integer",
+              "description": "Cap on how many records perPost mode writes to the connector; ignored in summary mode. Leave empty to deliver everything scraped."
+            }
+          }
+        },
+        "runsResponseSchema": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "actId": {
+                  "type": "string"
+                },
+                "userId": {
+                  "type": "string"
+                },
+                "startedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2025-01-08T00:00:00.000Z"
+                },
+                "finishedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2025-01-08T00:00:00.000Z"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "READY"
+                },
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "origin": {
+                      "type": "string",
+                      "example": "API"
+                    },
+                    "userAgent": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "stats": {
+                  "type": "object",
+                  "properties": {
+                    "inputBodyLen": {
+                      "type": "integer",
+                      "example": 2000
+                    },
+                    "rebootCount": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "restartCount": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "resurrectCount": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "computeUnits": {
+                      "type": "integer",
+                      "example": 0
+                    }
+                  }
+                },
+                "options": {
+                  "type": "object",
+                  "properties": {
+                    "build": {
+                      "type": "string",
+                      "example": "latest"
+                    },
+                    "timeoutSecs": {
+                      "type": "integer",
+                      "example": 300
+                    },
+                    "memoryMbytes": {
+                      "type": "integer",
+                      "example": 1024
+                    },
+                    "diskMbytes": {
+                      "type": "integer",
+                      "example": 2048
+                    }
+                  }
+                },
+                "buildId": {
+                  "type": "string"
+                },
+                "defaultKeyValueStoreId": {
+                  "type": "string"
+                },
+                "defaultDatasetId": {
+                  "type": "string"
+                },
+                "defaultRequestQueueId": {
+                  "type": "string"
+                },
+                "buildNumber": {
+                  "type": "string",
+                  "example": "1.0.0"
+                },
+                "containerUrl": {
+                  "type": "string"
+                },
+                "usage": {
+                  "type": "object",
+                  "properties": {
+                    "ACTOR_COMPUTE_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_WRITES": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "KEY_VALUE_STORE_LISTS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_INTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_EXTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_RESIDENTIAL_TRANSFER_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_SERPS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_UNBLOCKER_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    }
+                  }
+                },
+                "usageTotalUsd": {
+                  "type": "number",
+                  "example": 5e-05
+                },
+                "usageUsd": {
+                  "type": "object",
+                  "properties": {
+                    "ACTOR_COMPUTE_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_WRITES": {
+                      "type": "number",
+                      "example": 5e-05
+                    },
+                    "KEY_VALUE_STORE_LISTS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_INTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_EXTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_RESIDENTIAL_TRANSFER_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_SERPS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_UNBLOCKER_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

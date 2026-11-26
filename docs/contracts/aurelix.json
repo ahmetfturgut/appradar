@@ -1,0 +1,638 @@
+{
+  "retrievedAt": "2026-11-25T20:38:33.236285+00:00",
+  "sources": {
+    "metadata": "https://api.apify.com/v2/acts/aurelix~app-store-google-play-scraper",
+    "openapi": "https://api.apify.com/v2/acts/aurelix~app-store-google-play-scraper/builds/default/openapi.json"
+  },
+  "actorId": "wI26HiER6vwANfcVs",
+  "actorSlug": "aurelix~app-store-google-play-scraper",
+  "taggedBuilds": {
+    "latest": {
+      "buildId": "Jv44m9YSKPnrplU1T",
+      "finishedAt": "2026-11-23T23:36:00.448Z",
+      "buildNumberInt": 200023,
+      "buildNumber": "0.2.23"
+    },
+    "candidate": {
+      "buildId": "Jv44m9YSKPnrplU1T",
+      "finishedAt": "2026-11-23T23:36:00.448Z",
+      "buildNumberInt": 200023,
+      "buildNumber": "0.2.23"
+    }
+  },
+  "pricingInfos": [
+    {
+      "pricingModel": "PAY_PER_EVENT",
+      "pricingPerEvent": {
+        "actorChargeEvents": {
+          "app-result": {
+            "eventTitle": "App result",
+            "eventDescription": "One app returned",
+            "isOneTimeEvent": false,
+            "eventTieredPricingUsd": {
+              "FREE": {
+                "tieredEventPriceUsd": 0.00018
+              },
+              "BRONZE": {
+                "tieredEventPriceUsd": 0.00015
+              },
+              "SILVER": {
+                "tieredEventPriceUsd": 0.00015
+              },
+              "GOLD": {
+                "tieredEventPriceUsd": 0.00015
+              },
+              "PLATINUM": {
+                "tieredEventPriceUsd": 0.00015
+              },
+              "DIAMOND": {
+                "tieredEventPriceUsd": 0.00015
+              }
+            },
+            "isPrimaryEvent": true
+          },
+          "review-result": {
+            "eventTitle": "Review result",
+            "eventDescription": "One review returned",
+            "isOneTimeEvent": false,
+            "eventPriceUsd": 2.5e-05
+          },
+          "apify-actor-start": {
+            "eventTitle": "Actor Start",
+            "eventDescription": "Charged when the Actor starts running. Number of events charged depends on Actor memory (one event per GB, minimum one event).",
+            "isOneTimeEvent": true,
+            "eventPriceUsd": 0.005
+          }
+        }
+      },
+      "createdAt": "2026-11-07T17:33:36.496Z",
+      "startedAt": "2026-11-07T17:33:36.496Z",
+      "apifyMarginPercentage": 0.2
+    },
+    {
+      "pricingModel": "PAY_PER_EVENT",
+      "pricingPerEvent": {
+        "actorChargeEvents": {
+          "app-result": {
+            "eventTitle": "App result",
+            "eventDescription": "One app returned",
+            "isOneTimeEvent": false,
+            "eventTieredPricingUsd": {
+              "FREE": {
+                "tieredEventPriceUsd": 0.00018
+              },
+              "BRONZE": {
+                "tieredEventPriceUsd": 0.00015
+              },
+              "SILVER": {
+                "tieredEventPriceUsd": 0.00014
+              },
+              "GOLD": {
+                "tieredEventPriceUsd": 0.00014
+              },
+              "PLATINUM": {
+                "tieredEventPriceUsd": 0.00014
+              },
+              "DIAMOND": {
+                "tieredEventPriceUsd": 0.00014
+              }
+            },
+            "isPrimaryEvent": true
+          },
+          "review-result": {
+            "eventTitle": "Review result",
+            "eventDescription": "One review returned",
+            "isOneTimeEvent": false,
+            "eventPriceUsd": 2.5e-05
+          },
+          "apify-actor-start": {
+            "eventTitle": "Actor Start",
+            "eventDescription": "Charged when the Actor starts running. Number of events charged depends on Actor memory (one event per GB, minimum one event).",
+            "isOneTimeEvent": true,
+            "eventPriceUsd": 0.0043
+          }
+        }
+      },
+      "minimalMaxTotalChargeUsd": 0.01,
+      "reasonForChange": "Lower prices.",
+      "createdAt": "2026-11-11T21:02:25.147Z",
+      "startedAt": "2026-11-11T21:02:25.147Z",
+      "apifyMarginPercentage": 0.2,
+      "notifiedAboutChangeAt": "2026-11-11T21:30:25.928Z"
+    }
+  ],
+  "openapi": {
+    "openapi": "3.0.1",
+    "info": {
+      "title": "App Store & Google Play Scraper API | Reviews, Charts, Data",
+      "description": "Scrape App Store and Google Play apps and reviews in one schema: $0.18 per 1,000 apps and $0.025 per 1,000 reviews on the free plan. App Store data and Google Play data: ratings, installs, developer pages, App Store top charts, several countries per run, only-new-reviews mode. No login.",
+      "version": "0.2",
+      "x-build-id": "Jv44m9YSKPnrplU1T"
+    },
+    "servers": [
+      {
+        "url": "https://api.apify.com/v2"
+      }
+    ],
+    "paths": {
+      "/acts/aurelix~app-store-google-play-scraper/run-sync-get-dataset-items": {
+        "post": {
+          "operationId": "run-sync-get-dataset-items-aurelix-app-store-google-play-scraper",
+          "x-openai-isConsequential": false,
+          "summary": "Executes an Actor, waits for its completion, and returns Actor's dataset items in response.",
+          "tags": [
+            "Run Actor"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inputSchema"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "token",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "Enter your Apify token here"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/acts/aurelix~app-store-google-play-scraper/runs": {
+        "post": {
+          "operationId": "runs-sync-aurelix-app-store-google-play-scraper",
+          "x-openai-isConsequential": false,
+          "summary": "Executes an Actor and returns information about the initiated run in response.",
+          "tags": [
+            "Run Actor"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inputSchema"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "token",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "Enter your Apify token here"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/runsResponseSchema"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/acts/aurelix~app-store-google-play-scraper/run-sync": {
+        "post": {
+          "operationId": "run-sync-aurelix-app-store-google-play-scraper",
+          "x-openai-isConsequential": false,
+          "summary": "Executes an Actor, waits for completion, and returns the OUTPUT from Key-value store in response.",
+          "tags": [
+            "Run Actor"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inputSchema"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "token",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "Enter your Apify token here"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "apps": {
+              "title": "Apps",
+              "maxItems": 500,
+              "type": "array",
+              "description": "Apps to read, mixed freely: an App Store URL (e.g. 'https://apps.apple.com/us/app/spotify-music-and-podcasts/id324684580'), an App Store ID ('324684580' or 'id324684580'), a Google Play URL (e.g. 'https://play.google.com/store/apps/details?id=com.spotify.music') or an Android package name ('com.spotify.music'). A country in the URL (e.g. /gb/) is used for that app.",
+              "default": [],
+              "items": {
+                "type": "string"
+              }
+            },
+            "maxReviewsPerApp": {
+              "title": "Reviews per app",
+              "minimum": 0,
+              "maximum": 500,
+              "type": "integer",
+              "description": "How many reviews to return for each app and country, e.g. 100; 0 = app details only. The App Store gives up to 500 per app and country; Google Play's public app page shows about 20 per app and language.",
+              "default": 0
+            },
+            "developers": {
+              "title": "Developer pages",
+              "maxItems": 500,
+              "type": "array",
+              "description": "Every app of a developer, e.g. 'https://apps.apple.com/us/developer/spotify/id324684583', 'https://play.google.com/store/apps/developer?id=Spotify+AB' or 'https://play.google.com/store/apps/dev?id=5700313618786177705'.",
+              "default": [],
+              "items": {
+                "type": "string"
+              }
+            },
+            "appStoreCharts": {
+              "title": "App Store top charts",
+              "type": "array",
+              "description": "App Store top charts to read, e.g. ['top-free']: each app comes with its rank; an app on several of your charts is one row whose chart_ranks lists every chart and rank (up to 100). Google Play's charts are not on any public page that robots.txt allows, so they are not offered.",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "top-free",
+                  "top-paid",
+                  "top-grossing"
+                ],
+                "enumTitles": [
+                  "Top free",
+                  "Top paid",
+                  "Top grossing"
+                ]
+              },
+              "default": []
+            },
+            "chartGenre": {
+              "title": "Chart category",
+              "enum": [
+                "",
+                "6014",
+                "6000",
+                "6017",
+                "6016",
+                "6015",
+                "6023",
+                "6013",
+                "6012",
+                "6020",
+                "6011",
+                "6010",
+                "6009",
+                "6008",
+                "6007",
+                "6006",
+                "6024",
+                "6005",
+                "6004",
+                "6003",
+                "6002",
+                "6001",
+                "6018",
+                "6027",
+                "6026",
+                "6021"
+              ],
+              "type": "string",
+              "description": "App Store category for the charts, e.g. Games; 'All categories' = the overall chart.",
+              "default": ""
+            },
+            "countries": {
+              "title": "Countries",
+              "maxItems": 50,
+              "type": "array",
+              "description": "Two-letter store countries, e.g. ['us', 'gb', 'de']. Each app ID, package name, developer page and chart is read in every country listed; prices, ratings and reviews differ per country.",
+              "default": [
+                "us"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "maxAppsPerList": {
+              "title": "Apps per chart or developer",
+              "minimum": 1,
+              "maximum": 200,
+              "type": "integer",
+              "description": "Most apps to return from each chart (up to 100) or developer page, e.g. 50.",
+              "default": 50
+            },
+            "language": {
+              "title": "Google Play language",
+              "type": "string",
+              "description": "Language code for Google Play pages and the reviews they show, e.g. 'en', 'de', 'pt-BR'. The App Store answers in each country's own store language.",
+              "default": "en"
+            },
+            "reviewSort": {
+              "title": "App Store review order",
+              "enum": [
+                "mostrecent",
+                "mosthelpful"
+              ],
+              "type": "string",
+              "description": "Which App Store reviews come first: the most recent or the most helpful.",
+              "default": "mostrecent"
+            },
+            "onlyNewReviews": {
+              "title": "Only new reviews",
+              "type": "boolean",
+              "description": "Return only reviews not returned by your previous runs of the same app, in any country (one memory per app and Google Play language). The first run returns everything; schedule it daily to get each day's new reviews.",
+              "default": false
+            },
+            "stateKey": {
+              "title": "Tracking name (optional)",
+              "type": "string",
+              "description": "Name for the 'previous runs' memory used by 'Only new reviews', e.g. 'my-app-daily'. Leave empty to share one memory per app across all your runs."
+            },
+            "proxyConfiguration": {
+              "title": "Proxy",
+              "type": "object",
+              "description": "Apify Proxy; the default datacenter group works for both stores.",
+              "default": {
+                "useApifyProxy": true
+              }
+            },
+            "slackWebhookUrl": {
+              "title": "Slack webhook URL (optional)",
+              "type": "string",
+              "description": "After each run, post a short digest to Slack: how many results were saved (new reviews only when 'Only new reviews' is on) and the top 10, e.g. https://hooks.slack.com/services/T000/B000/XXXX. Nothing is posted when the run saved nothing. Leave empty to skip."
+            },
+            "webhookUrl": {
+              "title": "Webhook URL (optional)",
+              "type": "string",
+              "description": "After each run, POST the same digest as JSON (actor, newOnly, count, items = top 10 results, runUrl, text) to any URL, e.g. a Zapier, Make or n8n webhook. Nothing is sent when the run saved nothing. Leave empty to skip."
+            }
+          }
+        },
+        "runsResponseSchema": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "actId": {
+                  "type": "string"
+                },
+                "userId": {
+                  "type": "string"
+                },
+                "startedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2025-01-08T00:00:00.000Z"
+                },
+                "finishedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2025-01-08T00:00:00.000Z"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "READY"
+                },
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "origin": {
+                      "type": "string",
+                      "example": "API"
+                    },
+                    "userAgent": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "stats": {
+                  "type": "object",
+                  "properties": {
+                    "inputBodyLen": {
+                      "type": "integer",
+                      "example": 2000
+                    },
+                    "rebootCount": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "restartCount": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "resurrectCount": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "computeUnits": {
+                      "type": "integer",
+                      "example": 0
+                    }
+                  }
+                },
+                "options": {
+                  "type": "object",
+                  "properties": {
+                    "build": {
+                      "type": "string",
+                      "example": "latest"
+                    },
+                    "timeoutSecs": {
+                      "type": "integer",
+                      "example": 300
+                    },
+                    "memoryMbytes": {
+                      "type": "integer",
+                      "example": 1024
+                    },
+                    "diskMbytes": {
+                      "type": "integer",
+                      "example": 2048
+                    }
+                  }
+                },
+                "buildId": {
+                  "type": "string"
+                },
+                "defaultKeyValueStoreId": {
+                  "type": "string"
+                },
+                "defaultDatasetId": {
+                  "type": "string"
+                },
+                "defaultRequestQueueId": {
+                  "type": "string"
+                },
+                "buildNumber": {
+                  "type": "string",
+                  "example": "1.0.0"
+                },
+                "containerUrl": {
+                  "type": "string"
+                },
+                "usage": {
+                  "type": "object",
+                  "properties": {
+                    "ACTOR_COMPUTE_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_WRITES": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "KEY_VALUE_STORE_LISTS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_INTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_EXTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_RESIDENTIAL_TRANSFER_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_SERPS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_UNBLOCKER_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    }
+                  }
+                },
+                "usageTotalUsd": {
+                  "type": "number",
+                  "example": 5e-05
+                },
+                "usageUsd": {
+                  "type": "object",
+                  "properties": {
+                    "ACTOR_COMPUTE_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_WRITES": {
+                      "type": "number",
+                      "example": 5e-05
+                    },
+                    "KEY_VALUE_STORE_LISTS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_INTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_EXTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_RESIDENTIAL_TRANSFER_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_SERPS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_UNBLOCKER_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

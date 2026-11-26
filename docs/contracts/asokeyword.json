@@ -1,0 +1,500 @@
+{
+  "retrievedAt": "2026-11-26T08:42:20.995091Z",
+  "sources": {
+    "metadata": "https://api.apify.com/v2/acts/petersutarik~aso-keyword-intel",
+    "openapi": "https://api.apify.com/v2/acts/petersutarik~aso-keyword-intel/builds/default/openapi.json"
+  },
+  "actorId": "w4WTaae6mpu8tDtRo",
+  "actorSlug": "petersutarik~aso-keyword-intel",
+  "taggedBuilds": {
+    "latest": {
+      "buildId": "9ton1HLQZxcwZx6Jy",
+      "finishedAt": "2026-10-28T11:19:46.247Z",
+      "buildNumberInt": 200005,
+      "buildNumber": "0.2.5"
+    }
+  },
+  "pricingInfos": [
+    {
+      "pricingModel": "PAY_PER_EVENT",
+      "isPPEPlatformUsagePaidByUser": true,
+      "pricingPerEvent": {
+        "actorChargeEvents": {
+          "ranking-row": {
+            "eventTitle": "Ranking result row",
+            "eventDescription": "One keyword ranking row (tracked app rank or top-N app).",
+            "eventPriceUsd": 0.002,
+            "isPrimaryEvent": true
+          },
+          "suggestion-row": {
+            "eventTitle": "Suggestion row",
+            "eventDescription": "One autocomplete keyword suggestion.",
+            "eventPriceUsd": 0.001
+          },
+          "metrics-row": {
+            "eventTitle": "Keyword popularity & difficulty",
+            "eventDescription": "Real search popularity and difficulty for one keyword (Apple-sourced for iOS).",
+            "eventPriceUsd": 0.02
+          }
+        }
+      },
+      "reasonForChange": "Initial pricing setup before first publication",
+      "createdAt": "2026-07-04T10:22:38.205Z",
+      "startedAt": "2026-07-04T10:22:38.205Z",
+      "apifyMarginPercentage": 0.2
+    },
+    {
+      "pricingModel": "PAY_PER_EVENT",
+      "pricingPerEvent": {
+        "actorChargeEvents": {
+          "ranking-row": {
+            "eventTitle": "Ranking result row",
+            "eventDescription": "One keyword ranking row (tracked app rank or top-N app).",
+            "eventPriceUsd": 0.002,
+            "isPrimaryEvent": true
+          },
+          "suggestion-row": {
+            "eventTitle": "Suggestion row",
+            "eventDescription": "One autocomplete keyword suggestion.",
+            "eventPriceUsd": 0.001
+          },
+          "metrics-row": {
+            "eventTitle": "Keyword popularity & difficulty",
+            "eventDescription": "Real search popularity and difficulty for one keyword (Apple-sourced for iOS).",
+            "eventPriceUsd": 0.02
+          }
+        }
+      },
+      "reasonForChange": "Platform usage is no longer passed on to users: you pay only for the events.",
+      "createdAt": "2026-10-14T19:33:04.143Z",
+      "startedAt": "2026-10-14T19:33:03.000Z",
+      "apifyMarginPercentage": 0.2,
+      "notifiedAboutChangeAt": "2026-10-14T20:00:26.543Z"
+    }
+  ],
+  "openapi": {
+    "openapi": "3.0.1",
+    "info": {
+      "title": "App Store & Google Play ASO keyword rank tracker + popularity",
+      "description": "ASO keyword research for the App Store and Google Play: track keyword rankings for your app and competitors, get autocomplete suggestions, and Apple's own Search Popularity plus difficulty for every keyword. Built by the team behind trysonar.app.",
+      "version": "0.2",
+      "x-build-id": "9ton1HLQZxcwZx6Jy"
+    },
+    "servers": [
+      {
+        "url": "https://api.apify.com/v2"
+      }
+    ],
+    "paths": {
+      "/acts/petersutarik~aso-keyword-intel/run-sync-get-dataset-items": {
+        "post": {
+          "operationId": "run-sync-get-dataset-items-petersutarik-aso-keyword-intel",
+          "x-openai-isConsequential": false,
+          "summary": "Executes an Actor, waits for its completion, and returns Actor's dataset items in response.",
+          "tags": [
+            "Run Actor"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inputSchema"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "token",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "Enter your Apify token here"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/acts/petersutarik~aso-keyword-intel/runs": {
+        "post": {
+          "operationId": "runs-sync-petersutarik-aso-keyword-intel",
+          "x-openai-isConsequential": false,
+          "summary": "Executes an Actor and returns information about the initiated run in response.",
+          "tags": [
+            "Run Actor"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inputSchema"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "token",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "Enter your Apify token here"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/runsResponseSchema"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/acts/petersutarik~aso-keyword-intel/run-sync": {
+        "post": {
+          "operationId": "run-sync-petersutarik-aso-keyword-intel",
+          "x-openai-isConsequential": false,
+          "summary": "Executes an Actor, waits for completion, and returns the OUTPUT from Key-value store in response.",
+          "tags": [
+            "Run Actor"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inputSchema"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "token",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "Enter your Apify token here"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "inputSchema": {
+          "type": "object",
+          "required": [
+            "keywords"
+          ],
+          "properties": {
+            "keywords": {
+              "title": "Keywords",
+              "type": "array",
+              "description": "Keywords to analyze (max 100 per run). Each keyword produces ranking rows and, optionally, suggestion and popularity rows.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "store": {
+              "title": "Store",
+              "enum": [
+                "ios",
+                "android",
+                "both"
+              ],
+              "type": "string",
+              "description": "Which app store(s) to check.",
+              "default": "ios"
+            },
+            "country": {
+              "title": "Country",
+              "type": "string",
+              "description": "Two-letter country code of the storefront (e.g. us, gb, de). Rankings work everywhere; popularity and difficulty cover Sonar's 72 keyword-research markets.",
+              "default": "us"
+            },
+            "appIds": {
+              "title": "Track specific apps (optional)",
+              "type": "array",
+              "description": "App IDs whose rank you want for each keyword \u2014 numeric track IDs for iOS (e.g. 6479523618), package names for Android (e.g. com.example.app). Leave empty to get the top-N ranked apps per keyword instead.",
+              "default": [],
+              "items": {
+                "type": "string"
+              }
+            },
+            "topN": {
+              "title": "Top N apps per keyword",
+              "minimum": 1,
+              "maximum": 50,
+              "type": "integer",
+              "description": "How many top-ranked apps to return per keyword when no specific apps are tracked.",
+              "default": 10
+            },
+            "includeSuggestions": {
+              "title": "Include keyword suggestions",
+              "type": "boolean",
+              "description": "Fetch autocomplete/search suggestions for each keyword (great for keyword discovery).",
+              "default": false
+            },
+            "includePopularity": {
+              "title": "Include search popularity & difficulty",
+              "type": "boolean",
+              "description": "Fetch search popularity (Apple's own Search Popularity on iOS) and keyword difficulty for each keyword \u2014 premium, powered by Sonar (trysonar.app). Keywords that can't be served in the run are returned with an error and not charged.",
+              "default": true
+            }
+          }
+        },
+        "runsResponseSchema": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "actId": {
+                  "type": "string"
+                },
+                "userId": {
+                  "type": "string"
+                },
+                "startedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2025-01-08T00:00:00.000Z"
+                },
+                "finishedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2025-01-08T00:00:00.000Z"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "READY"
+                },
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "origin": {
+                      "type": "string",
+                      "example": "API"
+                    },
+                    "userAgent": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "stats": {
+                  "type": "object",
+                  "properties": {
+                    "inputBodyLen": {
+                      "type": "integer",
+                      "example": 2000
+                    },
+                    "rebootCount": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "restartCount": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "resurrectCount": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "computeUnits": {
+                      "type": "integer",
+                      "example": 0
+                    }
+                  }
+                },
+                "options": {
+                  "type": "object",
+                  "properties": {
+                    "build": {
+                      "type": "string",
+                      "example": "latest"
+                    },
+                    "timeoutSecs": {
+                      "type": "integer",
+                      "example": 300
+                    },
+                    "memoryMbytes": {
+                      "type": "integer",
+                      "example": 1024
+                    },
+                    "diskMbytes": {
+                      "type": "integer",
+                      "example": 2048
+                    }
+                  }
+                },
+                "buildId": {
+                  "type": "string"
+                },
+                "defaultKeyValueStoreId": {
+                  "type": "string"
+                },
+                "defaultDatasetId": {
+                  "type": "string"
+                },
+                "defaultRequestQueueId": {
+                  "type": "string"
+                },
+                "buildNumber": {
+                  "type": "string",
+                  "example": "1.0.0"
+                },
+                "containerUrl": {
+                  "type": "string"
+                },
+                "usage": {
+                  "type": "object",
+                  "properties": {
+                    "ACTOR_COMPUTE_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_WRITES": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "KEY_VALUE_STORE_LISTS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_INTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_EXTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_RESIDENTIAL_TRANSFER_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_SERPS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_UNBLOCKER_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    }
+                  }
+                },
+                "usageTotalUsd": {
+                  "type": "number",
+                  "example": 5e-05
+                },
+                "usageUsd": {
+                  "type": "object",
+                  "properties": {
+                    "ACTOR_COMPUTE_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_WRITES": {
+                      "type": "number",
+                      "example": 5e-05
+                    },
+                    "KEY_VALUE_STORE_LISTS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_INTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_EXTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_RESIDENTIAL_TRANSFER_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_SERPS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_UNBLOCKER_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

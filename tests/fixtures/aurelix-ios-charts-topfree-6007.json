@@ -1,0 +1,213 @@
+{
+  "job": {
+    "id": "9d28ce3c609f79af0228",
+    "provider": "aurelix",
+    "store": "ios",
+    "country": "US",
+    "mode": "charts",
+    "context": "topFree",
+    "input": {
+      "apps": [],
+      "developers": [],
+      "appStoreCharts": [
+        "top-free"
+      ],
+      "chartGenre": "6007",
+      "countries": [
+        "us"
+      ],
+      "language": "en",
+      "maxAppsPerList": 5,
+      "maxReviewsPerApp": 0,
+      "proxyConfiguration": {
+        "useApifyProxy": false
+      }
+    }
+  },
+  "run": {
+    "id": "tApAgRwpaPXNYXlKS",
+    "status": "SUCCEEDED",
+    "buildNumber": "0.2.23",
+    "usageTotalUsd": 0.0052,
+    "chargedEventCounts": {
+      "app-result": 5,
+      "review-result": 0,
+      "apify-actor-start": 1
+    }
+  },
+  "redactedRows": [
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6760173601",
+        "name": "Muse from Meta",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 1,
+        "rankContext": "topFree",
+        "rankCategory": "6007",
+        "ratingValue": 4.85,
+        "ratingCount": 720435,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "17.0",
+        "source": "aurelix"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6448311069",
+        "name": "ChatGPT",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 2,
+        "rankContext": "topFree",
+        "rankCategory": "6007",
+        "ratingValue": 4.82,
+        "ratingCount": 12577751,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "1.2026.321",
+        "source": "aurelix"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6473753684",
+        "name": "Claude by Anthropic",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 3,
+        "rankContext": "topFree",
+        "rankCategory": "6007",
+        "ratingValue": 4.73,
+        "ratingCount": 315307,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "1.261123.51",
+        "source": "aurelix"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6477489729",
+        "name": "Google Gemini",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 4,
+        "rankContext": "topFree",
+        "rankCategory": "6007",
+        "ratingValue": 4.73,
+        "ratingCount": 2460792,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "1.2026.4570305",
+        "source": "aurelix"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "422689480",
+        "name": "Gmail - Email by Google",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 5,
+        "rankContext": "topFree",
+        "rankCategory": "6007",
+        "ratingValue": 4.71,
+        "ratingCount": 2455915,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "6.0.261109",
+        "source": "aurelix"
+      }
+    }
+  ],
+  "redactedSamples": [
+    {
+      "type": "app",
+      "store": "app_store",
+      "app_id": "6760173601",
+      "title": "Muse from Meta",
+      "url": "https://apps.apple.com/us/app/muse-from-meta/id6760173601",
+      "genre": "Productivity",
+      "genre_id": "6007",
+      "price": 0,
+      "currency": "USD",
+      "is_free": true,
+      "rating": 4.85,
+      "ratings_count": 720435,
+      "reviews_count": null,
+      "version": "17.0",
+      "chart": "top-free",
+      "chart_genre": "iTunes Store: Top Free Applications in Productivity",
+      "chart_rank": 1,
+      "country": "us",
+      "language": null,
+      "scraped_at": "2026-11-26T07:52:08Z"
+    },
+    {
+      "type": "app",
+      "store": "app_store",
+      "app_id": "6448311069",
+      "title": "ChatGPT",
+      "url": "https://apps.apple.com/us/app/chatgpt/id6448311069",
+      "genre": "Productivity",
+      "genre_id": "6007",
+      "price": 0,
+      "currency": "USD",
+      "is_free": true,
+      "rating": 4.82,
+      "ratings_count": 12577751,
+      "reviews_count": null,
+      "version": "1.2026.321",
+      "chart": "top-free",
+      "chart_genre": "iTunes Store: Top Free Applications in Productivity",
+      "chart_rank": 2,
+      "country": "us",
+      "language": null,
+      "scraped_at": "2026-11-26T07:52:08Z"
+    },
+    {
+      "type": "app",
+      "store": "app_store",
+      "app_id": "6473753684",
+      "title": "Claude by Anthropic",
+      "url": "https://apps.apple.com/us/app/claude-by-anthropic/id6473753684",
+      "genre": "Productivity",
+      "genre_id": "6007",
+      "price": 0,
+      "currency": "USD",
+      "is_free": true,
+      "rating": 4.73,
+      "ratings_count": 315307,
+      "reviews_count": null,
+      "version": "1.261123.51",
+      "chart": "top-free",
+      "chart_genre": "iTunes Store: Top Free Applications in Productivity",
+      "chart_rank": 3,
+      "country": "us",
+      "language": null,
+      "scraped_at": "2026-11-26T07:52:08Z"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "job": {
+    "id": "22d4efd8da239040a23e",
+    "provider": "aurelix",
+    "store": "ios",
+    "country": "US",
+    "mode": "reviews",
+    "context": "570060128",
+    "input": {
+      "apps": [
+        "570060128"
+      ],
+      "developers": [],
+      "appStoreCharts": [],
+      "chartGenre": "",
+      "countries": [
+        "us"
+      ],
+      "language": "en",
+      "maxReviewsPerApp": 10,
+      "reviewSort": "mostrecent",
+      "onlyNewReviews": false,
+      "proxyConfiguration": {
+        "useApifyProxy": false
+      }
+    }
+  },
+  "run": {
+    "id": "4zLBiU5ZUhS0cg4De",
+    "status": "SUCCEEDED",
+    "buildNumber": "0.2.23",
+    "usageTotalUsd": 0.0043,
+    "chargedEventCounts": {
+      "app-result": 0,
+      "review-result": 0,
+      "apify-actor-start": 1
+    }
+  },
+  "redactedRows": [
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "570060128",
+        "name": "Duolingo: Learn Languages",
+        "country": "US",
+        "observationRole": "discovery",
+        "source": "aurelix"
+      }
+    }
+  ],
+  "redactedSamples": [
+    {
+      "type": "app",
+      "store": "app_store",
+      "app_id": "570060128",
+      "title": "Duolingo: Learn Languages",
+      "url": "https://apps.apple.com/us/app/duolingo-learn-languages/id570060128",
+      "developer": "Duolingo",
+      "developer_id": "570060151",
+      "developer_url": "https://apps.apple.com/us/developer/duolingo/id570060151",
+      "genre": "Education",
+      "genre_id": "6017",
+      "price": 0,
+      "currency": "USD",
+      "is_free": true,
+      "rating": 4.72,
+      "ratings_count": 5628995,
+      "reviews_count": null,
+      "version": "7.149.2",
+      "chart": null,
+      "chart_genre": null,
+      "chart_rank": null,
+      "found_via": "app",
+      "country": "us",
+      "language": null,
+      "scraped_at": "2026-11-26T08:02:31Z"
+    }
+  ]
+}

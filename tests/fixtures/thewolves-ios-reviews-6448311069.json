@@ -1,0 +1,363 @@
+{
+  "job": {
+    "id": "536e02562290bdea6e7b",
+    "provider": "thewolves",
+    "store": "ios",
+    "country": "US",
+    "mode": "reviews",
+    "context": "6448311069",
+    "input": {
+      "appIds": [
+        "6448311069"
+      ],
+      "country": "us",
+      "maxItems": 10
+    }
+  },
+  "run": {
+    "id": "BPcJtkbrNz6USvT7u",
+    "status": "SUCCEEDED",
+    "buildNumber": "0.0.1057",
+    "usageTotalUsd": 0.001,
+    "chargedEventCounts": {
+      "apify-default-dataset-item": 10
+    }
+  },
+  "redactedRows": [
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "ios",
+        "storeAppId": "6448311069",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": null,
+        "sourceReviewId": "14831434670",
+        "rating": 5,
+        "reviewedAt": "2026-11-25T00:00:00.000Z",
+        "appVersion": "1.2026.315",
+        "title": "Sample App Store review title for fixture tests",
+        "text": "Sample App Store review body for analysis-pipeline fixture tests. Personal identifiers removed.",
+        "hasDeveloperReply": false,
+        "source": "thewolves",
+        "idempotencyKey": "00a5481119f8e70c4ed98786b0b39f2dceb2450cafd6284a44f8894959af3261",
+        "fieldStatus": {
+          "title": "available",
+          "text": "available",
+          "appVersion": "available",
+          "helpfulVotes": "unsupported",
+          "totalVotes": "unsupported",
+          "developerReply": "unsupported",
+          "developerReplyAt": "unsupported",
+          "rating": "available",
+          "reviewedAt": "available"
+        }
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "ios",
+        "storeAppId": "6448311069",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": null,
+        "sourceReviewId": "14831413605",
+        "rating": 5,
+        "reviewedAt": "2026-11-25T00:00:00.000Z",
+        "appVersion": "1.2026.315",
+        "title": "Sample App Store review title for fixture tests",
+        "text": "Sample App Store review body for analysis-pipeline fixture tests. Personal identifiers removed.",
+        "hasDeveloperReply": false,
+        "source": "thewolves",
+        "idempotencyKey": "1b67b7c71bea9b3a485ba719031e58ae25c9774f18fd6d57e80b1d0e12b5b824",
+        "fieldStatus": {
+          "title": "available",
+          "text": "available",
+          "appVersion": "available",
+          "helpfulVotes": "unsupported",
+          "totalVotes": "unsupported",
+          "developerReply": "unsupported",
+          "developerReplyAt": "unsupported",
+          "rating": "available",
+          "reviewedAt": "available"
+        }
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "ios",
+        "storeAppId": "6448311069",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": null,
+        "sourceReviewId": "14831412550",
+        "rating": 5,
+        "reviewedAt": "2026-11-25T00:00:00.000Z",
+        "appVersion": "1.2026.315",
+        "title": "Sample App Store review title for fixture tests",
+        "text": "Sample App Store review body for analysis-pipeline fixture tests. Personal identifiers removed.",
+        "hasDeveloperReply": false,
+        "source": "thewolves",
+        "idempotencyKey": "a765b70255ff238abf62fea2bb6f8f792bbe59af5a458b11c70a3e75090178fa",
+        "fieldStatus": {
+          "title": "available",
+          "text": "available",
+          "appVersion": "available",
+          "helpfulVotes": "unsupported",
+          "totalVotes": "unsupported",
+          "developerReply": "unsupported",
+          "developerReplyAt": "unsupported",
+          "rating": "available",
+          "reviewedAt": "available"
+        }
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "ios",
+        "storeAppId": "6448311069",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": null,
+        "sourceReviewId": "14831391842",
+        "rating": 5,
+        "reviewedAt": "2026-11-25T00:00:00.000Z",
+        "appVersion": "1.2026.315",
+        "title": "Sample App Store review title for fixture tests",
+        "text": "Sample App Store review body for analysis-pipeline fixture tests. Personal identifiers removed.",
+        "hasDeveloperReply": false,
+        "source": "thewolves",
+        "idempotencyKey": "68ee72bcce1732f883839cc7ff2325c61474360b8122a6d94d922b1dae9cdc79",
+        "fieldStatus": {
+          "title": "available",
+          "text": "available",
+          "appVersion": "available",
+          "helpfulVotes": "unsupported",
+          "totalVotes": "unsupported",
+          "developerReply": "unsupported",
+          "developerReplyAt": "unsupported",
+          "rating": "available",
+          "reviewedAt": "available"
+        }
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "ios",
+        "storeAppId": "6448311069",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": null,
+        "sourceReviewId": "14831375649",
+        "rating": 1,
+        "reviewedAt": "2026-11-25T00:00:00.000Z",
+        "appVersion": "1.2026.315",
+        "title": "Sample App Store review title for fixture tests",
+        "text": "Sample App Store review body for analysis-pipeline fixture tests. Personal identifiers removed.",
+        "hasDeveloperReply": false,
+        "source": "thewolves",
+        "idempotencyKey": "ed66d411d2092f15755783f32e52063ea1fdc2cf9fbe1ee94635c538a50c65ce",
+        "fieldStatus": {
+          "title": "available",
+          "text": "available",
+          "appVersion": "available",
+          "helpfulVotes": "unsupported",
+          "totalVotes": "unsupported",
+          "developerReply": "unsupported",
+          "developerReplyAt": "unsupported",
+          "rating": "available",
+          "reviewedAt": "available"
+        }
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "ios",
+        "storeAppId": "6448311069",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": null,
+        "sourceReviewId": "14831352667",
+        "rating": 3,
+        "reviewedAt": "2026-11-25T00:00:00.000Z",
+        "appVersion": "1.2026.315",
+        "title": "Sample App Store review title for fixture tests",
+        "text": "Sample App Store review body for analysis-pipeline fixture tests. Personal identifiers removed.",
+        "hasDeveloperReply": false,
+        "source": "thewolves",
+        "idempotencyKey": "9044a5d198afb279937f4245eda740c491e7bb2e6b22dfedfe8221d2e7a09ab8",
+        "fieldStatus": {
+          "title": "available",
+          "text": "available",
+          "appVersion": "available",
+          "helpfulVotes": "unsupported",
+          "totalVotes": "unsupported",
+          "developerReply": "unsupported",
+          "developerReplyAt": "unsupported",
+          "rating": "available",
+          "reviewedAt": "available"
+        }
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "ios",
+        "storeAppId": "6448311069",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": null,
+        "sourceReviewId": "14831348160",
+        "rating": 5,
+        "reviewedAt": "2026-11-25T00:00:00.000Z",
+        "appVersion": "1.2026.315",
+        "title": "Sample App Store review title for fixture tests",
+        "text": "Sample App Store review body for analysis-pipeline fixture tests. Personal identifiers removed.",
+        "hasDeveloperReply": false,
+        "source": "thewolves",
+        "idempotencyKey": "8be183a7f43438d22acb2fe48c628ce24671075d7438ded41e17e9280ce3b251",
+        "fieldStatus": {
+          "title": "available",
+          "text": "available",
+          "appVersion": "available",
+          "helpfulVotes": "unsupported",
+          "totalVotes": "unsupported",
+          "developerReply": "unsupported",
+          "developerReplyAt": "unsupported",
+          "rating": "available",
+          "reviewedAt": "available"
+        }
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "ios",
+        "storeAppId": "6448311069",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": null,
+        "sourceReviewId": "14831340248",
+        "rating": 2,
+        "reviewedAt": "2026-11-25T00:00:00.000Z",
+        "appVersion": "1.2026.315",
+        "title": "Sample App Store review title for fixture tests",
+        "text": "Sample App Store review body for analysis-pipeline fixture tests. Personal identifiers removed.",
+        "hasDeveloperReply": false,
+        "source": "thewolves",
+        "idempotencyKey": "45742da595bc6912acd8c90aad2752b937403aecaaa5bde9bc6d232e95c0ab91",
+        "fieldStatus": {
+          "title": "available",
+          "text": "available",
+          "appVersion": "available",
+          "helpfulVotes": "unsupported",
+          "totalVotes": "unsupported",
+          "developerReply": "unsupported",
+          "developerReplyAt": "unsupported",
+          "rating": "available",
+          "reviewedAt": "available"
+        }
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "ios",
+        "storeAppId": "6448311069",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": null,
+        "sourceReviewId": "14831339333",
+        "rating": 4,
+        "reviewedAt": "2026-11-25T00:00:00.000Z",
+        "appVersion": "1.2026.315",
+        "title": "Sample App Store review title for fixture tests",
+        "text": "Sample App Store review body for analysis-pipeline fixture tests. Personal identifiers removed.",
+        "hasDeveloperReply": false,
+        "source": "thewolves",
+        "idempotencyKey": "de5e727aa65df5cd0308be116efe76665b6ffd554868227597bd84dd395e3b2d",
+        "fieldStatus": {
+          "title": "available",
+          "text": "available",
+          "appVersion": "available",
+          "helpfulVotes": "unsupported",
+          "totalVotes": "unsupported",
+          "developerReply": "unsupported",
+          "developerReplyAt": "unsupported",
+          "rating": "available",
+          "reviewedAt": "available"
+        }
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "ios",
+        "storeAppId": "6448311069",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": null,
+        "sourceReviewId": "14831338519",
+        "rating": 5,
+        "reviewedAt": "2026-11-25T00:00:00.000Z",
+        "appVersion": "1.2026.315",
+        "title": "Sample App Store review title for fixture tests",
+        "text": "Sample App Store review body for analysis-pipeline fixture tests. Personal identifiers removed.",
+        "hasDeveloperReply": false,
+        "source": "thewolves",
+        "idempotencyKey": "f7d6d7c9fc9ae03313496f58abb5dddc06f884cda2386d05dc09a5eb229789ae",
+        "fieldStatus": {
+          "title": "available",
+          "text": "available",
+          "appVersion": "available",
+          "helpfulVotes": "unsupported",
+          "totalVotes": "unsupported",
+          "developerReply": "unsupported",
+          "developerReplyAt": "unsupported",
+          "rating": "available",
+          "reviewedAt": "available"
+        }
+      }
+    }
+  ],
+  "redactedSamples": [
+    {
+      "id": "14831434670",
+      "date": "2026-11-25T00:00:00.000Z",
+      "version": "1.2026.315",
+      "score": 5,
+      "country": "US",
+      "appId": "6448311069",
+      "has_review_title": true,
+      "has_text": true,
+      "text_length": 20
+    },
+    {
+      "id": "14831413605",
+      "date": "2026-11-25T00:00:00.000Z",
+      "version": "1.2026.315",
+      "score": 5,
+      "country": "US",
+      "appId": "6448311069",
+      "has_review_title": true,
+      "has_text": true,
+      "text_length": 259
+    },
+    {
+      "id": "14831412550",
+      "date": "2026-11-25T00:00:00.000Z",
+      "version": "1.2026.315",
+      "score": 5,
+      "country": "US",
+      "appId": "6448311069",
+      "has_review_title": true,
+      "has_text": true,
+      "text_length": 31
+    }
+  ]
+}

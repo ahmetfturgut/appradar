@@ -1,0 +1,520 @@
+{
+  "retrievedAt": "2026-11-25T20:38:32.020883+00:00",
+  "sources": {
+    "metadata": "https://api.apify.com/v2/acts/subimpact~app-store-scraper",
+    "openapi": "https://api.apify.com/v2/acts/subimpact~app-store-scraper/builds/default/openapi.json"
+  },
+  "actorId": "cbSMPmaUHdY8NGIfS",
+  "actorSlug": "subimpact~app-store-scraper",
+  "taggedBuilds": {
+    "latest": {
+      "buildId": "NHjJXD6Nrjf8MpxN1",
+      "finishedAt": "2026-11-20T04:16:08.726Z",
+      "buildNumberInt": 100001,
+      "buildNumber": "0.1.1"
+    }
+  },
+  "pricingInfos": [
+    {
+      "pricingModel": "PAY_PER_EVENT",
+      "pricingPerEvent": {
+        "actorChargeEvents": {
+          "app": {
+            "eventTitle": "App",
+            "eventDescription": "One app row delivered to the dataset (iOS App Store or Google Play) with an app id and title. Platform usage included. Error rows are never charged.",
+            "eventTieredPricingUsd": {
+              "FREE": {
+                "tieredEventPriceUsd": 0.0003
+              },
+              "BRONZE": {
+                "tieredEventPriceUsd": 0.00028
+              },
+              "SILVER": {
+                "tieredEventPriceUsd": 0.00026
+              },
+              "GOLD": {
+                "tieredEventPriceUsd": 0.00024
+              },
+              "PLATINUM": {
+                "tieredEventPriceUsd": 0.00024
+              },
+              "DIAMOND": {
+                "tieredEventPriceUsd": 0.00024
+              }
+            },
+            "isPrimaryEvent": true
+          }
+        }
+      },
+      "apifyMarginPercentage": 0.2,
+      "createdAt": "2026-11-20T04:22:58.538Z",
+      "startedAt": "2026-11-20T04:22:58.000Z"
+    }
+  ],
+  "openapi": {
+    "openapi": "3.0.1",
+    "info": {
+      "title": "App Store & Google Play Scraper",
+      "description": "App Store and Google Play app data as JSON: search results, full app details and top charts (free, paid and grossing, with genre for iOS). Both stores, one schema, no start fee, from $0.30 per 1,000 apps.",
+      "version": "0.1",
+      "x-build-id": "NHjJXD6Nrjf8MpxN1"
+    },
+    "servers": [
+      {
+        "url": "https://api.apify.com/v2"
+      }
+    ],
+    "paths": {
+      "/acts/subimpact~app-store-scraper/run-sync-get-dataset-items": {
+        "post": {
+          "operationId": "run-sync-get-dataset-items-subimpact-app-store-scraper",
+          "x-openai-isConsequential": false,
+          "summary": "Executes an Actor, waits for its completion, and returns Actor's dataset items in response.",
+          "tags": [
+            "Run Actor"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inputSchema"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "token",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "Enter your Apify token here"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      },
+      "/acts/subimpact~app-store-scraper/runs": {
+        "post": {
+          "operationId": "runs-sync-subimpact-app-store-scraper",
+          "x-openai-isConsequential": false,
+          "summary": "Executes an Actor and returns information about the initiated run in response.",
+          "tags": [
+            "Run Actor"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inputSchema"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "token",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "Enter your Apify token here"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/runsResponseSchema"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/acts/subimpact~app-store-scraper/run-sync": {
+        "post": {
+          "operationId": "run-sync-subimpact-app-store-scraper",
+          "x-openai-isConsequential": false,
+          "summary": "Executes an Actor, waits for completion, and returns the OUTPUT from Key-value store in response.",
+          "tags": [
+            "Run Actor"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inputSchema"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "token",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "Enter your Apify token here"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "title": "Mode",
+              "enum": [
+                "search",
+                "details",
+                "charts"
+              ],
+              "type": "string",
+              "description": "search = find apps by keyword (up to 200 results per iOS term, about 30 per Play term). details = look up specific apps by id, URL, bundle id or package name. charts = today's top charts.",
+              "default": "search"
+            },
+            "store": {
+              "title": "Store",
+              "enum": [
+                "both",
+                "ios",
+                "play"
+              ],
+              "type": "string",
+              "description": "Which store to query. both interleaves the two stores so a small maxItems does not starve one of them.",
+              "default": "both"
+            },
+            "searchTerms": {
+              "title": "Search terms",
+              "type": "array",
+              "description": "One keyword per line, e.g. todo, photo editor, meditation. iOS returns up to 200 results per term; Google Play returns about 30 per term and has no paging. Search mode only.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "appIds": {
+              "title": "Apps",
+              "type": "array",
+              "description": "Apps to look up when mode is details. One per line: apps.apple.com URLs, numeric App Store ids (id389801252 or 389801252), Apple bundle ids (com.burbn.instagram), play.google.com URLs or Play package names (com.instagram.android). With store=both a bare bundle id or package name is tried against both stores.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "chartCollection": {
+              "title": "Chart",
+              "enum": [
+                "topFree",
+                "topPaid",
+                "topGrossing"
+              ],
+              "type": "string",
+              "description": "topFree and topPaid work on both stores. topGrossing is iOS-only on Apple's legacy feed; Google Play has its own grossing chart.",
+              "default": "topFree"
+            },
+            "iosGenreId": {
+              "title": "iOS genre id (optional)",
+              "pattern": "^(\\s*\\d{3,6}\\s*)?$",
+              "type": "string",
+              "description": "Apple genre id to filter the iOS chart, e.g. 6014 for Games or 6007 for Productivity. Genre filtering works on the iOS legacy iTunes feed only; Google Play uses playCategory instead."
+            },
+            "playCategory": {
+              "title": "Play category",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]{1,40}$",
+              "type": "string",
+              "description": "Google Play chart category id: APPLICATION (default), GAME, GAME_ACTION, GAME_ARCADE, PRODUCTIVITY, TOOLS and so on.",
+              "default": "APPLICATION"
+            },
+            "country": {
+              "title": "Country",
+              "pattern": "^(\\s*[A-Za-z]{2}\\s*)?$",
+              "type": "string",
+              "description": "Two-letter storefront: us, gb, de, my, sg, in, jp. Prices and currencies follow the storefront. uk is accepted as an alias for gb.",
+              "default": "us"
+            },
+            "language": {
+              "title": "Language",
+              "pattern": "^(\\s*[A-Za-z]{2,3}([-_][A-Za-z0-9]{2,4})?\\s*)?$",
+              "type": "string",
+              "description": "Language code for Google Play pages, e.g. en, de, pt-BR. iOS text follows the storefront. Each row carries the language the run used.",
+              "default": "en"
+            },
+            "fullDetails": {
+              "title": "Full details for Play search and chart rows",
+              "type": "boolean",
+              "description": "Google Play search and chart listings lack rating count, review count, version, update date and developer contacts. Turn this on to fetch each app's details page and fill them in (one extra request per app, still one app event). iOS rows are always full.",
+              "default": false
+            },
+            "maxItems": {
+              "title": "Max items",
+              "minimum": 1,
+              "maximum": 5000,
+              "type": "integer",
+              "description": "Global cap on delivered app rows across all terms and stores (1-5000). The default of 50 costs about $0.015. Error rows are never charged and do not count against this cap.",
+              "default": 50
+            },
+            "proxy": {
+              "title": "Proxy configuration",
+              "type": "object",
+              "description": "Off by default. Both stores answer direct requests from Apify; turn Apify Proxy on only if your runs get blocked. When it is on, a failed proxy setup fails the request instead of silently going direct.",
+              "default": {
+                "useApifyProxy": false
+              }
+            }
+          }
+        },
+        "runsResponseSchema": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "actId": {
+                  "type": "string"
+                },
+                "userId": {
+                  "type": "string"
+                },
+                "startedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2025-01-08T00:00:00.000Z"
+                },
+                "finishedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2025-01-08T00:00:00.000Z"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "READY"
+                },
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "origin": {
+                      "type": "string",
+                      "example": "API"
+                    },
+                    "userAgent": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "stats": {
+                  "type": "object",
+                  "properties": {
+                    "inputBodyLen": {
+                      "type": "integer",
+                      "example": 2000
+                    },
+                    "rebootCount": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "restartCount": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "resurrectCount": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "computeUnits": {
+                      "type": "integer",
+                      "example": 0
+                    }
+                  }
+                },
+                "options": {
+                  "type": "object",
+                  "properties": {
+                    "build": {
+                      "type": "string",
+                      "example": "latest"
+                    },
+                    "timeoutSecs": {
+                      "type": "integer",
+                      "example": 300
+                    },
+                    "memoryMbytes": {
+                      "type": "integer",
+                      "example": 1024
+                    },
+                    "diskMbytes": {
+                      "type": "integer",
+                      "example": 2048
+                    }
+                  }
+                },
+                "buildId": {
+                  "type": "string"
+                },
+                "defaultKeyValueStoreId": {
+                  "type": "string"
+                },
+                "defaultDatasetId": {
+                  "type": "string"
+                },
+                "defaultRequestQueueId": {
+                  "type": "string"
+                },
+                "buildNumber": {
+                  "type": "string",
+                  "example": "1.0.0"
+                },
+                "containerUrl": {
+                  "type": "string"
+                },
+                "usage": {
+                  "type": "object",
+                  "properties": {
+                    "ACTOR_COMPUTE_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_WRITES": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "KEY_VALUE_STORE_LISTS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_INTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_EXTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_RESIDENTIAL_TRANSFER_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_SERPS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_UNBLOCKER_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    }
+                  }
+                },
+                "usageTotalUsd": {
+                  "type": "number",
+                  "example": 5e-05
+                },
+                "usageUsd": {
+                  "type": "object",
+                  "properties": {
+                    "ACTOR_COMPUTE_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATASET_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "KEY_VALUE_STORE_WRITES": {
+                      "type": "number",
+                      "example": 5e-05
+                    },
+                    "KEY_VALUE_STORE_LISTS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_READS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "REQUEST_QUEUE_WRITES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_INTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "DATA_TRANSFER_EXTERNAL_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_RESIDENTIAL_TRANSFER_GBYTES": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_SERPS": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "PROXY_UNBLOCKER_UNITS": {
+                      "type": "integer",
+                      "example": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

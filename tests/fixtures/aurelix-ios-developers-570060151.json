@@ -1,0 +1,186 @@
+{
+  "job": {
+    "id": "3966f2d5d93144e14912",
+    "provider": "aurelix",
+    "store": "ios",
+    "country": "US",
+    "mode": "developers",
+    "context": "570060151",
+    "input": {
+      "apps": [],
+      "developers": [
+        "https://apps.apple.com/us/developer/duolingo/id570060151"
+      ],
+      "appStoreCharts": [],
+      "chartGenre": "",
+      "countries": [
+        "us"
+      ],
+      "language": "en",
+      "maxAppsPerList": 5,
+      "maxReviewsPerApp": 0,
+      "proxyConfiguration": {
+        "useApifyProxy": false
+      }
+    }
+  },
+  "run": {
+    "id": "DU274VwsElGfyASfF",
+    "status": "SUCCEEDED",
+    "buildNumber": "0.2.23",
+    "usageTotalUsd": 0.00484,
+    "chargedEventCounts": {
+      "app-result": 3,
+      "review-result": 0,
+      "apify-actor-start": 1
+    }
+  },
+  "redactedRows": [
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "570060128",
+        "name": "Duolingo: Learn Languages",
+        "country": "US",
+        "requestedLanguage": "en",
+        "developerName": "Duolingo",
+        "developerStoreId": "570060151",
+        "observationRole": "discovery",
+        "rankContext": "570060151",
+        "ratingValue": 4.72,
+        "ratingCount": 5628995,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Education",
+        "version": "7.149.2",
+        "source": "aurelix"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "1440502568",
+        "name": "Learn to Read - Duolingo ABC",
+        "country": "US",
+        "requestedLanguage": "en",
+        "developerName": "Duolingo",
+        "developerStoreId": "570060151",
+        "observationRole": "discovery",
+        "rankContext": "570060151",
+        "ratingValue": 4.25,
+        "ratingCount": 3872,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Education",
+        "version": "1.96.2",
+        "source": "aurelix"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6754582936",
+        "name": "DET - Duolingo English Test",
+        "country": "US",
+        "requestedLanguage": "en",
+        "developerName": "Duolingo",
+        "developerStoreId": "570060151",
+        "observationRole": "discovery",
+        "rankContext": "570060151",
+        "ratingValue": 2.13,
+        "ratingCount": 39,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Education",
+        "version": "1.8.2",
+        "source": "aurelix"
+      }
+    }
+  ],
+  "redactedSamples": [
+    {
+      "type": "app",
+      "store": "app_store",
+      "app_id": "570060128",
+      "title": "Duolingo: Learn Languages",
+      "url": "https://apps.apple.com/us/app/duolingo-learn-languages/id570060128",
+      "developer": "Duolingo",
+      "developer_id": "570060151",
+      "developer_url": "https://apps.apple.com/us/developer/duolingo/id570060151",
+      "genre": "Education",
+      "genre_id": "6017",
+      "price": 0,
+      "currency": "USD",
+      "is_free": true,
+      "rating": 4.72,
+      "ratings_count": 5628995,
+      "reviews_count": null,
+      "version": "7.149.2",
+      "chart": null,
+      "chart_genre": null,
+      "chart_rank": null,
+      "found_via": "developer",
+      "country": "us",
+      "language": null,
+      "scraped_at": "2026-11-26T07:57:05Z"
+    },
+    {
+      "type": "app",
+      "store": "app_store",
+      "app_id": "1440502568",
+      "title": "Learn to Read - Duolingo ABC",
+      "url": "https://apps.apple.com/us/app/learn-to-read-duolingo-abc/id1440502568",
+      "developer": "Duolingo",
+      "developer_id": "570060151",
+      "developer_url": "https://apps.apple.com/us/developer/duolingo/id570060151",
+      "genre": "Education",
+      "genre_id": "6017",
+      "price": 0,
+      "currency": "USD",
+      "is_free": true,
+      "rating": 4.25,
+      "ratings_count": 3872,
+      "reviews_count": null,
+      "version": "1.96.2",
+      "chart": null,
+      "chart_genre": null,
+      "chart_rank": null,
+      "found_via": "developer",
+      "country": "us",
+      "language": null,
+      "scraped_at": "2026-11-26T07:57:05Z"
+    },
+    {
+      "type": "app",
+      "store": "app_store",
+      "app_id": "6754582936",
+      "title": "DET - Duolingo English Test",
+      "url": "https://apps.apple.com/us/app/det-duolingo-english-test/id6754582936",
+      "developer": "Duolingo",
+      "developer_id": "570060151",
+      "developer_url": "https://apps.apple.com/us/developer/duolingo/id570060151",
+      "genre": "Education",
+      "genre_id": "6017",
+      "price": 0,
+      "currency": "USD",
+      "is_free": true,
+      "rating": 2.13,
+      "ratings_count": 39,
+      "reviews_count": null,
+      "version": "1.8.2",
+      "chart": null,
+      "chart_genre": null,
+      "chart_rank": null,
+      "found_via": "developer",
+      "country": "us",
+      "language": null,
+      "scraped_at": "2026-11-26T07:57:05Z"
+    }
+  ]
+}

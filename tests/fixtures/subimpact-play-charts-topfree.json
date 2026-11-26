@@ -1,0 +1,217 @@
+{
+  "job": {
+    "id": "7c923251a54971462394",
+    "provider": "subimpact",
+    "store": "play",
+    "country": "US",
+    "mode": "charts",
+    "context": "topFree",
+    "input": {
+      "mode": "charts",
+      "store": "play",
+      "country": "us",
+      "language": "en",
+      "chartCollection": "topFree",
+      "iosGenreId": "6007",
+      "playCategory": "PRODUCTIVITY",
+      "maxItems": 5,
+      "fullDetails": true,
+      "proxy": {
+        "useApifyProxy": false
+      }
+    }
+  },
+  "run": {
+    "id": "zgu5av20A3SD9kVsu",
+    "status": "SUCCEEDED",
+    "buildNumber": "0.1.1",
+    "usageTotalUsd": 0.0014999999999999998,
+    "chargedEventCounts": {
+      "app": 5
+    }
+  },
+  "redactedRows": [
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "play",
+        "storeAppId": "com.facebook.aura",
+        "name": "Muse from Meta",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 1,
+        "rankContext": "topFree",
+        "rankCategory": "PRODUCTIVITY",
+        "ratingValue": 4.811089,
+        "ratingCount": 249820,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": null,
+        "source": "subimpact"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "play",
+        "storeAppId": "com.openai.chatgpt",
+        "name": "ChatGPT",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 2,
+        "rankContext": "topFree",
+        "rankCategory": "PRODUCTIVITY",
+        "ratingValue": 4.781397,
+        "ratingCount": 69826519,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "1.2026.321",
+        "source": "subimpact"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "play",
+        "storeAppId": "com.eet.settings.launcher",
+        "name": "Settings Home",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 3,
+        "rankContext": "topFree",
+        "rankCategory": "PRODUCTIVITY",
+        "ratingValue": 4.275817,
+        "ratingCount": 7137,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "1.6.6",
+        "source": "subimpact"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "play",
+        "storeAppId": "com.anthropic.claude",
+        "name": "Claude by Anthropic",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 4,
+        "rankContext": "topFree",
+        "rankCategory": "PRODUCTIVITY",
+        "ratingValue": 4.5432167,
+        "ratingCount": 907322,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "1.261124.19",
+        "source": "subimpact"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "play",
+        "storeAppId": "com.wake.box.ryan",
+        "name": "WakeBox",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 5,
+        "rankContext": "topFree",
+        "rankCategory": "PRODUCTIVITY",
+        "ratingValue": 4.2300615,
+        "ratingCount": 3253,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "1.2.6",
+        "source": "subimpact"
+      }
+    }
+  ],
+  "redactedSamples": [
+    {
+      "store": "play",
+      "appId": "com.facebook.aura",
+      "appTitle": "Muse from Meta",
+      "price": 0,
+      "currency": "USD",
+      "isFree": true,
+      "rating": 4.811089,
+      "ratingCount": 249820,
+      "reviewCount": 30986,
+      "genre": "Productivity",
+      "version": null,
+      "appUrl": "https://play.google.com/store/apps/details?id=com.facebook.aura",
+      "searchTerm": null,
+      "searchRank": null,
+      "chartCollection": "topFree",
+      "chartCategory": "PRODUCTIVITY",
+      "chartRank": 1,
+      "country": "us",
+      "language": "en",
+      "detailLevel": "full",
+      "source": "play-vyAe2",
+      "scrapedAt": "2026-11-26T07:17:04.276Z",
+      "status": null
+    },
+    {
+      "store": "play",
+      "appId": "com.openai.chatgpt",
+      "appTitle": "ChatGPT",
+      "price": 0,
+      "currency": "USD",
+      "isFree": true,
+      "rating": 4.781397,
+      "ratingCount": 69826519,
+      "reviewCount": 214401,
+      "genre": "Productivity",
+      "version": "1.2026.321",
+      "appUrl": "https://play.google.com/store/apps/details?id=com.openai.chatgpt",
+      "searchTerm": null,
+      "searchRank": null,
+      "chartCollection": "topFree",
+      "chartCategory": "PRODUCTIVITY",
+      "chartRank": 2,
+      "country": "us",
+      "language": "en",
+      "detailLevel": "full",
+      "source": "play-vyAe2",
+      "scrapedAt": "2026-11-26T07:17:04.276Z",
+      "status": null
+    },
+    {
+      "store": "play",
+      "appId": "com.eet.settings.launcher",
+      "appTitle": "Settings Home",
+      "price": 0,
+      "currency": "USD",
+      "isFree": true,
+      "rating": 4.275817,
+      "ratingCount": 7137,
+      "reviewCount": 866,
+      "genre": "Productivity",
+      "version": "1.6.6",
+      "appUrl": "https://play.google.com/store/apps/details?id=com.eet.settings.launcher",
+      "searchTerm": null,
+      "searchRank": null,
+      "chartCollection": "topFree",
+      "chartCategory": "PRODUCTIVITY",
+      "chartRank": 3,
+      "country": "us",
+      "language": "en",
+      "detailLevel": "full",
+      "source": "play-vyAe2",
+      "scrapedAt": "2026-11-26T07:17:04.276Z",
+      "status": null
+    }
+  ]
+}

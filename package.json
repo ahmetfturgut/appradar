@@ -1,0 +1,57 @@
+{
+  "name": "appradar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "start": "next start --hostname 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "build": "next build",
+    "build:poc": "tsc -p tsconfig.build.json",
+    "check": "npm run typecheck && npm run lint && npm test && npm run build",
+    "poc:plan": "node --import tsx tools/poc.ts plan",
+    "poc:run": "node --import tsx tools/poc.ts run",
+    "poc:resume": "node --import tsx tools/poc.ts resume",
+    "poc:report": "node --import tsx tools/poc.ts report",
+    "data:fetch": "node --import tsx tools/local-fetch.ts",
+    "data:subimpact": "node --import tsx tools/subimpact-fetch.ts",
+    "data:aurelix-charts": "node --import tsx tools/aurelix-charts-fetch.ts",
+    "data:aurelix-developers": "node --import tsx tools/aurelix-developers-fetch.ts",
+    "data:aurelix-reviews": "node --import tsx tools/aurelix-reviews-fetch.ts",
+    "data:thewolves-reviews": "node --import tsx tools/thewolves-reviews-fetch.ts",
+    "data:aurelix-play-reviews": "node --import tsx tools/aurelix-play-reviews-fetch.ts",
+    "data:datatrail-new-apps": "node --import tsx tools/datatrail-new-apps-fetch.ts",
+    "data:asokeyword": "node --import tsx tools/asokeyword-fetch.ts"
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "1.5.0",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "lucide-react": "1.80.0",
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "tailwind-merge": "3.7.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@tailwindcss/postcss": "4.3.5",
+    "@types/node": "26.6.10",
+    "@types/react": "19.3.3",
+    "@types/react-dom": "19.3.0",
+    "eslint": "10.15.0",
+    "eslint-config-next": "16.4.6",
+    "postcss": "8.5.33",
+    "tailwindcss": "4.3.5",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.74.0"
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "job": {
+    "id": "9b3d9831bbc8aa3bac13",
+    "provider": "aurelix",
+    "store": "play",
+    "country": "US",
+    "mode": "developers",
+    "context": "6957685454452609502",
+    "input": {
+      "apps": [],
+      "developers": [
+        "https://play.google.com/store/apps/dev?id=6957685454452609502"
+      ],
+      "appStoreCharts": [],
+      "chartGenre": "",
+      "countries": [
+        "us"
+      ],
+      "language": "en",
+      "maxAppsPerList": 5,
+      "maxReviewsPerApp": 0,
+      "proxyConfiguration": {
+        "useApifyProxy": false
+      }
+    }
+  },
+  "run": {
+    "id": "ViHu2DztdwJfCHUz0",
+    "status": "SUCCEEDED",
+    "buildNumber": "0.2.23",
+    "usageTotalUsd": 0.00484,
+    "chargedEventCounts": {
+      "app-result": 3,
+      "review-result": 0,
+      "apify-actor-start": 1
+    }
+  },
+  "redactedRows": [
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "play",
+        "storeAppId": "com.duolingo",
+        "name": "Duolingo: Learn Languages",
+        "country": "US",
+        "requestedLanguage": "en",
+        "developerName": "Duolingo",
+        "developerStoreId": "6957685454452609502",
+        "observationRole": "discovery",
+        "rankContext": "6957685454452609502",
+        "ratingValue": 4.75,
+        "ratingCount": 52218630,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Education",
+        "version": null,
+        "source": "aurelix"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "play",
+        "storeAppId": "com.duolingo.literacy",
+        "name": "Learn to Read - Duolingo ABC",
+        "country": "US",
+        "requestedLanguage": "en",
+        "developerName": "Duolingo",
+        "developerStoreId": "6957685454452609502",
+        "observationRole": "discovery",
+        "rankContext": "6957685454452609502",
+        "ratingValue": 3.84,
+        "ratingCount": 24208,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Education",
+        "version": "1.25.1",
+        "source": "aurelix"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "play",
+        "storeAppId": "com.duolingo.detmobile",
+        "name": "Duolingo English Test (DET)",
+        "country": "US",
+        "requestedLanguage": "en",
+        "developerName": "Duolingo",
+        "developerStoreId": "6957685454452609502",
+        "observationRole": "discovery",
+        "rankContext": "6957685454452609502",
+        "ratingValue": 2.86,
+        "ratingCount": 1234,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Education",
+        "version": "1.8.1",
+        "source": "aurelix"
+      }
+    }
+  ],
+  "redactedSamples": [
+    {
+      "type": "app",
+      "store": "google_play",
+      "app_id": "com.duolingo",
+      "title": "Duolingo: Learn Languages",
+      "url": "https://play.google.com/store/apps/details?id=com.duolingo",
+      "developer": "Duolingo",
+      "developer_id": "6957685454452609502",
+      "developer_url": "https://play.google.com/store/apps/dev?id=6957685454452609502",
+      "genre": "Education",
+      "genre_id": "EDUCATION",
+      "price": 0,
+      "currency": "USD",
+      "is_free": true,
+      "rating": 4.75,
+      "ratings_count": 52218630,
+      "reviews_count": 971025,
+      "version": null,
+      "chart": null,
+      "chart_genre": null,
+      "chart_rank": null,
+      "found_via": "developer",
+      "country": "us",
+      "language": "en",
+      "scraped_at": "2026-11-26T07:57:10Z"
+    },
+    {
+      "type": "app",
+      "store": "google_play",
+      "app_id": "com.duolingo.literacy",
+      "title": "Learn to Read - Duolingo ABC",
+      "url": "https://play.google.com/store/apps/details?id=com.duolingo.literacy",
+      "developer": "Duolingo",
+      "developer_id": "6957685454452609502",
+      "developer_url": "https://play.google.com/store/apps/dev?id=6957685454452609502",
+      "genre": "Education",
+      "genre_id": "EDUCATION",
+      "price": 0,
+      "currency": "USD",
+      "is_free": true,
+      "rating": 3.84,
+      "ratings_count": 24208,
+      "reviews_count": 951,
+      "version": "1.25.1",
+      "chart": null,
+      "chart_genre": null,
+      "chart_rank": null,
+      "found_via": "developer",
+      "country": "us",
+      "language": "en",
+      "scraped_at": "2026-11-26T07:57:10Z"
+    },
+    {
+      "type": "app",
+      "store": "google_play",
+      "app_id": "com.duolingo.detmobile",
+      "title": "Duolingo English Test (DET)",
+      "url": "https://play.google.com/store/apps/details?id=com.duolingo.detmobile",
+      "developer": "Duolingo",
+      "developer_id": "6957685454452609502",
+      "developer_url": "https://play.google.com/store/apps/dev?id=6957685454452609502",
+      "genre": "Education",
+      "genre_id": "EDUCATION",
+      "price": 0,
+      "currency": "USD",
+      "is_free": true,
+      "rating": 2.86,
+      "ratings_count": 1234,
+      "reviews_count": 16,
+      "version": "1.8.1",
+      "chart": null,
+      "chart_genre": null,
+      "chart_rank": null,
+      "found_via": "developer",
+      "country": "us",
+      "language": "en",
+      "scraped_at": "2026-11-26T07:57:10Z"
+    }
+  ]
+}

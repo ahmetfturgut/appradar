@@ -1,0 +1,329 @@
+{
+  "job": {
+    "id": "d8775896e48fa109ec38",
+    "provider": "aurelix",
+    "store": "play",
+    "country": "US",
+    "mode": "reviews",
+    "context": "com.openai.chatgpt",
+    "input": {
+      "apps": [
+        "com.openai.chatgpt"
+      ],
+      "developers": [],
+      "appStoreCharts": [],
+      "chartGenre": "",
+      "countries": [
+        "us"
+      ],
+      "language": "en",
+      "maxReviewsPerApp": 10,
+      "reviewSort": "mostrecent",
+      "onlyNewReviews": false,
+      "proxyConfiguration": {
+        "useApifyProxy": false
+      }
+    }
+  },
+  "run": {
+    "id": "lhmCb8WB28eAivKew",
+    "status": "SUCCEEDED",
+    "buildNumber": "0.2.23",
+    "usageTotalUsd": 0.00473,
+    "chargedEventCounts": {
+      "app-result": 1,
+      "review-result": 10,
+      "apify-actor-start": 1
+    }
+  },
+  "redactedRows": [
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "play",
+        "storeAppId": "com.openai.chatgpt",
+        "name": "ChatGPT",
+        "country": "US",
+        "observationRole": "discovery",
+        "source": "aurelix"
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "play",
+        "storeAppId": "com.openai.chatgpt",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": "en",
+        "sourceReviewId": "daba1dc3-d9e6-4f64-b7d2-bd7818a4ca9d",
+        "rating": 2,
+        "reviewedAt": "2026-09-18T02:59:21Z",
+        "appVersion": "1.2026.244",
+        "helpfulVotes": 12202,
+        "totalVotes": null,
+        "hasDeveloperReply": false,
+        "hasTitle": false,
+        "hasText": true,
+        "textLength": 465,
+        "source": "aurelix",
+        "idempotencyKey": "f5ecd02dc14b2dcec3e9635ad606eb2d7c79a409b3cddbc5d3e9d072ca32f91b"
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "play",
+        "storeAppId": "com.openai.chatgpt",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": "en",
+        "sourceReviewId": "c97256b8-1479-4110-a855-4a65a4f8e60d",
+        "rating": 1,
+        "reviewedAt": "2026-09-24T20:35:52Z",
+        "appVersion": "1.2026.258",
+        "helpfulVotes": 5143,
+        "totalVotes": null,
+        "hasDeveloperReply": false,
+        "hasTitle": false,
+        "hasText": true,
+        "textLength": 498,
+        "source": "aurelix",
+        "idempotencyKey": "0ec2bdc8841bc384de2ddd173be81cf0be9241c445be86f7bc0d2325c8b242c3"
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "play",
+        "storeAppId": "com.openai.chatgpt",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": "en",
+        "sourceReviewId": "84409f6c-3357-4c51-b207-8c8891e80db3",
+        "rating": 1,
+        "reviewedAt": "2025-10-11T15:47:40Z",
+        "appVersion": "1.2025.273",
+        "helpfulVotes": 8111,
+        "totalVotes": null,
+        "hasDeveloperReply": false,
+        "hasTitle": false,
+        "hasText": true,
+        "textLength": 437,
+        "source": "aurelix",
+        "idempotencyKey": "f5d9d0af8dbef6edb5a39a6c675dee91855e45806def85babbba09f9f24de395"
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "play",
+        "storeAppId": "com.openai.chatgpt",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": "en",
+        "sourceReviewId": "da53fdad-5552-4964-bd09-541d8e98fc14",
+        "rating": 3,
+        "reviewedAt": "2025-07-15T22:25:51Z",
+        "appVersion": "1.2025.189",
+        "helpfulVotes": 8962,
+        "totalVotes": null,
+        "hasDeveloperReply": false,
+        "hasTitle": false,
+        "hasText": true,
+        "textLength": 457,
+        "source": "aurelix",
+        "idempotencyKey": "c2f7df36955872d14f6eb99f40c8d6b8f5b5faad731edae75c586c28e590bb6b"
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "play",
+        "storeAppId": "com.openai.chatgpt",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": "en",
+        "sourceReviewId": "f8479fe4-764a-46f9-9849-899a2534a3a1",
+        "rating": 2,
+        "reviewedAt": "2025-05-17T07:04:25Z",
+        "appVersion": "1.2025.126",
+        "helpfulVotes": 4811,
+        "totalVotes": null,
+        "hasDeveloperReply": false,
+        "hasTitle": false,
+        "hasText": true,
+        "textLength": 494,
+        "source": "aurelix",
+        "idempotencyKey": "55182bbde193627e88a8278953ce17ecda4c2a8def2fbd2a6a766c4602554529"
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "play",
+        "storeAppId": "com.openai.chatgpt",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": "en",
+        "sourceReviewId": "148fb6db-ddb7-4081-abfc-cbf7855d8bc1",
+        "rating": 5,
+        "reviewedAt": "2025-02-23T18:21:20Z",
+        "appVersion": "1.2025.042",
+        "helpfulVotes": 22927,
+        "totalVotes": null,
+        "hasDeveloperReply": false,
+        "hasTitle": false,
+        "hasText": true,
+        "textLength": 491,
+        "source": "aurelix",
+        "idempotencyKey": "f316d74bf266570dd416326026522b22ddede097805a0eec63ef086f73828afb"
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "play",
+        "storeAppId": "com.openai.chatgpt",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": "en",
+        "sourceReviewId": "16fcf41b-cdf6-4f39-84e6-928e70ac29a1",
+        "rating": 3,
+        "reviewedAt": "2025-10-02T15:18:23Z",
+        "appVersion": "1.2025.266",
+        "helpfulVotes": 4000,
+        "totalVotes": null,
+        "hasDeveloperReply": false,
+        "hasTitle": false,
+        "hasText": true,
+        "textLength": 459,
+        "source": "aurelix",
+        "idempotencyKey": "6ec672b8f31073713d36d9edeaa1527e6cda5e16612d9f7639f9c344a9ea578f"
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "play",
+        "storeAppId": "com.openai.chatgpt",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": "en",
+        "sourceReviewId": "00714b91-8524-4849-96ab-00162d7d3b25",
+        "rating": 5,
+        "reviewedAt": "2025-02-03T22:54:01Z",
+        "appVersion": "1.2025.021",
+        "helpfulVotes": 14559,
+        "totalVotes": null,
+        "hasDeveloperReply": false,
+        "hasTitle": false,
+        "hasText": true,
+        "textLength": 474,
+        "source": "aurelix",
+        "idempotencyKey": "4292468ea3476331cfd557ed9bea3750824bb6dfa2fdb8a64d39ac6061bfd218"
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "play",
+        "storeAppId": "com.openai.chatgpt",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": "en",
+        "sourceReviewId": "5818664a-6ca0-45cd-bc3e-c617736acb73",
+        "rating": 3,
+        "reviewedAt": "2025-07-24T22:14:32Z",
+        "appVersion": "1.2025.196",
+        "helpfulVotes": 4936,
+        "totalVotes": null,
+        "hasDeveloperReply": false,
+        "hasTitle": false,
+        "hasText": true,
+        "textLength": 405,
+        "source": "aurelix",
+        "idempotencyKey": "bc823b597227797ab218566b405bdbed7397370799b41447b44622621a573e58"
+      }
+    },
+    {
+      "kind": "valid_review",
+      "review": {
+        "store": "play",
+        "storeAppId": "com.openai.chatgpt",
+        "country": "US",
+        "requestedLanguage": "en",
+        "language": "en",
+        "sourceReviewId": "a2ba8d3c-6e29-4bf0-83fe-aface3cfe68b",
+        "rating": 3,
+        "reviewedAt": "2025-07-05T11:23:19Z",
+        "appVersion": "1.2025.175",
+        "helpfulVotes": 3733,
+        "totalVotes": null,
+        "hasDeveloperReply": false,
+        "hasTitle": false,
+        "hasText": true,
+        "textLength": 416,
+        "source": "aurelix",
+        "idempotencyKey": "6f157a205fa46af8512fd0ec49a18a54ee3751058972790f23b7ffd35470c8eb"
+      }
+    }
+  ],
+  "redactedSamples": [
+    {
+      "type": "review",
+      "store": "google_play",
+      "app_id": "com.openai.chatgpt",
+      "review_id": "daba1dc3-d9e6-4f64-b7d2-bd7818a4ca9d",
+      "rating": 2,
+      "date": "2026-09-18T02:59:21Z",
+      "app_version": "1.2026.244",
+      "helpful_votes": 12202,
+      "total_votes": null,
+      "country": "us",
+      "language": "en",
+      "scraped_at": "2026-11-26T08:04:11Z",
+      "has_review_title": false,
+      "has_text": true,
+      "text_length": 465,
+      "has_developer_reply": false
+    },
+    {
+      "type": "review",
+      "store": "google_play",
+      "app_id": "com.openai.chatgpt",
+      "review_id": "c97256b8-1479-4110-a855-4a65a4f8e60d",
+      "rating": 1,
+      "date": "2026-09-24T20:35:52Z",
+      "app_version": "1.2026.258",
+      "helpful_votes": 5143,
+      "total_votes": null,
+      "country": "us",
+      "language": "en",
+      "scraped_at": "2026-11-26T08:04:11Z",
+      "has_review_title": false,
+      "has_text": true,
+      "text_length": 498,
+      "has_developer_reply": false
+    },
+    {
+      "type": "review",
+      "store": "google_play",
+      "app_id": "com.openai.chatgpt",
+      "review_id": "84409f6c-3357-4c51-b207-8c8891e80db3",
+      "rating": 1,
+      "date": "2025-10-11T15:47:40Z",
+      "app_version": "1.2025.273",
+      "helpful_votes": 8111,
+      "total_votes": null,
+      "country": "us",
+      "language": "en",
+      "scraped_at": "2026-11-26T08:04:11Z",
+      "has_review_title": false,
+      "has_text": true,
+      "text_length": 437,
+      "has_developer_reply": false
+    }
+  ],
+  "note": "Free-text review bodies and reviewer identity omitted from fixtures."
+}

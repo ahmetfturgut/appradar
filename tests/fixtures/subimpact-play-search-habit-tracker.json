@@ -1,0 +1,217 @@
+{
+  "job": {
+    "id": "407f88bc49360e3aaf43",
+    "provider": "subimpact",
+    "store": "play",
+    "country": "US",
+    "mode": "search",
+    "context": "Habit Tracker",
+    "input": {
+      "mode": "search",
+      "store": "play",
+      "searchTerms": [
+        "Habit Tracker"
+      ],
+      "country": "us",
+      "language": "en",
+      "maxItems": 5,
+      "fullDetails": true,
+      "proxy": {
+        "useApifyProxy": false
+      }
+    }
+  },
+  "run": {
+    "id": "dngI546b3Co1eAQXd",
+    "status": "SUCCEEDED",
+    "buildNumber": "0.1.1",
+    "usageTotalUsd": 0.0014999999999999998,
+    "chargedEventCounts": {
+      "app": 5
+    }
+  },
+  "redactedRows": [
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "play",
+        "storeAppId": "org.isoron.uhabits",
+        "name": "Loop Habit Tracker",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 1,
+        "rankContext": "Habit Tracker",
+        "rankCategory": null,
+        "ratingValue": 4.71811,
+        "ratingCount": 63790,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "2.3.1",
+        "source": "subimpact"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "play",
+        "storeAppId": "com.habitnow",
+        "name": "HabitNow Daily Routine Planner",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 2,
+        "rankContext": "Habit Tracker",
+        "rankCategory": null,
+        "ratingValue": 4.7552795,
+        "ratingCount": 93866,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "2.5.5",
+        "source": "subimpact"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "play",
+        "storeAppId": "habittracker.todolist.tickit.daily.planner",
+        "name": "Habit Tracker - Habit Diary",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 3,
+        "rankContext": "Habit Tracker",
+        "rankCategory": null,
+        "ratingValue": 4.7376094,
+        "ratingCount": 136394,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Lifestyle",
+        "version": "1.3.9",
+        "source": "subimpact"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "play",
+        "storeAppId": "com.roehl.habitkit",
+        "name": "Habit Tracker - HabitKit",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 4,
+        "rankContext": "Habit Tracker",
+        "rankCategory": null,
+        "ratingValue": 4.5153847,
+        "ratingCount": 12302,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "1.19.2",
+        "source": "subimpact"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "play",
+        "storeAppId": "app.disciplined.productive.structured.habit.tracker",
+        "name": "Disciplined - Habit Tracker",
+        "country": "US",
+        "requestedLanguage": "en",
+        "rank": 5,
+        "rankContext": "Habit Tracker",
+        "rankCategory": null,
+        "ratingValue": 4.285714,
+        "ratingCount": 11609,
+        "priceAmount": 0,
+        "currency": "USD",
+        "isFree": true,
+        "category": "Productivity",
+        "version": "1.0.50",
+        "source": "subimpact"
+      }
+    }
+  ],
+  "redactedSamples": [
+    {
+      "store": "play",
+      "appId": "org.isoron.uhabits",
+      "appTitle": "Loop Habit Tracker",
+      "price": 0,
+      "currency": "USD",
+      "isFree": true,
+      "rating": 4.71811,
+      "ratingCount": 63790,
+      "reviewCount": 3437,
+      "genre": "Productivity",
+      "version": "2.3.1",
+      "appUrl": "https://play.google.com/store/apps/details?id=org.isoron.uhabits",
+      "searchTerm": "Habit Tracker",
+      "searchRank": 1,
+      "chartCollection": null,
+      "chartCategory": null,
+      "chartRank": null,
+      "country": "us",
+      "language": "en",
+      "detailLevel": "full",
+      "source": "play-search-html",
+      "scrapedAt": "2026-11-26T07:16:59.750Z",
+      "status": null
+    },
+    {
+      "store": "play",
+      "appId": "com.habitnow",
+      "appTitle": "HabitNow Daily Routine Planner",
+      "price": 0,
+      "currency": "USD",
+      "isFree": true,
+      "rating": 4.7552795,
+      "ratingCount": 93866,
+      "reviewCount": 2888,
+      "genre": "Productivity",
+      "version": "2.5.5",
+      "appUrl": "https://play.google.com/store/apps/details?id=com.habitnow",
+      "searchTerm": "Habit Tracker",
+      "searchRank": 2,
+      "chartCollection": null,
+      "chartCategory": null,
+      "chartRank": null,
+      "country": "us",
+      "language": "en",
+      "detailLevel": "full",
+      "source": "play-search-html",
+      "scrapedAt": "2026-11-26T07:16:59.750Z",
+      "status": null
+    },
+    {
+      "store": "play",
+      "appId": "habittracker.todolist.tickit.daily.planner",
+      "appTitle": "Habit Tracker - Habit Diary",
+      "price": 0,
+      "currency": "USD",
+      "isFree": true,
+      "rating": 4.7376094,
+      "ratingCount": 136394,
+      "reviewCount": 962,
+      "genre": "Lifestyle",
+      "version": "1.3.9",
+      "appUrl": "https://play.google.com/store/apps/details?id=habittracker.todolist.tickit.daily.planner",
+      "searchTerm": "Habit Tracker",
+      "searchRank": 3,
+      "chartCollection": null,
+      "chartCategory": null,
+      "chartRank": null,
+      "country": "us",
+      "language": "en",
+      "detailLevel": "full",
+      "source": "play-search-html",
+      "scrapedAt": "2026-11-26T07:16:59.750Z",
+      "status": null
+    }
+  ]
+}

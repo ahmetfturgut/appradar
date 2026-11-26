@@ -1,0 +1,80 @@
+{
+  "job": {
+    "id": "4d2cb90e35baf3687bd1",
+    "provider": "aurelix",
+    "store": "ios",
+    "country": "US",
+    "mode": "reviews",
+    "context": "6448311069",
+    "input": {
+      "apps": [
+        "6448311069"
+      ],
+      "developers": [],
+      "appStoreCharts": [],
+      "chartGenre": "",
+      "countries": [
+        "us"
+      ],
+      "language": "en",
+      "maxReviewsPerApp": 10,
+      "reviewSort": "mostrecent",
+      "onlyNewReviews": false,
+      "proxyConfiguration": {
+        "useApifyProxy": false
+      }
+    }
+  },
+  "run": {
+    "id": "fkA9Ny9Ywh9triBIR",
+    "status": "SUCCEEDED",
+    "buildNumber": "0.2.23",
+    "usageTotalUsd": 0.0043,
+    "chargedEventCounts": {
+      "app-result": 1,
+      "review-result": 0,
+      "apify-actor-start": 1
+    }
+  },
+  "redactedRows": [
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6448311069",
+        "name": "ChatGPT",
+        "country": "US",
+        "observationRole": "discovery",
+        "source": "aurelix"
+      }
+    }
+  ],
+  "redactedSamples": [
+    {
+      "type": "app",
+      "store": "app_store",
+      "app_id": "6448311069",
+      "title": "ChatGPT",
+      "url": "https://apps.apple.com/us/app/chatgpt/id6448311069",
+      "developer": "OpenAI OpCo, LLC",
+      "developer_id": "1684349733",
+      "developer_url": "https://apps.apple.com/us/developer/openai-opco-llc/id1684349733",
+      "genre": "Productivity",
+      "genre_id": "6007",
+      "price": 0,
+      "currency": "USD",
+      "is_free": true,
+      "rating": 4.82,
+      "ratings_count": 12577751,
+      "reviews_count": null,
+      "version": "1.2026.321",
+      "chart": null,
+      "chart_genre": null,
+      "chart_rank": null,
+      "found_via": "app",
+      "country": "us",
+      "language": null,
+      "scraped_at": "2026-11-26T08:03:31Z"
+    }
+  ]
+}

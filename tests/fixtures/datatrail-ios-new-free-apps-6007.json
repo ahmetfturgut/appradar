@@ -1,0 +1,554 @@
+{
+  "job": {
+    "id": "4fdc786f2c1becf75322",
+    "provider": "datatrail",
+    "store": "ios",
+    "country": "US",
+    "mode": "charts",
+    "context": "newFreeApps",
+    "input": {
+      "appleCharts": [
+        "new-free-apps"
+      ],
+      "appleGenres": [
+        "6007"
+      ],
+      "chartLimit": 10,
+      "trackRankChanges": false,
+      "countries": [
+        "us"
+      ],
+      "language": "en",
+      "includeDescription": false,
+      "proxyConfiguration": {
+        "useApifyProxy": true
+      }
+    }
+  },
+  "run": {
+    "id": "EZSoWQEmnoZd30rhB",
+    "status": "SUCCEEDED",
+    "buildNumber": "0.1.7",
+    "usageTotalUsd": 0.04405,
+    "chargedEventCounts": {
+      "apify-actor-start": 1,
+      "app": 24
+    }
+  },
+  "stats": {
+    "appCount": 24,
+    "chart": "new-free-apps",
+    "chartGenre": "6007",
+    "releaseDateMin": "2026-11-24",
+    "releaseDateMax": "2026-11-27",
+    "note": "chartLimit=10 requested; actor returned 24 charged app rows"
+  },
+  "redactedRows": [
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6812650477",
+        "name": "AQUARIUM PULU",
+        "country": "US",
+        "category": "Games",
+        "observationRole": "discovery",
+        "rank": 1,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "f909ebfa244a5b8d44247cdb555de1ba18f944c974d529ff45189f0d40e55b03"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6826184123",
+        "name": "Astrarium: Bullet Hell Shooter",
+        "country": "US",
+        "category": "Games",
+        "observationRole": "discovery",
+        "rank": 2,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "2775d218b7b43294078c9dcad33cc5bfc8934159156984ed913ea5667d7c8d36"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6828917582",
+        "name": "Chibiwish",
+        "country": "US",
+        "category": "Games",
+        "observationRole": "discovery",
+        "rank": 3,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "c15780b199ab840a52fbcc54da4d91ff4b048449f4093d9d265a69f1f9265e50"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6833364548",
+        "name": "Don't Touch the Water Game",
+        "country": "US",
+        "category": "Games",
+        "observationRole": "discovery",
+        "rank": 4,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "f744212b25644eefdc183cf0281609f40a999c8bdb53b66812e95fe38a92dc74"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6831523333",
+        "name": "Dots and Boxes: LAST BOX",
+        "country": "US",
+        "category": "Games",
+        "observationRole": "discovery",
+        "rank": 5,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "afc4e32f7fa6360a212195b5cf276892afcd1d091329c14a16b18b7cd1d6df67"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6833930016",
+        "name": "FlockRoute: Delivery Tracking",
+        "country": "US",
+        "category": "Business",
+        "observationRole": "discovery",
+        "rank": 6,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "29449b5aaf82b82fbb115072c34701229bfaf83f380b604f3c6d0a9f619f24e8"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6822358558",
+        "name": "Handoff Tickets: Fan Resale",
+        "country": "US",
+        "category": "Finance",
+        "observationRole": "discovery",
+        "rank": 7,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-26T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "5afcf930587ec6169dd5981bfe8e6c3f1bce7deb4d17b75090406c62b5068063"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6773016403",
+        "name": "IronTunnel",
+        "country": "US",
+        "category": "Utilities",
+        "observationRole": "discovery",
+        "rank": 8,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "0694b66a233f7f9548893fa4f2bed94cde08b37067e8ee239bcc8d009d1591bf"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6836670537",
+        "name": "LabelSage: Allergy Scanner",
+        "country": "US",
+        "category": "Food & Drink",
+        "observationRole": "discovery",
+        "rank": 9,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "e934f5fb437ef519daaf12c7b848cf0f2493a5606ef6037fb5cb9f6d692c0171"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6798277673",
+        "name": "MapPizzeria",
+        "country": "US",
+        "category": "Food & Drink",
+        "observationRole": "discovery",
+        "rank": 10,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "0435f93f874810741c7e820d86479a19487b30f1788985610ff8d4149b703ec2"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6831673520",
+        "name": "NPL Cricket League",
+        "country": "US",
+        "category": "Games",
+        "observationRole": "discovery",
+        "rank": 11,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "536911ac6d237b12799342401c5245279d34cfe6b91351e37d2bc3b52cb73f38"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6838355023",
+        "name": "Rishtay Wali Aunty",
+        "country": "US",
+        "category": "Lifestyle",
+        "observationRole": "discovery",
+        "rank": 12,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-26T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "d4932caf0e01fa5f9363b1bda437685116838e1a1af40db04c6a39a8ec5ca99d"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6817645832",
+        "name": "三國幻想錄:開局送5星關羽",
+        "country": "US",
+        "category": "Games",
+        "observationRole": "discovery",
+        "rank": 13,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-27T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-27T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "3adfd944258e6fca60eb17abbc4998733f478785998979816869a6fe533e8bdf"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6838189947",
+        "name": "智控平台-众智科技",
+        "country": "US",
+        "category": "Utilities",
+        "observationRole": "discovery",
+        "rank": 14,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "40e6dede5ca2f9f3884ccb043406c0a57d9fa48fdcae034519cb46becc8104ad"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6837962085",
+        "name": "滴答-待办清单日程提醒番茄专注习惯打卡",
+        "country": "US",
+        "category": "Utilities",
+        "observationRole": "discovery",
+        "rank": 15,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "de17b5204baf721c66e3f906f6ceaa0e35c8b1017217c2680290493052b406d4"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6838620069",
+        "name": "Yutnori ABORRO",
+        "country": "US",
+        "category": "Games",
+        "observationRole": "discovery",
+        "rank": 16,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-24T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "0fbf14e43da1576affe1f09d076d3c1359af9d3456529ade1d5e1fcc625c75a2"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6838630945",
+        "name": "AoftriByork",
+        "country": "US",
+        "category": "Productivity",
+        "observationRole": "discovery",
+        "rank": 17,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-25T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "ee28a46eac4342f8bce871d8c1e7f3a5c686ae160e08cd16ad8b3dea83c3e9d0"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6835370691",
+        "name": "Plotzy: Short Dramas & Writing",
+        "country": "US",
+        "category": "Entertainment",
+        "observationRole": "discovery",
+        "rank": 18,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-24T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-24T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "694f18bbf9ccb0607b8770b00cc20afe9375f0618badc5bdd4555ed840241fb3"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6822841135",
+        "name": "Siraaj: Islamic AI & Quran",
+        "country": "US",
+        "category": "Reference",
+        "observationRole": "discovery",
+        "rank": 19,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-24T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-24T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "d3bebda94f20cd8de64344a9ef1b82517188170c5a919b707a52cc162935669a"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6837655246",
+        "name": "27 Gazişehir Sürücü Kursu",
+        "country": "US",
+        "category": "Education",
+        "observationRole": "discovery",
+        "rank": 20,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-24T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-24T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "61ef35991d8de3d1cccaa1202b237e4c8aab5a621c792832dbfb6c16107dd4e8"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6838286019",
+        "name": "Indian Compass: Hare Krishna",
+        "country": "US",
+        "category": "Book",
+        "observationRole": "discovery",
+        "rank": 21,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-24T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-25T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "bd8c586bc1a24adbb93e99eb32bddae38c340f3d0bbc42e8485e5e462618f116"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6766980728",
+        "name": "Daily Deal Hunter",
+        "country": "US",
+        "category": "Shopping",
+        "observationRole": "discovery",
+        "rank": 22,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-24T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-24T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "e8a9bca8ef4160a51847c7bb08501b217f0e894621bcc17d70bd7dec04e57431"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6835014110",
+        "name": "spinir",
+        "country": "US",
+        "category": "Music",
+        "observationRole": "discovery",
+        "rank": 23,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-24T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-24T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "c15c27546e362b33737b7f3efb5580afe15e4ff1c9920b9deaba3e5225d67396"
+      }
+    },
+    {
+      "kind": "valid",
+      "observation": {
+        "store": "ios",
+        "storeAppId": "6838163663",
+        "name": "주차 도우미",
+        "country": "US",
+        "category": "Navigation",
+        "observationRole": "discovery",
+        "rank": 24,
+        "rankContext": "newFreeApps",
+        "rankCategory": "6007",
+        "releasedAt": "2026-11-24T00:00:00.000Z",
+        "listingUpdatedAt": "2026-11-24T00:00:00.000Z",
+        "source": "datatrail",
+        "idempotencyKey": "01cdb4816971303018beb94eca38ca51ba4341167613cd7d4b0a18479188b7e3"
+      }
+    }
+  ],
+  "redactedSamples": [
+    {
+      "store": "appStore",
+      "appId": "6812650477",
+      "title": "AQUARIUM PULU",
+      "developer": "Ciagram",
+      "developerId": "830231476",
+      "category": "Games",
+      "categoryId": "6014",
+      "rating": 0,
+      "ratingsCount": 0,
+      "price": 0,
+      "currency": "USD",
+      "isFree": true,
+      "contentRating": "4+",
+      "releaseDate": "2026-11-25",
+      "updatedAt": "2026-11-25",
+      "version": "1.0.0",
+      "url": "https://apps.apple.com/us/app/aquarium-pulu/id6812650477",
+      "source": "chart",
+      "chart": "new-free-apps",
+      "chartGenre": "6007",
+      "chartRank": 1,
+      "country": "us"
+    },
+    {
+      "store": "appStore",
+      "appId": "6826184123",
+      "title": "Astrarium: Bullet Hell Shooter",
+      "developer": "Patrick Felber",
+      "developerId": "6826183730",
+      "category": "Games",
+      "categoryId": "6014",
+      "rating": 0,
+      "ratingsCount": 0,
+      "price": 0,
+      "currency": "USD",
+      "isFree": true,
+      "contentRating": "12+",
+      "releaseDate": "2026-11-25",
+      "updatedAt": "2026-11-25",
+      "version": "1.0.14",
+      "url": "https://apps.apple.com/us/app/astrarium-bullet-hell-shooter/id6826184123",
+      "source": "chart",
+      "chart": "new-free-apps",
+      "chartGenre": "6007",
+      "chartRank": 2,
+      "country": "us"
+    },
+    {
+      "store": "appStore",
+      "appId": "6828917582",
+      "title": "Chibiwish",
+      "developer": "Ravid Eliyahu",
+      "developerId": "6826376549",
+      "category": "Games",
+      "categoryId": "6014",
+      "rating": 0,
+      "ratingsCount": 0,
+      "price": 0,
+      "currency": "USD",
+      "isFree": true,
+      "contentRating": "4+",
+      "releaseDate": "2026-11-25",
+      "updatedAt": "2026-11-25",
+      "version": "1.0.1",
+      "url": "https://apps.apple.com/us/app/chibiwish/id6828917582",
+      "source": "chart",
+      "chart": "new-free-apps",
+      "chartGenre": "6007",
+      "chartRank": 3,
+      "country": "us"
+    }
+  ]
+}
