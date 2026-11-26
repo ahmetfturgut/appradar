@@ -584,6 +584,45 @@ Sıkılaştırma: anonim Supabase kullanıcısı oturumsuz sayılır; parola de�
 #### Kalan manuel adımlar ve yayın engelleri
 Kontrol listesi: `docs/PRODUCTION.md` §11. Başlıca engeller: ticari veri kullanım izni; gizlilik politikası, koşullar, iletişim ve hesap silme süreci; **üretim Supabase projesi yok**; migration'ların production'a uygulanması; Auth/SMTP/OAuth yapılandırması ve **gerçek** uçtan uca auth testi; Supabase/hosting rate limit; yedek ve geri yükleme provası; onaylı saklama politikası; deployment.
 
+### 6.22 B4 — Gerçek veri pilotu (ön kontrol) — 27 Kasım 2026
+
+#### Sahip onayı (bütçe ve kapsam — veri kullanım izni değil)
+Aşağıdakiler **onaylandı**: günlük bütçe **USD 1**; aylık bütçe **USD 5**; Actor koşusu başına üst ücret **USD 0.05** (motor `maxChargeUsd` sabiti); ülke **US**; dil **en**; kategori Productivity (iOS `6007`, Play `PRODUCTIVITY`); App Store top **50** free; Google Play top **50** free; iOS new releases istenen limit **10** (DataTrail aşımı bilinen risk); keşiften sonra tekilleştirilmiş detay toplama; teknik `retentionDays` / `expires_at` **30 gün**; yalnız **development** Supabase.
+
+**Bütçe/kapsam onayı, ticari veya POC veri kullanım onayı değildir.** `POC_DATA_USE_CONFIRMED` bu turda **true yapılmadı** ve yapılamaz.
+
+#### Hazırlık durumu
+- Yapılandırma: git dışı `.poc/pilot.config.json` (`schedulingEnabled: false`, `retentionDays: 30`, `maxAttempts: 2`; Aurelix charts, Subimpact charts, DataTrail charts, Aurelix details iki hedef). Detay `appIds` keşif sonrası doldurulacak yer tutucudur.
+- Offline `collection/cli.ts plan`: dry-run OK; **5 iş**; rezervasyon tavanı **$0.25**; kapılar kapalı (`COLLECTION_PAID_EXECUTION`, `APIFY_COLLECTION_ENABLED`, `POC_DATA_USE_CONFIRMED`, token/bütçe eksikleri).
+- Hedef DB (salt okuma): development `*.supabase.co`; migration defteri **12/12**; `apps=0`; `budget_periods` boş (bu turda yazılmadı). Üretim kaynağı yok.
+- Build pinleri (`src/poc/plan.ts`): Aurelix `0.2.23` / `Jv44m9YSKPnrplU1T`; Subimpact `0.1.1` / `NHjJXD6Nrjf8MpxN1`; DataTrail `0.1.7` / `oKsySVUZf5K5p2o1U`.
+- İçerik bayrakları ve saklama temizliği kapalı kalır. Zamanlama kapalı.
+
+#### Veri kullanımı — iç pilot ile ticari saklama/gösterim ayrımı
+- Repoda hiçbir sağlayıcı veya mağaza için saklama/gösterim/yeniden dağıtım izni kaydı yok (§5.2, §6.20): durum **[DOĞRULANMADI]**.
+- Apify Standard Actor Contract (yayımlanmış): Actor'u **kendi iç iş amaçlarıyla** kullanma hakkı; çıktının Creator'a karşı IP'si kullanıcıda kalabilir; **kullanıcı**, çıktının yürürlükteki hukuka ve **üçüncü taraf IP haklarına** uygunluğundan sorumludur. Bu, App Store / Google Play şartları altında katalog verisini üründe saklama veya gösterme izni değildir.
+- Apify Genel Şartları (eski/genel metinler): çıkarma yalnızca yetkili olunan kaynaklarda; ihlalde sorumluluk kullanıcıdadır.
+- Pilotun teknik yolu ücretli Actor + development DB'ye kalıcı yazma + (bayraklar kapalı olsa bile) metrik/sıralama UI gösterimini içerir → bu **saklama ve gösterim**dir; “yalnızca platform ücreti ödendi” yeterli dayanak değildir.
+- Sonuç: `POC_DATA_USE_CONFIRMED` iç pilot için **meşru şekilde true edilemez**. Kapı açılmadan ücretli `work` çalışmaz. Ön kontrol sonucu: **BLOCKED**.
+
+#### Sonraki adımlar (engel kalkarsa)
+1. Sağlayıcı + mağaza için saklama/gösterim dayanağını kaydet (gerekirse uzman incelemesi; outreach ayrı onay).  
+2. Kaydı APPRADAR'a yazdıktan sonra operatör `POC_DATA_USE_CONFIRMED=true` ve diğer ücretli bayrakları / bütçe env'lerini development kabuğunda açar.  
+3. Önceki B4 plandaki enqueue → `work --max-jobs 1` sırası; keşif sonrası ID tekilleştirme; detay; `reconcile`; ~24s sonra `--new-window` ranking.
+
+### 6.23 B5 — Beta yayın hazırlığı — 27 Kasım 2026
+
+- **Yasal/iletişim taslakları:** `/en/privacy`, `/en/terms`, `/en/contact` ve `/tr/…` karşılıkları mevcut tanıtım tasarımını ve dil mimarisini kullanır; footer bağlantıları çalışır. Dil değişimi aynı belgeyi korur. Başlık/metadata yereldir; taslaklar production'da da `noindex` kalır. Görünür taslak ve eksik sahip bilgisi uyarısı vardır; şirket, adres, e-posta, yetki alanı, mevzuata uyum veya ticari veri hakkı uydurulmadı. Yayın onayı verilmedi; iletişim sayfası mesaj/talep göndermez.
+- **Hesap:** `/settings` erişim kontrolünden sonra `/account`'a yönlenir; eski tarayıcı-içi takip iddiaları ürün akışından çıkarıldı. Hesap e-postası, parola değiştirme/kurtarma, çıkış ve silme aynı sayfada.
+- **Silme yetkisi:** demo daha Auth çağrısı olmadan reddedilir. Server Action tam `DELETE` metni + ayrı onay + parolayı kontrol eder. `getUser()` ile o isteğin gerçek, anonim olmayan ve e-postası doğrulanmış kullanıcısı alınır; yalnız bu e-postayla, tarayıcıya yazmayan geçici istemcide yeni parola doğrulaması yapılır. Dönen kullanıcı kimliği aynı olmalı; ilk oturum yeniden doğrulanır; 60 saniyeyi aşan kanıt reddedilir. Formdaki kimlik/e-posta/proje kullanılmaz. Doğrulanmış MFA faktörü varsa parola ile güvenlik seviyesi düşürülmez, işlem kapalıdır.
+- **Silme kapsamı:** `server-only` modülde session/admin proje origin'leri, anahtar türleri ve eski JWT proje ref'leri denetlenir. Yalnız `auth.admin.deleteUser(currentUser.id, false)`; mevcut `0010` watchlist FK cascade'i kullanılır. Ortak katalog, diğer hesaplar ve immutable gözlemler için DML yok. Yeni migration yok; uzaktaki 12 migration'a dokunulmadı.
+- **Hata davranışı:** önce elle watchlist silinmez. Belirsiz/başarısız silme yanıtında aynı kullanıcı bir kez sorgulanır; yalnız başarı veya açık `user_not_found` tamamlanma sayılır; belirsizlikte başarı iddiası ve otomatik silme tekrarı yok. Başarıda yerel çıkış; geçici doğrulama oturumunda her sonuçta çıkış denenir. Ağ hatasında sunucu token iptali gecikebilir; çıkış hatası tamamlanmış silmeyi geri almaz. Yedek/altyapı kaydı temizliği veya bütün JWT'lerin anında geçersizleşmesi vaat edilmez; uygulama erişimi `getUser()` ile doğrulanır, silinen kullanıcı için watchlist FK'sı yeniden yazmayı engeller.
+- **Sınırlamalar:** yalnız Google kullanan hesap mevcut parola kurtarma akışıyla önce parola belirlemelidir (gerçek projede desteklenmesi doğrulanacak). MFA veya kurtarma istisnaları için sahibin sağlayacağı doğrulanmış destek süreci eksiktir. Gerçek Auth, SMTP, OAuth ve hesap silme bu görevde denenmedi. Onaylı saklama/yedek/kayıt süreleri ve gerçek iletişim bilgisi hâlâ yayın engelidir.
+- **Doğrulama (B5 entegrasyon, 27 Kasım 2026):** Odaklı paket (`beta-readiness` + landing + auth + production-readiness) **42/42**. Tam paket **194 pass / 2 skip / 0 fail** (PGlite yok → retention DB testi skip; `RETENTION_PGLITE_PATH` yok). Typecheck OK; lint 0 hata, 2 mevcut `<img>` uyarısı; production build OK (`/[locale]/[document]`, `/account`, `/settings` dahil). Yerel HTTP: altı yasal rota 200 + `noindex`/draft; `/admin` 404 + `private, no-store`; güvenlik başlıkları (CSP, `X-Frame-Options: DENY`, Permissions-Policy) korunuyor; hesap/settings `Cache-Control: no-store`. Demo tarayıcı: EN/TR Privacy masaüstü+mobil, footer/dil; `/settings` → `/account`; demo hesapta silme formu yok. `.next/static` içinde service-role/secret eşleşmesi yok. B4 §6.22 bloğu ve ücretli/toplama/saklama kapıları (`POC_DATA_USE_CONFIRMED` vb. false) korundu.
+- **Silme doğrulama sınırı:** Hesap silme güvenliği **yalnızca mock** (sahte HTTP + sentetik kullanıcı/çerez). Gerçek Supabase Auth oturumu, SMTP, OAuth, MFA challenge veya canlı `deleteUser` **doğrulanmadı**; gerçek hesap/uzaktan DB silinmedi. Watchlist cascade için önceki SQL/RLS kanıtı + mock taklit; bu turda yeni DB cascade koşusu yok.
+- **Dosyalar:** `src/lib/landing/{legal,locale,metadata,dictionaries}.ts`, `src/components/landing/{public-chrome,legal-page,landing-page}.tsx`, `src/app/[locale]/[document]/page.tsx`, `src/lib/auth/delete-account{,-action}.ts`, `src/components/auth/delete-account-form.tsx`, `src/app/{account,settings}/page.tsx`, `src/app/(auth)/auth-card.tsx`, `tests/beta-readiness.test.ts`; işletim ayrıntıları `docs/BETA_READINESS.md`, güncellenen `docs/{AUTH_SETUP,PRODUCTION}.md`.
+- **Beta kararı:** teknik hazırlık doğrulandı, **yayına hazır değil**. B4 ticari kullanım engeli ve bütün veri/toplama kapıları korundu. Sahip/hukuk onayı + çalışan iletişim kanalı, gerçek Auth ve production yapılandırması, onaylı saklama politikası, veri kullanım dayanağı ve yetkilendirilmiş pilot beklenir. Ücretli API/toplama, gerçek hesap silme, uzak DB işlemi, deployment, dış kaynak oluşturma, zamanlama/temizlik veya ödeme işlemi yapılmadı. Onaylı kusur bulunmadı; kod düzeltmesi yapılmadı.
+
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
 POC kodu da Bölüm 1'deki plan onayından sonra yazılır. Aşağıdaki eşikler öneridir ve onaylı plana alınmalıdır.

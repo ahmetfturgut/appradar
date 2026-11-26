@@ -55,7 +55,7 @@ export const dictionaries: Record<LandingLocale, LandingDictionary> = {
       { question: "Does AppRadar provide exact revenue or download figures?", answer: "No. AppRadar does not provide exact revenue, download estimates, active-user counts or market share. Where available, Google Play’s published install ranges are shown as store ranges, not exact downloads or a download rate. App Store install counts are unavailable." },
     ] },
     cta: { title: "Your next app starts with a better question.", description: "Create an account and give your next idea a little more context. Explore the available catalog at your own pace.", button: "Create your account" },
-    footer: { legal: "Legal and contact information (not yet published)", privacy: "Privacy", terms: "Terms", contact: "Contact", pending: "coming soon", unpublished: "Not yet published" },
+    footer: { legal: "Legal drafts and contact", privacy: "Privacy", terms: "Terms", contact: "Contact", pending: "draft", unpublished: "Draft — owner and legal review required" },
   },
   tr: {
     meta: { title: "AppRadar · Bir sonraki harika uygulama fikrini keşfet", description: "AppRadar ile App Store ve Google Play’i araştırın. Uygulamaların fiyatlarını, puanlarını, sıralamalarını ve mevcut geçmiş verilerini bağlamıyla inceleyin." },
@@ -93,6 +93,6 @@ export const dictionaries: Record<LandingLocale, LandingDictionary> = {
       { question: "AppRadar kesin gelir veya indirme sayıları veriyor mu?", answer: "Hayır. AppRadar kesin gelir, tahmini indirme, aktif kullanıcı sayısı veya pazar payı sunmaz. Veri varsa Google Play’in yayımladığı yükleme aralıkları gösterilir; bunlar kesin indirme sayısı veya dönemsel indirme hızı değildir. App Store yükleme sayıları mevcut değildir." },
     ] },
     cta: { title: "Bir sonraki uygulamanız daha iyi bir soruyla başlasın.", description: "Hesap oluşturun, fikrinizin yer alacağı pazarı daha yakından tanıyın. Mevcut kataloğu kendi hızınızda keşfedin.", button: "Hesap oluştur" },
-    footer: { legal: "Yasal bilgiler ve iletişim (henüz yayımlanmadı)", privacy: "Gizlilik", terms: "Kullanım koşulları", contact: "İletişim", pending: "yakında", unpublished: "Henüz yayımlanmadı" },
+    footer: { legal: "Yasal taslaklar ve iletişim", privacy: "Gizlilik", terms: "Kullanım koşulları", contact: "İletişim", pending: "taslak", unpublished: "Taslak — sahip ve hukuk incelemesi gerekli" },
   },
 };

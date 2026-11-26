@@ -11,7 +11,7 @@ Set them in `.env.local` for development and in the hosting provider for product
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API → Project URL | https only, except localhost |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase → Project Settings → API Keys → **Publishable** key (`sb_publishable_…`), or the legacy `anon` key | Safe for browsers. `sb_secret_…` and `service_role` keys are rejected at runtime. |
 | `NEXT_PUBLIC_SITE_URL` | Your public origin, e.g. `https://app.example.com` | Required in production. Used for email links and the OAuth callback. |
-| `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Unchanged | Server-only catalog reads. Never prefix with `NEXT_PUBLIC_`. |
+| `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Supabase project API settings | Server-only catalog reads and current-user Auth deletion. Must target the same project as the session client. Never prefix with `NEXT_PUBLIC_`. |
 
 Without the two `NEXT_PUBLIC_SUPABASE_*` values, auth pages show "Authentication is not configured", and protected routes redirect to `/login`. That is development behaviour: in production the whole app answers 503 until the variables in [PRODUCTION.md](PRODUCTION.md) are complete.
 
@@ -36,7 +36,7 @@ Without the two `NEXT_PUBLIC_SUPABASE_*` values, auth pages show "Authentication
 The "Continue with Google" button appears only when the Google provider is enabled in Supabase. The app reads this from the project's public `/auth/v1/settings` endpoint and caches the result for 5 minutes.
 
 1. **Google Cloud Console:**
-   1. Go to **APIs & Services → OAuth consent screen**. Set the app name, a support email, an authorized domain, and links to the privacy policy and terms (both still missing; see the launch blockers below).
+   1. Go to **APIs & Services → OAuth consent screen**. Set the app name, a support email, an authorized domain, and links to the privacy policy and terms (B5 drafts still require owner/legal approval; see the launch blockers below).
    2. Go to **Credentials → Create credentials → OAuth client ID → Web application**:
       - **Authorized JavaScript origins:** your site origin, e.g. `https://app.example.com`. Add `http://localhost:3000` for local development.
       - **Authorized redirect URIs:** `https://<project-ref>.supabase.co/auth/v1/callback`. Supabase shows this exact URL on the Google provider page.
@@ -50,10 +50,11 @@ The "Continue with Google" button appears only when the Google provider is enabl
 - `src/lib/auth/paths.ts`: `safeNextPath()` allows only internal app paths, and keeps the query, so country, language and store survive the login round trip.
 - `src/app/auth/callback/route.ts` handles OAuth codes and `token_hash` email links.
 - A successful password change signs out the account's other sessions.
+- `/settings` redirects verified viewers to `/account`. Account deletion requires a real verified session, exact confirmation and password reauthentication in the same request (60-second maximum), then deletes only that Auth user; the existing FK cascades its watchlist. Demo cannot delete. MFA accounts fail closed; Google-only password recovery must be verified on the configured project. See [BETA_READINESS.md](BETA_READINESS.md) for authorization, partial failures and retention limitations.
 - **Development demo:** with `NODE_ENV=development` and `APPRADAR_DEMO_MODE=true`, protected pages open without signing in. No fake user or session is created, and data comes from local fixtures only. This bypass is impossible in production.
 
 ## 5. Launch blockers
 
-- Privacy policy, terms of service and contact details have not been written or approved. The footer shows them as "coming soon", and Google's consent screen needs the first two.
+- Privacy, terms and contact now have English/Turkish draft routes linked from the footer, but owner information, a working contact channel and legal approval remain missing. Do not use unapproved drafts to claim publication readiness or data-use permission.
 - Custom SMTP and the email templates above must be configured.
 - End-to-end sign-up, verification, Google sign-in and logout have not been tested against a real Supabase project yet, because no publishable key was configured and no test account has been approved.

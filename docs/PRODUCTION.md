@@ -93,7 +93,7 @@ External setup, before opening sign-up:
 
 - **Supabase → Auth → Rate Limits:** review email, sign-up/sign-in, verification and token refresh limits.
 - **Shared-IP caveat:** auth calls are made by the app server, so Supabase's per-IP limits count the host's addresses, not each visitor. One abuser can exhaust them for everyone. Per-visitor limiting must happen at the host, or through Supabase's documented client-IP forwarding (not implemented; check its requirements).
-- **Host firewall rules** (check plan availability): limit `POST` to `/login`, `/signup`, `/forgot-password`, `/reset-password`, and any request carrying a `Next-Action` header, since actions can be posted to other paths. Also limit authenticated heavy reads: `/markets`, `/opportunities`, `/compare`, `/watchlist`, `/trending`.
+- **Host firewall rules** (check plan availability): limit `POST` to `/login`, `/signup`, `/forgot-password`, `/reset-password`, `/account`, and any request carrying a `Next-Action` header, since actions can be posted to other paths. Also limit authenticated heavy reads: `/markets`, `/opportunities`, `/compare`, `/watchlist`, `/trending`.
 - The publishable key can call Supabase Auth directly, bypassing host rules; Supabase limits are the control there.
 - Set spend alerts and caps on Supabase and the host.
 
@@ -127,7 +127,7 @@ These lines carry codes only. Next.js and the host log unhandled errors and requ
 ## 11. Launch checklist
 
 - [ ] Commercial data-use permissions recorded per provider and store
-- [ ] Privacy policy, terms, contact details; account and data deletion process
+- [ ] Owner/legal approval of B5 bilingual privacy/terms/contact drafts, real contact channel and retention/request procedures; review [BETA_READINESS.md](BETA_READINESS.md). Account deletion is implemented with mocked verification only.
 - [ ] Production Supabase project; migrations applied and privileges checked
 - [ ] Env vars set; offline check prints `production_config_ok`
 - [ ] Auth settings, redirect URL, templates, custom SMTP and DNS records

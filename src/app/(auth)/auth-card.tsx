@@ -17,6 +17,7 @@ const ERRORS: Record<string, string> = {
 };
 const MESSAGES: Record<string, string> = {
   signed_out: "You have been signed out.",
+  account_deleted: "Your account and watchlist have been deleted. Shared app catalog data is preserved.",
 };
 /** Only fixed, known codes are rendered; query text is never reflected. */
 export const authNotice = (params: Record<string, string | string[] | undefined>) => {
