@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import "../../../components/core/explorer-details.css";
 import { ProductAppDetails } from "../../../components/core/app-details";
 import { ReadNotice } from "../../../components/core/elements";
-import { toDetailsModel } from "../../../components/core/catalog-mapping";
+import { toAppViewModel, toDetailsModel } from "../../../components/core/catalog-mapping";
 import { contextResetHref, parseScope, parsePage, queryValue, readFailure, QueryError, type SearchValues } from "../../../components/core/catalog-query";
 import { scopeQuery } from "../../../components/core/view-models";
 import { appData, detailSections } from "../../../lib/ui/catalog.server";
@@ -27,8 +28,9 @@ export default async function AppPage({ params, searchParams }: Props) {
   if (result.state !== "ready") return <ReadNotice result={result} />;
   if (!result.data) notFound();
   const model = toDetailsModel(result.data);
+  const related = result.data.relatedApps.map(toAppViewModel);
   const backHref = rawBack && /^\/explore(?:\?[^#\\]*)?$/.test(rawBack) ? rawBack : `/explore?${scopeQuery(scope)}`;
-  if (!model) return <><Link className="product-back" href={backHref}>Back to App Explorer</Link><section className="product-panel product-state"><h1>Listing unavailable in this context</h1><p>The app exists, but no current listing matches {scope.country} / {scope.language ?? "any requested language"}. Another context has not been substituted.</p>{result.data.contexts.map(context => <Link className="product-text-link" key={`${context.country}:${context.requestedLanguage}`} href={`/apps/${id}?${scopeQuery({ country: context.country, language: context.requestedLanguage })}&back=${encodeURIComponent(backHref)}`}>{context.country} · {context.requestedLanguage}</Link>)}</section></>;
+  if (!model) return <div className="ed-root"><Link className="product-back" href={backHref}>Back to App Explorer</Link><section className="product-panel product-state"><h1>Listing unavailable in this context</h1><p>The app exists, but no current listing matches {scope.country} / {scope.language ?? "any requested language"}. Another context has not been substituted.</p>{result.data.contexts.map(context => <Link className="product-text-link" key={`${context.country}:${context.requestedLanguage}`} href={`/apps/${id}?${scopeQuery({ country: context.country, language: context.requestedLanguage })}&back=${encodeURIComponent(backHref)}`}>{context.country} · {context.requestedLanguage}</Link>)}</section></div>;
   const sections = await detailSections({ appId: id, store: model.app.store, country: model.app.country, language: model.app.requestedLanguage, tab, reviewPage, keywordPage, reviewSort: reviewSort as "newest" | "helpful", ...(keyword ? { keyword } : {}), ...(keywordSnapshot ? { keywordSnapshot } : {}) });
-  return <ProductAppDetails model={model} sections={sections} tab={tab as "Overview" | "History" | "Reviews" | "Keywords"} backHref={backHref} />;
+  return <ProductAppDetails model={model} sections={sections} related={related} tab={tab as "Overview" | "History" | "Reviews" | "Keywords"} backHref={backHref} />;
 }

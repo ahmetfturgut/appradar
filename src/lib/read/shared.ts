@@ -82,8 +82,10 @@ export function freshness(lastObservedAt: string | null, now: string, staleAfter
   return { lastObservedAt, ageHours: Math.round(ageHours * 10) / 10, status: ageHours > staleAfterHours ? "stale" : "fresh", staleAfterHours };
 }
 
-/** Store media rights are unconfirmed (spec §6.5); icons/screenshots are withheld unless explicitly enabled. */
+/** Store media rights are unconfirmed (spec §5.2 / §6.5); icons/screenshots are withheld unless explicitly enabled. */
 export const mediaEnabled = () => process.env.APPRADAR_STORE_MEDIA_ENABLED === "true";
+/** Store description rights are unconfirmed; listing text is withheld unless explicitly enabled. */
+export const storeDescriptionEnabled = () => process.env.APPRADAR_STORE_DESCRIPTION_ENABLED === "true";
 /** Review usage rights are unconfirmed; text is withheld unless explicitly enabled. */
 export const reviewContentEnabled = () => process.env.APPRADAR_REVIEW_CONTENT_ENABLED === "true";
 

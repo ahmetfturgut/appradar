@@ -1,0 +1,55 @@
+{
+  "schedulingEnabled": false,
+  "retentionDays": 365,
+  "maxAttempts": 2,
+  "schedules": [
+    {
+      "provider": "aurelix",
+      "mode": "charts",
+      "everyMinutes": 1440,
+      "enabled": false,
+      "targets": [
+        {
+          "store": "ios",
+          "country": "US",
+          "language": "en",
+          "chart": "topFree",
+          "category": "6007",
+          "maxResults": 50
+        }
+      ]
+    },
+    {
+      "provider": "subimpact",
+      "mode": "charts",
+      "everyMinutes": 1440,
+      "enabled": false,
+      "targets": [
+        {
+          "store": "play",
+          "country": "US",
+          "language": "en",
+          "chart": "topFree",
+          "category": "PRODUCTIVITY",
+          "maxResults": 50
+        }
+      ]
+    },
+    {
+      "provider": "datatrail",
+      "mode": "charts",
+      "everyMinutes": 1440,
+      "enabled": false,
+      "targets": [
+        {
+          "store": "ios",
+          "country": "US",
+          "language": "en",
+          "chart": "newFreeApps",
+          "category": "6007",
+          "maxResults": 10
+        }
+      ]
+    }
+  ]
+}

@@ -73,12 +73,46 @@ test("media is withheld defensively and history series are never merged by the U
     app: { id: appId, store: "ios", storeAppId: "123", storeUrl: "https://apps.apple.com/app/id123", firstSeenAt: now, lastSeenAt: now },
     listing: { ...listing({ iconUrl: "https://media.test/icon.png" }), description: "Plain text", screenshotUrls: ["https://media.test/screenshot.png"], provenance: {} },
     contexts: [{ country: "GB", requestedLanguage: "en-GB", lastObservedAt: null }], developer: null, relatedApps: [],
-    history: { from: now, to: now, series: [{ seriesKey: "source-a", source: "aurelix", role: "detail", points: [], comparable: false }, { seriesKey: "source-b", source: "subimpact", role: "discovery", points: [], comparable: false }] }, media: { enabled: false },
+    history: { from: now, to: now, series: [{ seriesKey: "source-a", source: "aurelix", role: "detail", points: [], comparable: false }, { seriesKey: "source-b", source: "subimpact", role: "discovery", points: [], comparable: false }] }, media: { enabled: false }, storeDescription: { enabled: false },
   };
   const model = toDetailsModel(data)!;
-  assert.equal(model.app.iconUrl, null); assert.equal(model.screenshots, null); assert.equal(model.series.length, 2);
+  assert.equal(model.app.iconUrl, null); assert.equal(model.app.description, null); assert.equal(model.screenshots, null); assert.equal(model.series.length, 2);
   assert.equal(safeMediaUrl("javascript:alert(1)"), null);
   assert.equal(toAppViewModel(listing({ installs: { text: "100+", lowerBound: 100, supported: true } })).installsText, null);
+});
+
+test("disabled store descriptions are not selected or returned by the read contract", async () => {
+  const previous = process.env.APPRADAR_STORE_DESCRIPTION_ENABLED;
+  process.env.APPRADAR_STORE_DESCRIPTION_ENABLED = "false";
+  try {
+    const result = await getAppDetails({ appId, country: "US", language: "en", relatedLimit: 0 }, client({
+      select: async (table, query) => {
+        if (table === "apps") {
+          return { rows: [{ id: appId, store: "ios", store_app_id: "123", canonical_url: "https://apps.apple.com/app/id123", developer_id: null, first_seen_at: now, last_seen_at: now }], total: null };
+        }
+        if (table === "app_listings") {
+          assert.doesNotMatch(query.select!, /(?:^|,)description(?:,|$)/);
+          return { rows: [{
+            id: 1, app_id: appId, store: "ios", country: "US", requested_language: "en", effective_language: "en",
+            name: "Probe", developer_name: "Dev", category_name: "Productivity", version: null,
+            released_at: null, released_at_precision: null, store_updated_at: null, store_updated_at_precision: null,
+            price_amount: null, currency: null, is_free: true, rating_value: null, rating_count: null, review_count: null,
+            installs_text: null, installs_lower_bound: null, icon_url: null, first_seen_at: now, last_observed_at: now,
+            description: "Should not be returned", screenshot_urls: [], field_provenance: {},
+            apps: { store_app_id: "123", canonical_url: "https://apps.apple.com/app/id123", developer_id: null },
+          }], total: null };
+        }
+        return { rows: [], total: null };
+      },
+    }));
+    assert.ok(result);
+    assert.equal(result.storeDescription.enabled, false);
+    assert.equal(result.listing?.description, null);
+    assert.equal(toDetailsModel(result)?.app.description, null);
+  } finally {
+    if (previous === undefined) delete process.env.APPRADAR_STORE_DESCRIPTION_ENABLED;
+    else process.env.APPRADAR_STORE_DESCRIPTION_ENABLED = previous;
+  }
 });
 
 test("disabled review content is not requested or returned by the read contract", async () => {

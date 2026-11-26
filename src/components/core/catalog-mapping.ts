@@ -28,11 +28,11 @@ export function toDetailsModel(data: AppDetails): DetailsModel | null {
   const listing = data.listing;
   const sources = [...new Set(Object.values(listing.provenance).flatMap(stamp => stamp.source ? [stamp.source] : []))];
   return {
-    app: { ...toAppViewModel(listing), description: listing.description,
+    app: { ...toAppViewModel(listing), description: data.storeDescription.enabled ? listing.description : null,
       iconUrl: data.media.enabled ? safeMediaUrl(listing.iconUrl) : null,
       sourceLabel: sources.length ? sources.join(", ") : "Source unavailable" },
     developer: data.developer, contexts: data.contexts, series: data.history.series, historyTo: data.history.to,
-    mediaEnabled: data.media.enabled,
+    mediaEnabled: data.media.enabled, storeDescriptionEnabled: data.storeDescription.enabled,
     screenshots: data.media.enabled ? listing.screenshotUrls?.flatMap(value => { const url = safeMediaUrl(value); return url ? [url] : []; }) ?? null : null,
   };
 }

@@ -1,12 +1,18 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { ChartNoAxesCombined } from "lucide-react";
 import { compact, count, dateLabel, type HistoryPoint } from "./view-models";
 
 export function HistoryChart({ points, referenceDate, label }: { points: HistoryPoint[]; referenceDate: string; label: string }) {
   const [metric, setMetric] = useState<"ratingCount" | "rating">("ratingCount");
   const [range, setRange] = useState<7 | 30>(30);
+  const [tips, setTips] = useState(false);
+  // SVG <title> text is dropped by the HTML parser, so tooltips are attached after hydration.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setTips(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
   const titleId = useId();
   const lastDate = points.length ? Date.parse(points[points.length - 1]!.date) : 0;
   const visible = points.filter(point => Date.parse(point.date) >= Date.parse(referenceDate) - range * 86400000 && Date.parse(point.date) <= Date.parse(referenceDate));
@@ -33,9 +39,13 @@ export function HistoryChart({ points, referenceDate, label }: { points: History
     {valid.length < 2 ? <div className="product-state"><ChartNoAxesCombined size={28} /><h3>Not enough history yet</h3><p>At least two comparable observations are needed for this metric.</p></div> : <>
       <div className="product-chart-summary"><strong>{metric === "ratingCount" ? count(values[values.length - 1]!) : values[values.length - 1]!.toFixed(2)}</strong><span>{metric === "ratingCount" ? "ratings at the last available observation" : "out of 5 at the last available observation"}</span></div>
       <svg className="product-chart" viewBox="0 0 720 255" role="img" aria-label={`${metric === "rating" ? "Rating" : "Rating count"} history. ${valid.length} observations. First value ${values[0]}, last value ${values[values.length - 1]}. A data table follows.`}>
-        {[0, 1, 2, 3, 4].map(tick => { const value = min + span * tick / 4; return <g key={tick}><line x1="64" x2="680" y1={y(value)} y2={y(value)} stroke="#edf0f4" /><text x="52" y={y(value) + 4} textAnchor="end">{metric === "rating" ? value.toFixed(1) : compact(value)}</text></g>; })}
-        {segments.map((part, index) => <polyline key={index} points={part.map(point => `${x(point)},${y(point[metric]!)}`).join(" ")} fill="none" stroke="#6257cf" strokeWidth="2.5" strokeLinejoin="round" />)}
-        {valid.map(point => <circle key={`${point.date}:${valid.indexOf(point)}`} cx={x(point)} cy={y(point[metric]!)} r="3.5" fill="#6257cf"><title>{dateLabel(point.date)}: {point[metric]}</title></circle>)}
+        {[0, 1, 2, 3, 4].map(tick => { const value = min + span * tick / 4; return <g key={tick}><line x1="64" x2="680" y1={y(value)} y2={y(value)} stroke="var(--border)" /><text x="52" y={y(value) + 4} textAnchor="end">{metric === "rating" ? value.toFixed(1) : compact(value)}</text></g>; })}
+        {segments.map((part, index) => {
+          const line = part.map(point => `${x(point)},${y(point[metric]!)}`).join(" ");
+          const first = part[0]!, last = part[part.length - 1]!;
+          return <g key={index}><polygon points={`${x(first)},210 ${line} ${x(last)},210`} fill="var(--chart-1)" opacity="0.12" /><polyline points={line} fill="none" stroke="var(--chart-1)" strokeWidth="2" strokeLinejoin="round" /></g>;
+        })}
+        {valid.map(point => <circle key={`${point.date}:${valid.indexOf(point)}`} cx={x(point)} cy={y(point[metric]!)} r="3.5" fill="var(--chart-1)">{tips ? <title>{dateLabel(point.date)}: {point[metric]}</title> : null}</circle>)}
         {[visible[0]!, visible[visible.length - 1]!].map((point, index) => <text key={index} x={x(point)} y="242" textAnchor={index === 0 ? "start" : "end"}>{dateLabel(point.date)}</text>)}
       </svg>
     </>}

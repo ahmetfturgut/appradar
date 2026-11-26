@@ -2,16 +2,17 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ChartNoAxesCombined, ChevronRight, Compass, Database, LayoutDashboard, Menu, Radar, Search, X } from "lucide-react";
+import { ChartNoAxesCombined, ChevronRight, Compass, Database, FlaskConical, LayoutDashboard, Menu, Radar, Search, Sparkles, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-
+import { cn } from "../lib/utils";
+import { SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, sidebarMenuButtonVariants } from "./ui/sidebar";
 
 const navigation = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/explore", label: "App Explorer", icon: Compass },
 ];
 
-export function Shell({ children }: { children: React.ReactNode }) {
+export function Shell({ children, demo = false }: { children: React.ReactNode; demo?: boolean }) {
   const path = usePathname();
   const params = useSearchParams();
   const context = new URLSearchParams();
@@ -22,7 +23,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const closeButton = useRef<HTMLButtonElement>(null);
   useEffect(() => { if (open) closeButton.current?.focus(); }, [open]);
   useEffect(() => {
-    const desktop = window.matchMedia("(min-width: 761px)");
+    const desktop = window.matchMedia("(min-width: 1024px)");
     const closeOnDesktop = () => { if (desktop.matches) setOpen(false); };
     desktop.addEventListener("change", closeOnDesktop);
     return () => desktop.removeEventListener("change", closeOnDesktop);
@@ -31,23 +32,63 @@ export function Shell({ children }: { children: React.ReactNode }) {
     setOpen(false);
     requestAnimationFrame(() => menuButton.current?.focus());
   }
+  const isActive = (href: string) => path === href || href === "/explore" && path.startsWith("/apps/");
   const title = path.startsWith("/apps/") ? "App details" : navigation.find(item => item.href === path)?.label ?? "Workspace";
-  return <div className="product-shell" onKeyDown={event => { if (open && event.key === "Escape") closeNavigation(); }}>
+  return <div className="product-shell flex min-h-screen" onKeyDown={event => { if (open && event.key === "Escape") closeNavigation(); }}>
     <a className="skip-link" href="#main">Skip to content</a>
-    {open && <button className="product-sidebar-overlay" aria-label="Dismiss navigation" onClick={closeNavigation} />}
-    <aside id="product-sidebar" className={`product-sidebar ${open ? "is-open" : ""}`}>
-      <div className="product-brand-row"><Link href={scoped("/")} className="product-brand" onClick={() => setOpen(false)}><span><Radar size={22} /></span>AppRadar</Link><button ref={closeButton} className="product-mobile-toggle" aria-label="Close navigation" onClick={closeNavigation}><X size={20} /></button></div>
-      <div className="product-workspace"><span className="product-workspace-avatar">I</span><div><strong>Indie workspace</strong><small>Personal research</small></div><ChevronRight size={14} /></div>
-      <p className="product-nav-label">WORKSPACE</p>
-      <nav aria-label="Main navigation">{navigation.map(item => <Link href={scoped(item.href)} key={item.href} onClick={() => setOpen(false)} className={`product-nav-link ${path === item.href || item.href === "/explore" && path.startsWith("/apps/") ? "is-active" : ""}`} aria-current={path === item.href ? "page" : undefined}><item.icon size={18} />{item.label}</Link>)}</nav>
-      <p className="product-nav-label">RESEARCH SHORTCUTS</p>
-      <nav aria-label="Research shortcuts"><Link className="product-nav-link" href={`${scoped("/")}#trending`} onClick={() => setOpen(false)}><ChartNoAxesCombined size={18} />Trending apps</Link><Link className="product-nav-link" href={`${scoped("/explore")}&sort=releasedAt`} onClick={() => setOpen(false)}><Compass size={18} />New releases</Link></nav>
-      <div className="product-sidebar-bottom"><div className="product-preview-note"><Database size={18} /><strong>Your research starts here</strong><p>Research stored observations with their country, language, and collection context.</p><span>Stored observations</span></div><div className="product-profile"><span>JD</span><div><strong>Indie developer</strong><small>Research workspace</small></div></div></div>
+    {open && <button className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-[1px] lg:hidden" aria-label="Dismiss navigation" onClick={closeNavigation} />}
+    <aside id="product-sidebar" aria-label="Sidebar" className={cn("fixed inset-y-0 left-0 z-50 w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex lg:w-60", open ? "flex shadow-xl" : "hidden")}>
+      <SidebarHeader className="gap-3 pt-4">
+        <div className="flex items-center justify-between px-1">
+          <Link href={scoped("/")} onClick={() => setOpen(false)} className="flex items-center gap-2.5 rounded-md px-1 py-1 text-[15px] font-semibold tracking-[-0.02em] text-foreground">
+            <span className="grid size-7 place-items-center rounded-lg bg-primary text-primary-foreground shadow-xs"><Radar className="size-4" strokeWidth={2.2} /></span>AppRadar
+          </Link>
+          <button ref={closeButton} type="button" className="grid size-9 place-items-center rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-foreground lg:hidden" aria-label="Close navigation" onClick={closeNavigation}><X className="size-4" /></button>
+        </div>
+        <div className={cn(sidebarMenuButtonVariants({ variant: "outline", size: "lg" }), "gap-2.5 px-2.5 hover:bg-card hover:shadow-[0_0_0_1px_var(--sidebar-border)]")}><span className="grid size-8 shrink-0 place-items-center rounded-md bg-accent text-xs font-semibold text-accent-foreground">IW</span><span className="grid min-w-0 flex-1 leading-tight"><span className="truncate text-[13px] font-medium text-foreground">Indie workspace</span><span className="truncate text-xs text-muted-foreground">Personal research</span></span></div>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+          <nav aria-label="Main navigation"><SidebarMenu>{navigation.map(item => <SidebarMenuItem key={item.href}><SidebarMenuButton asChild isActive={isActive(item.href)}><Link href={scoped(item.href)} onClick={() => setOpen(false)} aria-current={path === item.href ? "page" : undefined}><item.icon /><span>{item.label}</span></Link></SidebarMenuButton></SidebarMenuItem>)}</SidebarMenu></nav>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Research shortcuts</SidebarGroupLabel>
+          <nav aria-label="Research shortcuts"><SidebarMenu>
+            <SidebarMenuItem><SidebarMenuButton asChild><Link href={`${scoped("/")}#trending`} onClick={() => setOpen(false)}><ChartNoAxesCombined /><span>Trending apps</span></Link></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton asChild><Link href={`${scoped("/explore")}&sort=releasedAt`} onClick={() => setOpen(false)}><Sparkles /><span>New releases</span></Link></SidebarMenuButton></SidebarMenuItem>
+          </SidebarMenu></nav>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter className="pb-4">
+        <div className="rounded-lg border bg-card p-3 shadow-xs">
+          <div className="flex items-center gap-2 text-[13px] font-medium text-foreground">{demo ? <FlaskConical className="size-4 text-warning" /> : <Database className="size-4 text-primary" />}{demo ? "Synthetic demo data" : "Stored observations"}</div>
+          <p className="mt-1.5 text-xs/relaxed text-muted-foreground">{demo ? "Every app, ranking and metric is a fixture. No store or database reads." : "Research stored observations with their country, language, and collection context."}</p>
+        </div>
+      </SidebarFooter>
     </aside>
-    <div className="product-main-shell" inert={open || undefined}>
-      <header className="product-header"><div className="product-breadcrumb"><button ref={menuButton} className="product-mobile-toggle" aria-label="Open navigation" aria-expanded={open} aria-controls="product-sidebar" onClick={() => setOpen(!open)}><Menu size={21} /></button><span>Workspace</span><ChevronRight size={14} /><strong>{title}</strong></div><div className="product-header-actions"><form action="/explore" className="product-header-search"><Search size={15} />{[...context].map(([key, value]) => <input key={key} type="hidden" name={key} value={value} />)}<input aria-label="Search the app catalog" name="q" placeholder="Search apps…" maxLength={100} /></form><span className="product-preview-badge"><span />Research workspace</span></div></header>
-      <main id="main" className="product-main">{children}</main>
-      <footer className="product-footer"><span>AppRadar <span>·</span> A clearer view of the app market.</span><span>Stored observations · No download or revenue estimates</span></footer>
+    <div className="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-60" inert={open || undefined}>
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b bg-background/90 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/75 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 items-center gap-2">
+          <button ref={menuButton} type="button" className="-ml-1.5 grid size-9 place-items-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground lg:hidden" aria-label="Open navigation" aria-expanded={open} aria-controls="product-sidebar" onClick={() => setOpen(!open)}><Menu className="size-[18px]" /></button>
+          <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1.5 text-[13px]"><span className="hidden text-muted-foreground sm:inline">Workspace</span><ChevronRight className="hidden size-3.5 text-muted-foreground/70 sm:block" aria-hidden="true" /><span className="truncate font-medium text-foreground" aria-current="page">{title}</span></nav>
+        </div>
+        <div className="flex items-center gap-2.5">
+          <form action="/explore" role="search" className="hidden h-9 w-64 items-center gap-2 rounded-md border bg-card px-2.5 text-muted-foreground shadow-xs focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/25 md:flex xl:w-72">
+            <Search className="size-4" aria-hidden="true" />{[...context].map(([key, value]) => <input key={key} type="hidden" name={key} value={value} />)}
+            <input aria-label="Search the app catalog" name="q" placeholder="Search apps…" maxLength={100} className="h-full min-w-0 flex-1 bg-transparent text-[13px] text-foreground placeholder:text-muted-foreground focus-visible:outline-none" />
+          </form>
+          <span className={cn("inline-flex h-7 items-center gap-1.5 rounded-full border px-2.5 text-xs font-medium whitespace-nowrap", demo ? "border-warning/30 bg-warning/10 text-warning" : "bg-card text-muted-foreground")}><span className={cn("size-1.5 rounded-full", demo ? "bg-warning" : "bg-success")} aria-hidden="true" />{demo ? "Demo data" : "Research workspace"}</span>
+        </div>
+      </header>
+      <main id="main" className="product-main px-4 pt-6 pb-10 sm:px-6 lg:px-8 lg:pt-8">
+        {demo && <div className="mb-6 flex items-start gap-2.5 rounded-lg border border-warning/25 bg-warning/[0.06] px-3.5 py-2.5 text-xs/relaxed text-foreground sm:items-center" role="note"><FlaskConical className="mt-0.5 size-4 shrink-0 text-warning sm:mt-0" aria-hidden="true" /><p><strong className="mr-1.5 font-semibold tracking-[0.02em] text-warning">DEVELOPMENT DEMO</strong><span className="text-muted-foreground">All apps, developers, content, dates, rankings and metrics are synthetic. No Supabase reads or writes. Store media is not used.</span></p></div>}
+        {children}
+      </main>
+      <footer className="flex flex-col gap-1 border-t px-4 py-4 text-xs text-muted-foreground sm:flex-row sm:justify-between sm:px-6 lg:px-8">
+        <span>AppRadar · A clearer view of the app market.</span>
+        <span>{demo ? "Synthetic demo data only" : "Stored observations"} · No download or revenue estimates</span>
+      </footer>
     </div>
   </div>;
 }

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { defaultReadClient, ReadError, type ReadClient } from "./client.ts";
 import {
-  Country, Language, LISTING_SELECT, Store, Uuid, listingsFor, mapListing, mediaEnabled, num, parseInput, sanitizeText, str, bool,
+  Country, Language, LISTING_SELECT, Store, Uuid, listingsFor, mapListing, mediaEnabled, storeDescriptionEnabled, num, parseInput, sanitizeText, str, bool,
   type ListingSummary,
 } from "./shared.ts";
 
@@ -58,6 +58,8 @@ export interface AppDetails {
   relatedApps: ListingSummary[];
   history: { from: string; to: string; series: HistorySeries[] };
   media: { enabled: boolean };
+  /** Store listing description; withheld unless APPRADAR_STORE_DESCRIPTION_ENABLED=true. */
+  storeDescription: { enabled: boolean };
 }
 
 function provenance(raw: unknown): Record<string, FieldProvenance> {
@@ -88,8 +90,9 @@ export async function getAppDetails(input: AppDetailsInput, client: ReadClient =
   const appId = String(appRow.id);
   const store: Store = appRow.store === "play" ? "play" : "ios";
 
+  const descriptionsOn = storeDescriptionEnabled();
   const listingQuery: Record<string, string> = {
-    select: `${LISTING_SELECT},description,screenshot_urls,field_provenance`, app_id: `eq.${appId}`, expires_at: `gt.${now}`,
+    select: `${LISTING_SELECT},${descriptionsOn ? "description," : ""}screenshot_urls,field_provenance`, app_id: `eq.${appId}`, expires_at: `gt.${now}`,
     order: "last_observed_at.desc.nullslast,id.asc", limit: "200",
   };
   const { rows: listingRows } = await client.select("app_listings", listingQuery);
@@ -98,7 +101,7 @@ export async function getAppDetails(input: AppDetailsInput, client: ReadClient =
   // A requested context that has no current listing is reported as such, not swapped for another country.
   const listing = chosen ? {
     ...mapListing(chosen, now),
-    description: sanitizeText(chosen.description),
+    description: descriptionsOn ? sanitizeText(chosen.description) : null,
     screenshotUrls: mediaEnabled() && Array.isArray(chosen.screenshot_urls) ? chosen.screenshot_urls.filter((u): u is string => typeof u === "string") : null,
     provenance: provenance(chosen.field_provenance),
   } : null;
@@ -125,7 +128,7 @@ export async function getAppDetails(input: AppDetailsInput, client: ReadClient =
     },
     listing, contexts,
     developer: dev ? { id: String(dev.id), storeDeveloperId: String(dev.store_developer_id), name: sanitizeText(dev.name, 500), storeUrl: str(dev.store_url) } : null,
-    relatedApps, history, media: { enabled: mediaEnabled() },
+    relatedApps, history, media: { enabled: mediaEnabled() }, storeDescription: { enabled: descriptionsOn },
   };
 }
 

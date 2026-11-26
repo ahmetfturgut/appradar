@@ -1,0 +1,59 @@
+/* Feature styles for App Explorer and App Details. Scoped under .ed-root.
+   Colours resolve to the shared tokens in app/globals.css (Modern Minimal theme). */
+.ed-root{display:flex;flex-direction:column;gap:16px;min-width:0}
+.ed-root .product-heading{margin-bottom:0}
+.ed-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px;border-bottom:1px solid var(--border)}
+.ed-search{display:flex;align-items:center;gap:8px;flex:1 1 240px;min-width:0;height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--muted-foreground)}
+.ed-search input{flex:1;min-width:0;border:0;background:transparent;padding:8px 0;color:var(--foreground)}
+.ed-search .button{min-height:28px;height:28px;padding:0 8px}
+.ed-filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.ed-filters select,.ed-sort select{height:36px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--foreground);padding:0 8px;max-width:100%}
+.ed-segmented{display:inline-flex;height:36px;padding:3px;border:1px solid var(--border);border-radius:8px;background:var(--muted)}
+.ed-segmented button{display:inline-flex;align-items:center;gap:6px;padding:0 10px;border-radius:6px;background:transparent;color:var(--muted-foreground);font-size:12px}
+.ed-segmented button[aria-pressed=true]{background:var(--card);color:var(--foreground);box-shadow:0 1px 2px oklch(0.21 0.015 264 / .08)}
+.ed-clear{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 8px;background:transparent;color:var(--muted-foreground);font-size:12px}
+.ed-columns{position:relative}
+.ed-columns summary{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);list-style:none;font-size:12px}
+.ed-columns summary::-webkit-details-marker{display:none}
+.ed-columns div{position:absolute;z-index:5;right:0;margin-top:4px;min-width:160px;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--card);box-shadow:0 8px 24px oklch(0.21 0.015 264 / .08)}
+.ed-columns label{display:flex;align-items:center;gap:8px;padding:4px 2px;font-size:12px}
+.ed-root .product-table th button{gap:4px}
+.ed-root .product-pagination .button{width:auto;min-width:0;padding:0 10px;gap:4px}
+.ed-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px 0}
+.ed-meta h2{font-size:14px}
+.ed-meta p{font-size:12px;color:var(--muted-foreground);margin-top:2px}
+.ed-count{font-variant-numeric:tabular-nums;font-size:12px;color:var(--muted-foreground);border:1px solid var(--border);border-radius:999px;padding:2px 8px;background:var(--muted)}
+.ed-root .product-table{table-layout:auto}
+.ed-root .product-table td:first-child{max-width:280px;white-space:normal}
+.ed-root .product-table th.ed-num,.ed-root .product-table td.ed-num{text-align:right;font-variant-numeric:tabular-nums}
+.ed-root .product-table th.ed-num button{justify-content:flex-end;width:100%}
+.ed-root .product-table th button[aria-sort]{color:var(--foreground)}
+.ed-root .product-table tbody tr:hover{background:color-mix(in oklch, var(--muted) 70%, transparent)}
+.ed-root .product-table tbody tr:focus-within{background:var(--accent)}
+.ed-badge{display:inline-flex;align-items:center;border-radius:999px;padding:2px 8px;font-size:11px;background:var(--muted);color:var(--muted-foreground)}
+.ed-badge-free{background:color-mix(in oklch, var(--success) 12%, white);color:var(--success)}
+.ed-root .product-stats-grid{border-radius:10px}
+.ed-root .product-metric{padding:14px 16px}
+.ed-root .product-metric>strong{font-size:22px;letter-spacing:-.04em}
+.ed-root .product-detail-heading{align-items:flex-start;margin-bottom:0}
+.ed-root .product-detail-identity h1{font-size:24px}
+.ed-root .product-series-select{display:flex;align-items:center;gap:8px;min-width:0}
+.ed-root .product-series-select select{max-width:min(100%,420px);overflow:hidden;text-overflow:ellipsis}
+.ed-root .product-detail-tabs{gap:4px;margin-bottom:0}
+.ed-root .product-detail-tabs button{border-radius:8px 8px 0 0;padding:8px 12px}
+.ed-root .product-detail-columns{gap:16px}
+.ed-root .product-about,.ed-root .product-developer,.ed-root .product-provenance,.ed-root .product-history{padding-bottom:4px}
+.ed-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.ed-facts div{min-width:0;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--muted)}
+.ed-facts span{display:block;font-size:11px;color:var(--muted-foreground)}
+.ed-facts strong{display:block;margin-top:2px;font-size:13px;font-weight:600}
+.ed-related{display:flex;flex-direction:column;gap:8px;padding:0 16px 16px}
+.ed-related a{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--border);font-size:13px}
+.ed-empty{padding:28px 16px;text-align:center;color:var(--muted-foreground)}
+.ed-empty h3{font-size:14px;color:var(--foreground);margin-bottom:4px}
+@media(max-width:760px){
+  .ed-toolbar,.ed-meta,.ed-facts{align-items:stretch}
+  .ed-facts,.ed-root .product-detail-columns>aside{grid-template-columns:minmax(0,1fr)}
+  .ed-segmented{width:100%;overflow:auto}
+  .ed-meta{flex-direction:column;align-items:flex-start}
+}

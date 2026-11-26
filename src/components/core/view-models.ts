@@ -35,7 +35,7 @@ export interface DetailsSections {
 }
 export interface DetailsModel {
   app: AppViewModel; developer: AppDetails["developer"]; contexts: AppDetails["contexts"];
-  series: HistorySeries[]; historyTo: string; mediaEnabled: boolean; screenshots: string[] | null;
+  series: HistorySeries[]; historyTo: string; mediaEnabled: boolean; storeDescriptionEnabled: boolean; screenshots: string[] | null;
 }
 export const countryLabels: Record<string, string> = { US: "United States", TR: "Türkiye" };
 export const countryLabel = (country: string) => countryLabels[country] ?? country;

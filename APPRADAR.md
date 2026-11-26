@@ -129,9 +129,11 @@ Bu tutarları ürün arayüzüne, satış vaadine veya sabit iş kuralına gömm
 
 ### 5.2 Ticari kullanım kapısı
 
-**[DOĞRULANMADI]** Actor'a ödeme yapmak veriyi yeniden yayınlama, saklama, satma veya görselleri ticari üründe kullanma hakkını kendiliğinden kanıtlamaz. Apify koşulları, actor lisansı/sağlayıcı koşulları, kaynak mağaza şartları, görsel hakları ve yorumların kişisel veri niteliği ayrı incelenmelidir. Bu belge hukuki uygunluk kararı vermez.
+**[DOĞRULANMADI]** Actor'a ödeme yapmak veriyi yeniden yayınlama, saklama, satma veya görselleri ticari üründe kullanma hakkını kendiliğinden kanıtlamaz. Apify koşulları, actor lisansı/sağlayıcı koşulları, kaynak mağaza şartları, görsel hakları, mağaza açıklama metinleri ve yorumların kişisel veri niteliği ayrı incelenmelidir. Bu belge hukuki uygunluk kararı vermez.
 
 POC'nin saklama kapsamı dahil kullanım koşullarını kontrol et. Üretim öncesi saklama, kullanıcıya gösterim, türetilmiş analiz, cache, yeniden dağıtım ve silme talepleri için izin dayanağını kaydet. Belirsiz ticari yetki varsa gerekli sağlayıcı açıklamasını/uzman incelemesini tamamlamadan ilgili veriyi yayımlama. İzin verilen alan ve saklama süresi uygulama yapılandırmasına yansıtılmalıdır.
+
+**Açık kısıtlar (26 Kasım 2026):** Ticari saklama/gösterim izni henüz onaylanmadı. Ücretli toplama ve zamanlama kapalıdır (`APIFY_COLLECTION_ENABLED`, `COLLECTION_PAID_EXECUTION`, `POC_DATA_USE_CONFIRMED`, `schedulingEnabled`). Okuma katmanında varsayılan kapalı bayraklar: `APPRADAR_STORE_MEDIA_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`. Bayrak kapalıyken ikon/ekran görüntüsü, mağaza açıklaması ve yorum metni istemciye dönmez; açıklama sütunu seçilmez. Sağlayıcı entegrasyonları korunur; hak onayı olmadan bu bayraklar açılmaz. Önerilen metrik saklama (`retentionDays: 365`) kullanım hakkına bağlıdır.
 
 ## 6. Veri sözlüğü ve veri yeterliliği
 
@@ -374,6 +376,22 @@ Günlük ve aylık UTC dönemleri `DAILY_LIMIT_USD` / `MONTHLY_LIMIT_USD` ile id
 | Kalite kapısı | test 88/88; typecheck OK; lint 0 error (2 `no-img-element` warning); `next build` OK |
 
 Lint düzeltmeleri: `page.tsx` / `explore/page.tsx` try/catch içinde JSX kaldırıldı; `sanitizeText` düzensiz whitespace sınıfı Unicode kaçışlarına alındı.
+
+### 6.13 Arayüz entegrasyonu — 26 Kasım 2026
+
+Claude (kabuk, Dashboard, Modern Minimal tokenları, paylaşılan primitifler) ve Cursor (Explorer, App Details) aynı çalışma ağacında. Ek git worktree yok; `main` hâlâ `dc64364`. İki tarafın dosyaları korundu. Yeni ekran, bağımlılık, MCP çekimi, ücretli çağrı veya veritabanı değişikliği yok.
+
+| Kontrol | Sonuç |
+|---|---|
+| Tokenlar | Explorer CSS tanımsız `--product-border` / `--product-muted` kullanıyordu; kenarlıklar ve grafik rengi `globals.css` tokenlarına alındı |
+| Explorer | Arama, mağaza/kategori/fiyat, sunucu sıralaması, sütun gizleme, sayfa 2 (`9–16 / 120`) demo modunda geçti |
+| Dashboard / Details | Demo kabuğu, KPI, ayrı tarih serileri ve boşluklar duruyor; production’da demo bayrağı sentetik katalog açmıyor |
+| Hidrasyon | Enstrümansız Chrome. Dashboard ve Explorer uyumsuzluk üretmedi. Details’te SVG `<title>` metni HTML ayrıştırmasında boşalıyordu; ipuçları hidrasyondan sonra ekleniyor |
+| Loading / not-found | `loading.tsx` iskeleti duruyor. Bilinmeyen adres “Page not found” (404). Geçersiz veya eksik uygulama “App not found”. `error.tsx` Next.js 16 `retry` kullanıyor |
+| Koruma | `APPRADAR_DEMO_MODE` yalnız `NODE_ENV=development` iken geçerli. Production keşif sentetik değil. `.next/static` içinde service role / token yok |
+| Kalite kapısı | test 100/100; typecheck OK; lint 0 error (2 `no-img-element` warning); `next build` OK |
+
+**Tema lisansı [DOĞRULANMADI]:** 21st.dev “Modern Minimal” teması (`https://21st.dev/community/themes/modern-minimal`, serafimcloud) `get_theme` ile alındı. Bileşen dosyalarındaki MIT kayıtları duruyor (shadcn sidebar/card/empty/skeleton, Origin/shadcn tablo, StatCard, BarChart, Partition Bar). Tema sayfasının ticari kullanım lisansı bu entegrasyonda doğrulanmadı; tema değerleri `src/app/globals.css` içindedir ve lisans kaydı gelmeden yeni tema kopyalanmaz.
 
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
@@ -653,7 +671,7 @@ Aşağıdaki birincil kaynaklar 25 Kasım 2026 tarihinde kamuya açık web içer
 | [ASO Keyword Intel OpenAPI](https://api.apify.com/v2/acts/petersutarik~aso-keyword-intel/builds/default/openapi.json) | `keywords`, `store` ios/android/both, `topN`≤50, `includePopularity` | Build `0.2.5` / `9ton1HLQZxcwZx6Jy`; dil ayrı input yok |
 | [ASO Keyword Intel fiyat](https://apify.com/petersutarik/aso-keyword-intel/pricing) | ranking/suggestion/metrics events | 10 rank + 1 metrics = $0.04 |
 | [Apify fiyatlandırma](https://apify.com/pricing) | PAYG ve plan tabanı ayrımı | Hesap/kredi/vergi koşulları teyit bekliyor |
-| [21st.dev](https://21st.dev/) | Tasarım ve bileşen keşfi | Seçilmiş bileşen ve ticari lisans doğrulaması yok |
+| [21st.dev](https://21st.dev/) | Tasarım ve bileşen keşfi | Seçilen bileşenlerin MIT notları kaynak dosyalarda. Modern Minimal tema lisansı doğrulanmadı |
 | [shadcn/ui](https://ui.shadcn.com/docs) | UI altyapı referansı | Sürüm ve seçili bileşenler uygulamada sabitlenecek |
 | [Tailwind responsive](https://tailwindcss.com/docs/responsive-design) | Responsive uygulama referansı | Bu belge görsel prototip değildir |
 | [Next.js App Router](https://nextjs.org/docs/app) | Web mimarisi referansı | Proje kurulumu/testi yapılmadı |

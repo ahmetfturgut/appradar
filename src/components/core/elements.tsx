@@ -5,6 +5,9 @@ import { useTransition } from "react";
 import { Apple, ArrowRight, CircleAlert, Search, Star, Play, Globe2 } from "lucide-react";
 import { AppIcon } from "../app-icon";
 import { Button } from "../ui/button";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
+import { Skeleton } from "../ui/skeleton";
+import { StatCard } from "../ui/stat-card";
 import { countryLabels, countryLabel, dateLabel, detailsHref, type AppViewModel, type Scope, type ReadResult } from "./view-models";
 import type { Freshness } from "../../lib/read/index";
 
@@ -37,11 +40,14 @@ export function PanelHeading({ title, subtitle, href }: { title: string; subtitl
   return <div className="product-panel-heading"><div><h2>{title}</h2>{subtitle && <p>{subtitle}</p>}</div>{href && <Link className="product-text-link" href={href}>View all <ArrowRight size={14} /></Link>}</div>;
 }
 export function CatalogState({ state, onReset }: { state: "loading" | "empty" | "error"; onReset?: () => void }) {
-  if (state === "loading") return <div className="product-loading" role="status" aria-label="Loading applications"><span className="sr-only">Loading applications…</span>{[0, 1, 2, 3, 4].map(row => <div className="product-skeleton-row" key={row}><span /><span /><span /></div>)}</div>;
-  return <div className="product-state" role={state === "error" ? "alert" : "status"}>{state === "error" ? <CircleAlert size={28} /> : <Search size={28} />}<h2>{state === "error" ? "We couldn’t load these apps" : "No current listings found"}</h2><p>{state === "error" ? "Your filters are preserved. Try loading the catalog again." : "No stored listings match this context and these filters. Try another search or clear a filter. This does not mean the apps are absent from the store."}</p>{onReset && <Button variant="outline" onClick={onReset}>{state === "error" ? "Try again" : "Clear filters"}</Button>}</div>;
+  if (state === "loading") return <div className="product-loading px-5 py-2" role="status" aria-label="Loading applications"><span className="sr-only">Loading applications…</span>{[0, 1, 2, 3, 4].map(row => <div className="flex items-center gap-3 border-b py-3.5 last:border-b-0" key={row}><Skeleton className="size-9 rounded-lg" /><div className="min-w-0 flex-1"><Skeleton className="h-3 w-2/5" /><Skeleton className="mt-2 h-2.5 w-1/4" /></div><Skeleton className="h-3 w-12" /></div>)}</div>;
+  const error = state === "error";
+  return <Empty className="product-state" role={error ? "alert" : "status"}><EmptyHeader><EmptyMedia variant="icon">{error ? <CircleAlert /> : <Search />}</EmptyMedia><EmptyTitle role="heading" aria-level={2}>{error ? "We couldn’t load these apps" : "No current listings found"}</EmptyTitle><EmptyDescription>{error ? "Your filters are preserved. Try loading the catalog again." : "No stored listings match this context and these filters. Try another search or clear a filter. This does not mean the apps are absent from the store."}</EmptyDescription></EmptyHeader>{onReset && <EmptyContent><Button variant="outline" onClick={onReset}>{error ? "Try again" : "Clear filters"}</Button></EmptyContent>}</Empty>;
 }
 export function Metric({ label, value, note }: { label: string; value: React.ReactNode; note: string }) {
-  return <div className="product-metric"><p>{label}</p><strong>{value}</strong><span>{note}</span></div>;
+  // 21st.dev StatCard (plain variant) as a cell of the `.product-stats-grid` hairline grid.
+  const shown = typeof value === "number" || typeof value === "string" ? value : <>{value}</>;
+  return <StatCard variant="plain" className="product-metric -m-px border-t border-l px-5 py-4" label={label} value={shown} hint={note} />;
 }
 export function InstallValue({ app }: { app: AppViewModel }) {
   return app.store === "ios" ? <span className="product-muted" title="App Store does not publish install counts">Not published</span> : <span>{app.installsText ?? "Not available"}</span>;
