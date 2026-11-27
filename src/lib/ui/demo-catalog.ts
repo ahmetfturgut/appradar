@@ -167,7 +167,7 @@ export function createDemoCatalog(clock = new Date()) {
     return { app: { id: appId, store: all[0]!.store, storeAppId: all[0]!.storeAppId!, storeUrl: "", firstSeenAt: at(releaseAge(i)), lastSeenAt: all[0]!.freshness.lastObservedAt ?? at(releaseAge(i)) },
       listing, contexts: all.map(row => ({ country: row.country, requestedLanguage: row.requestedLanguage, lastObservedAt: row.freshness.lastObservedAt })),
       developer: { id: `demo-developer-${Math.floor(i / 2)}`, storeDeveloperId: `demo-studio-${Math.floor(i / 2)}`, name: all[0]!.developerName, storeUrl: null },
-      relatedApps: [], history: { from: at(30), to: at(0), series }, media: { enabled: false }, storeDescription: { enabled: true } };
+      relatedApps: [], history: { from: at(30), to: at(0), series }, media: { iconsEnabled: false, screenshotsEnabled: false }, storeDescription: { enabled: true } };
   }
   function detailSections(input: { appId: string; store: "ios" | "play"; country: string; language: string; tab: string; reviewPage: number; reviewSort: "newest" | "helpful"; keywordPage: number; keyword?: string; keywordSnapshot?: number }): DetailsSections {
     const result: DetailsSections = { reviews: null, distribution: null, keywords: null, selectedKeyword: null };

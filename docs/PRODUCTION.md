@@ -34,7 +34,7 @@ Required. In production the app answers **503** until all are present and consis
 
 Unset or exactly `false` (anything else is also a 503): `APPRADAR_DEMO_MODE`, `COLLECTION_PAID_EXECUTION`, `APIFY_COLLECTION_ENABLED`, `POC_DATA_USE_CONFIRMED`, `RETENTION_CLEANUP_EXECUTION`.
 
-Keep `false` until usage rights are recorded (not enforced by the check): `APPRADAR_STORE_MEDIA_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`.
+Keep `false` until usage rights are recorded (not enforced by the check): `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`. Legacy `APPRADAR_STORE_MEDIA_ENABLED` is ignored. See [CONTENT_USAGE.md](CONTENT_USAGE.md).
 
 Do **not** set on the web host: `APIFY_TOKEN`, `POC_LIMIT_USD`, `DAILY_LIMIT_USD`, `MONTHLY_LIMIT_USD`, database connection strings.
 
@@ -52,7 +52,7 @@ Limits of the check: it compares URLs and legacy JWT keys with the declared ref.
 
 ## 4. Migrations
 
-Apply all files in `supabase/migrations/` to the empty production database in filename order (`000100` → `001200`), each in its own transaction, stopping at the first error:
+Apply all files in `supabase/migrations/` to the empty production database in filename order (`000100` → `001300` media suppression), each in its own transaction, stopping at the first error:
 
 ```bash
 psql "$PRODUCTION_DATABASE_URL" --single-transaction --set=ON_ERROR_STOP=1 --file supabase/migrations/20261126000100_catalog_core.sql

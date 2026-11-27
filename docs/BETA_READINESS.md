@@ -34,6 +34,12 @@ For production, configure a separate Supabase project and matching server/public
 - Shared catalog and other accounts remain. Backups, infrastructure logs and independent browser state are not erased by the Auth API. Existing JWTs can remain cryptographically valid until expiry; application requests recheck `getUser()`, watchlist inserts require an existing Auth FK and reads return no deleted-user rows. Do not claim instant global token invalidation. See [Supabase user management](https://supabase.com/docs/guides/auth/managing-user-data).
 - **Evidence split:** mocked suite = authorization edge cases; owner development check = happy-path live deletion only. Do not equate them.
 
+## Content / media (B4.2)
+
+Icons and screenshots use independent flags, provider eligibility, HTTPS CDN allowlisting and app-level suppression. See [CONTENT_USAGE.md](CONTENT_USAGE.md). Flags stay `false` until a documented usage basis exists for the intended scope. Terms drafts mention third-party store content; they remain drafts.
+
+**Development integration (27 Nov 2026):** migration `0013` applied (ledger 13/13); service_role-only suppression RPC verified with synthetic rollback; fixture/media suite + full regression green. No display or collection flags enabled. Production still needs reviewed `0013` apply and rights-approved live media verification before any flag enablement.
+
 ## Remaining production gates
 
-Owner/legal/contact approval; confirmed commercial data-use basis and approved real-data pilot; production project/environment and reviewed migration procedure; production Auth with custom SMTP validation; working support (including MFA/recovery exceptions); approved retention policy; host/Auth rate limiting; backups and restore rehearsal; deployment/header checks and monitoring; two-user isolation on the live stack when authorized. Reuse [PRODUCTION.md](PRODUCTION.md), without activating scheduling or cleanup as part of B5. No payment or subscription implementation is included.
+Owner/legal/contact approval; confirmed commercial data-use basis and approved real-data pilot (separate internal vs public scopes); production project/environment and reviewed migration procedure including `0013` media suppression; production Auth with custom SMTP validation; working support (including MFA/recovery exceptions); approved retention policy; host/Auth rate limiting; backups and restore rehearsal; deployment/header checks and monitoring; two-user isolation on the live stack when authorized; first rights-approved live media field verification before enabling icon/screenshot flags. Reuse [PRODUCTION.md](PRODUCTION.md), without activating scheduling or cleanup as part of B5. No payment or subscription implementation is included.

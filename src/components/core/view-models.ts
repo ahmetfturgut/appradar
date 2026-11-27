@@ -36,7 +36,9 @@ export interface DetailsSections {
 }
 export interface DetailsModel {
   app: AppViewModel; developer: AppDetails["developer"]; contexts: AppDetails["contexts"];
-  series: HistorySeries[]; historyTo: string; mediaEnabled: boolean; storeDescriptionEnabled: boolean; screenshots: string[] | null;
+  series: HistorySeries[]; historyTo: string;
+  iconsEnabled: boolean; screenshotsEnabled: boolean; storeDescriptionEnabled: boolean; screenshots: string[] | null;
+  storeListingUrl: string | null; contentReportHref: string;
 }
 export const countryLabels: Record<string, string> = { US: "United States", TR: "Türkiye" };
 export const countryLabel = (country: string) => countryLabels[country] ?? country;
@@ -55,7 +57,4 @@ export const detailsHref = (app: AppViewModel, back?: string) => {
   if (back) query.set("back", back);
   return `/apps/${encodeURIComponent(app.id)}?${query}`;
 };
-export function safeMediaUrl(value: string | null): string | null {
-  if (!value) return null;
-  try { const url = new URL(value); return url.protocol === "https:" || url.protocol === "http:" ? url.href : null; } catch { return null; }
-}
+export { safeMediaUrl, safeStoreListingUrl } from "../../lib/media/urls";

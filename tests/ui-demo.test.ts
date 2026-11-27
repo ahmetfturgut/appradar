@@ -36,7 +36,7 @@ test("fixtures are deterministic and use no external media or store URLs", () =>
     assert.equal(row.iconUrl, null); assert.equal(row.storeUrl, null);
     assert.match(row.storeAppId!, /^demo\./);
     const details = demo.getAppDetails(row.appId, scope)!;
-    assert.equal(details.media.enabled, false); assert.equal(details.listing!.screenshotUrls, null);
+    assert.equal(details.media.iconsEnabled, false); assert.equal(details.media.screenshotsEnabled, false); assert.equal(details.listing!.screenshotUrls, null);
     assert.equal(details.developer!.storeUrl, null);
     assert.match(toDetailsModel(details)!.app.description!, /Synthetic demo description/);
     assert.ok(row.price.amount == null || row.price.currency != null);

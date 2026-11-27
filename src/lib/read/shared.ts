@@ -1,7 +1,10 @@
 import { z } from "zod";
+import { mediaDisplayAllowed, storeIconsEnabled, storeScreenshotsEnabled } from "../media/flags.ts";
+import { validateStoreMediaUrl } from "../media/urls.ts";
 import { ReadError, type ReadClient } from "./client.ts";
 import { fieldFreshness, freshness, type FieldFreshness, type Freshness } from "./field-freshness.ts";
 export { freshness, STALE_AFTER_HOURS, type Freshness, type FreshnessStatus } from "./field-freshness.ts";
+export { storeIconsEnabled, storeScreenshotsEnabled };
 
 export const MAX_PAGE_SIZE = 100;
 export const MAX_OFFSET = 10000;
@@ -72,12 +75,41 @@ export function sanitizeText(value: unknown, max = 20000): string | null {
   return cleaned.length > max ? `${cleaned.slice(0, max)}…` : cleaned;
 }
 
-/** Store media rights are unconfirmed (spec §5.2 / §6.5); icons/screenshots are withheld unless explicitly enabled. */
-export const mediaEnabled = () => process.env.APPRADAR_STORE_MEDIA_ENABLED === "true";
+/** @deprecated Always false; legacy APPRADAR_STORE_MEDIA_ENABLED is ignored. Use storeIconsEnabled / storeScreenshotsEnabled. */
+export const mediaEnabled = () => false;
 /** Store description rights are unconfirmed; listing text is withheld unless explicitly enabled. */
 export const storeDescriptionEnabled = () => process.env.APPRADAR_STORE_DESCRIPTION_ENABLED === "true";
 /** Review usage rights are unconfirmed; text is withheld unless explicitly enabled. */
 export const reviewContentEnabled = () => process.env.APPRADAR_REVIEW_CONTENT_ENABLED === "true";
+
+function provenanceSource(raw: unknown, field: string): string | null {
+  if (!raw || typeof raw !== "object") return null;
+  const stamp = (raw as Record<string, unknown>)[field];
+  if (!stamp || typeof stamp !== "object") return null;
+  const source = (stamp as Record<string, unknown>).source;
+  return typeof source === "string" ? source : null;
+}
+
+function releaseIconUrl(row: Record<string, unknown>, app: Record<string, unknown>): string | null {
+  const suppressed = app.icons_suppressed_at != null;
+  const allowed = mediaDisplayAllowed({
+    kind: "icons", flagOn: storeIconsEnabled(), providerSource: provenanceSource(row.field_provenance, "icon_url"), suppressed,
+  });
+  return allowed ? validateStoreMediaUrl(str(row.icon_url)) : null;
+}
+
+export function releaseScreenshotUrls(row: Record<string, unknown>, app: Record<string, unknown>): string[] | null {
+  const suppressed = app.screenshots_suppressed_at != null;
+  const allowed = mediaDisplayAllowed({
+    kind: "screenshots", flagOn: storeScreenshotsEnabled(), providerSource: provenanceSource(row.field_provenance, "screenshot_urls"), suppressed,
+  });
+  if (!allowed || !Array.isArray(row.screenshot_urls)) return null;
+  const urls = row.screenshot_urls.flatMap(value => {
+    const url = typeof value === "string" ? validateStoreMediaUrl(value) : null;
+    return url ? [url] : [];
+  });
+  return urls.length ? urls : null;
+}
 
 export const LISTING_COLUMNS = [
   "id", "app_id", "store", "country", "requested_language", "effective_language", "name", "developer_name",
@@ -85,7 +117,7 @@ export const LISTING_COLUMNS = [
   "price_amount", "currency", "is_free", "rating_value", "rating_count", "review_count", "installs_text",
   "installs_lower_bound", "icon_url", "first_seen_at", "last_observed_at", "field_provenance",
 ].join(",");
-export const LISTING_SELECT = `${LISTING_COLUMNS},apps!inner(store_app_id,canonical_url,developer_id)`;
+export const LISTING_SELECT = `${LISTING_COLUMNS},apps!inner(store_app_id,canonical_url,developer_id,icons_suppressed_at,screenshots_suppressed_at)`;
 
 export interface ListingSummary {
   appId: string;
@@ -131,7 +163,7 @@ export function mapListing(row: Record<string, unknown>, now: string): ListingSu
     price: { amount: num(row.price_amount), currency: str(row.currency), isFree: bool(row.is_free) },
     rating: num(row.rating_value), ratingCount: num(row.rating_count), reviewCount: num(row.review_count),
     installs: { text: str(row.installs_text), lowerBound: num(row.installs_lower_bound), supported: store === "play" },
-    iconUrl: mediaEnabled() ? str(row.icon_url) : null,
+    iconUrl: releaseIconUrl(row, app),
     firstSeenAt: str(row.first_seen_at), freshness: freshness(str(row.last_observed_at), now),
     fieldFreshness: fieldFreshness(row.field_provenance, now),
   };

@@ -1,5 +1,5 @@
 import type { AppDetails, Dashboard, ListingSummary } from "../../lib/read/index";
-import { safeMediaUrl, type AppViewModel, type DashboardModel, type DetailsModel } from "./view-models";
+import { safeMediaUrl, safeStoreListingUrl, type AppViewModel, type DashboardModel, type DetailsModel } from "./view-models";
 
 export function toAppViewModel(listing: ListingSummary): AppViewModel {
   return {
@@ -28,11 +28,26 @@ export function toDetailsModel(data: AppDetails): DetailsModel | null {
   const listing = data.listing;
   const sources = [...new Set(Object.values(listing.provenance).flatMap(stamp => stamp.source ? [stamp.source] : []))];
   return {
-    app: { ...toAppViewModel(listing), description: data.storeDescription.enabled ? listing.description : null,
-      iconUrl: data.media.enabled ? safeMediaUrl(listing.iconUrl) : null,
-      sourceLabel: sources.length ? sources.join(", ") : "Source unavailable" },
+    app: {
+      ...toAppViewModel(listing),
+      description: data.storeDescription.enabled ? listing.description : null,
+      iconUrl: data.media.iconsEnabled ? safeMediaUrl(listing.iconUrl) : null,
+      sourceLabel: sources.length ? sources.join(", ") : "Source unavailable",
+    },
     developer: data.developer, contexts: data.contexts, series: data.history.series, historyTo: data.history.to,
-    mediaEnabled: data.media.enabled, storeDescriptionEnabled: data.storeDescription.enabled,
-    screenshots: data.media.enabled ? listing.screenshotUrls?.flatMap(value => { const url = safeMediaUrl(value); return url ? [url] : []; }) ?? null : null,
+    iconsEnabled: data.media.iconsEnabled, screenshotsEnabled: data.media.screenshotsEnabled,
+    storeDescriptionEnabled: data.storeDescription.enabled,
+    screenshots: data.media.screenshotsEnabled
+      ? listing.screenshotUrls?.flatMap(value => { const url = safeMediaUrl(value); return url ? [url] : []; }) ?? null
+      : null,
+    storeListingUrl: safeStoreListingUrl(data.app.storeUrl),
+    contentReportHref: "/en/contact",
   };
+}
+
+/** Attribution copy for app details (EN). */
+export function detailsAttribution(model: DetailsModel): string {
+  return model.app.sourceLabel === "Source unavailable"
+    ? "Third-party store data may be incomplete. AppRadar is an independent research tool and is not affiliated with Apple, Google or listed developers."
+    : `Data observed via ${model.app.sourceLabel}. App names, trademarks, icons and screenshots remain third-party property. AppRadar is independent research software and is not affiliated with Apple, Google or listed developers.`;
 }

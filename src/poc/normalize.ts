@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { validateStoreMediaUrl } from "../lib/media/urls.ts";
 import { type Job, sources, stableHash } from "./plan.ts";
 
 const Text = z.string().trim().min(1).max(10000);
@@ -76,7 +77,8 @@ const DataTrail = z.object({
 
 // Presentation metadata is untrusted and optional: a bad value is dropped, never the whole row.
 // Field names come from public Actor docs and are not yet verified against live payloads.
-const MediaUrl = z.url({ protocol: /^https$/ }).max(2048).refine(value => { const url = new URL(value); return !url.username && !url.password; });
+// Host allowlist matches src/lib/media/urls.ts (no binaries stored; https store/CDN URLs only).
+const MediaUrl = z.string().max(2048).refine((value): value is string => validateStoreMediaUrl(value) != null).transform(value => validateStoreMediaUrl(value)!);
 const Description = z.string().trim().min(1).max(20000);
 const ScreenshotUrls = z.array(MediaUrl).min(1).max(30);
 

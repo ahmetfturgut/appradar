@@ -73,10 +73,11 @@ test("media is withheld defensively and history series are never merged by the U
     app: { id: appId, store: "ios", storeAppId: "123", storeUrl: "https://apps.apple.com/app/id123", firstSeenAt: now, lastSeenAt: now },
     listing: { ...listing({ iconUrl: "https://media.test/icon.png" }), description: "Plain text", screenshotUrls: ["https://media.test/screenshot.png"], provenance: {} },
     contexts: [{ country: "GB", requestedLanguage: "en-GB", lastObservedAt: null }], developer: null, relatedApps: [],
-    history: { from: now, to: now, series: [{ seriesKey: "source-a", source: "aurelix", role: "detail", points: [], comparable: false }, { seriesKey: "source-b", source: "subimpact", role: "discovery", points: [], comparable: false }] }, media: { enabled: false }, storeDescription: { enabled: false },
+    history: { from: now, to: now, series: [{ seriesKey: "source-a", source: "aurelix", role: "detail", points: [], comparable: false }, { seriesKey: "source-b", source: "subimpact", role: "discovery", points: [], comparable: false }] }, media: { iconsEnabled: false, screenshotsEnabled: false }, storeDescription: { enabled: false },
   };
   const model = toDetailsModel(data)!;
   assert.equal(model.app.iconUrl, null); assert.equal(model.app.description, null); assert.equal(model.screenshots, null); assert.equal(model.series.length, 2);
+  assert.equal(model.storeListingUrl, "https://apps.apple.com/app/id123");
   assert.equal(safeMediaUrl("javascript:alert(1)"), null);
   assert.equal(toAppViewModel(listing({ installs: { text: "100+", lowerBound: 100, supported: true } })).installsText, null);
 });

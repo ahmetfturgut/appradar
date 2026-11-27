@@ -19,12 +19,15 @@ function chartRow(appId: string, rank: number, extra: Record<string, unknown> = 
 }
 
 test("presentation metadata is optional and a bad value does not reject the row", () => {
-  const good = chartRow("1", 1, { description: "Text", iconUrl: "https://example.com/i.png", screenshots: ["https://example.com/s.png"] });
-  assert.equal(good.iconUrl, "https://example.com/i.png");
-  assert.deepEqual(good.screenshotUrls, ["https://example.com/s.png"]);
-  const bad = chartRow("1", 1, { iconUrl: "http://example.com/i.png", screenshots: [] });
+  const good = chartRow("1", 1, { description: "Text", iconUrl: "https://is1-ssl.mzstatic.com/image/thumb/Purple/i.png", screenshots: ["https://play-lh.googleusercontent.com/s.png"] });
+  assert.equal(good.iconUrl, "https://is1-ssl.mzstatic.com/image/thumb/Purple/i.png");
+  assert.deepEqual(good.screenshotUrls, ["https://play-lh.googleusercontent.com/s.png"]);
+  const bad = chartRow("1", 1, { iconUrl: "http://is1-ssl.mzstatic.com/i.png", screenshots: [] });
   assert.equal(bad.iconUrl, null);
   assert.equal(bad.screenshotUrls, null);
+  const untrusted = chartRow("1", 1, { iconUrl: "https://evil.example/i.png", screenshots: ["https://evil.example/s.png"] });
+  assert.equal(untrusted.iconUrl, null);
+  assert.equal(untrusted.screenshotUrls, null);
   assert.equal(bad.fieldStatus.description, "missing");
   assert.equal(bad.idempotencyKey, good.idempotencyKey);
 });
