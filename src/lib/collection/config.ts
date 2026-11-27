@@ -1,6 +1,7 @@
 // Collection settings. Everything that spends money or schedules work is off unless stated explicitly.
 import { z } from "zod";
 import { Provider, Store } from "../../poc/plan.ts";
+import { dataUseAuthorizationClosed } from "./authorization.ts";
 
 export const CollectionMode = z.enum(["details", "search", "charts", "developers", "reviews", "keywords"]);
 export type CollectionMode = z.infer<typeof CollectionMode>;
@@ -59,11 +60,12 @@ export function configuredBudgetLimits(env: Record<string, string | undefined>):
 /** Reasons paid execution is closed. Separate from the POC flags so an existing .env cannot open the engine. */
 export function closedGates(env: Record<string, string | undefined>, config: CollectionConfig): string[] {
   const reasons: string[] = [];
-  for (const name of ["COLLECTION_PAID_EXECUTION", "APIFY_COLLECTION_ENABLED", "POC_DATA_USE_CONFIRMED"]) {
+  for (const name of ["COLLECTION_PAID_EXECUTION", "APIFY_COLLECTION_ENABLED"] as const) {
     if (env[name] !== "true") reasons.push(`${name}_not_true`);
   }
   if (!env.APIFY_TOKEN?.trim()) reasons.push("APIFY_TOKEN_missing");
   if (config.retentionDays == null) reasons.push("retentionDays_not_configured");
   if (configuredBudgetLimits(env) == null) reasons.push("budget_limits_missing");
+  reasons.push(...dataUseAuthorizationClosed(env, config));
   return reasons;
 }

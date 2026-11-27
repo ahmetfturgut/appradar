@@ -32,7 +32,7 @@ Required. In production the app answers **503** until all are present and consis
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_…` (or legacy `anon`) | public |
 | `NEXT_PUBLIC_SITE_URL` | `https://your-domain`, origin only | public |
 
-Unset or exactly `false` (anything else is also a 503): `APPRADAR_DEMO_MODE`, `COLLECTION_PAID_EXECUTION`, `APIFY_COLLECTION_ENABLED`, `POC_DATA_USE_CONFIRMED`, `RETENTION_CLEANUP_EXECUTION`.
+Unset or exactly `false` (anything else is also a 503): `APPRADAR_DEMO_MODE`, `COLLECTION_PAID_EXECUTION`, `APIFY_COLLECTION_ENABLED`, `POC_DATA_USE_CONFIRMED`, `RETENTION_CLEANUP_EXECUTION`, `APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL`, `APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED`, `APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED`.
 
 Keep `false` until usage rights are recorded (not enforced by the check): `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`. Legacy `APPRADAR_STORE_MEDIA_ENABLED` is ignored. See [CONTENT_USAGE.md](CONTENT_USAGE.md).
 
@@ -122,7 +122,7 @@ These lines carry codes only. Next.js and the host log unhandled errors and requ
 ## 10. Collection and retention safeguards
 
 - The web app has no code path that starts collection or cleanup, and nothing is scheduled.
-- Collection needs `COLLECTION_PAID_EXECUTION`, `APIFY_COLLECTION_ENABLED`, `POC_DATA_USE_CONFIRMED`, a token, budget limits, `retentionDays` and `--execute`, all from an operator shell. Do not open them without recorded data-use rights.
+- Collection needs `COLLECTION_PAID_EXECUTION`, `APIFY_COLLECTION_ENABLED`, a token, budget limits, `retentionDays`, `--execute`, and a scoped data-use path from an operator shell (`verified`+`POC_DATA_USE_CONFIRMED`, or bounded `unconfirmed` internal pilot — see [CONTENT_USAGE.md](CONTENT_USAGE.md)). Do not set `POC_DATA_USE_CONFIRMED` without verified evidence. Production web must keep pilot/public-display flags false.
 - Retention needs a human-approved policy, `RETENTION_CLEANUP_EXECUTION=true` and `--execute` (see `APPRADAR.md` 6.20). Dry-run and verify a backup first.
 - Keep production operator env files separate from development ones, and check which project they point to before any `--execute`.
 

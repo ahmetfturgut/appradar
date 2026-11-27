@@ -32,9 +32,16 @@ const REF = "abcdefghijklmnopqrst", DEV_REF = "devdevdevdevdevdevde";
 const SUPABASE = `https://${REF}.supabase.co`, SITE = "https://app.example.com";
 const COOKIE = `sb-${REF}-auth-token`;
 const jwt = (claims: object) => `${Buffer.from('{"alg":"HS256"}').toString("base64url")}.${Buffer.from(JSON.stringify(claims)).toString("base64url")}.c2ln`;
+const productionClosed = {
+  APPRADAR_DEMO_MODE: "false", COLLECTION_PAID_EXECUTION: "false", APIFY_COLLECTION_ENABLED: "false",
+  POC_DATA_USE_CONFIRMED: "false", RETENTION_CLEANUP_EXECUTION: "false",
+  APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL: "false", APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED: "false",
+  APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED: "false",
+};
 const production = {
   NODE_ENV: "production", APPRADAR_SUPABASE_PROJECT_REF: REF, SUPABASE_URL: SUPABASE, NEXT_PUBLIC_SUPABASE_URL: SUPABASE,
   SUPABASE_SERVICE_ROLE_KEY: "sb_secret_fixture", NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_fixture", NEXT_PUBLIC_SITE_URL: SITE,
+  ...productionClosed,
 };
 
 const originalEnv = { ...process.env }, originalFetch = globalThis.fetch, originalError = console.error, originalWarn = console.warn;
@@ -83,7 +90,8 @@ const visit = (path: string, cookie?: string) => proxy(new NextRequest(`${SITE}$
 test("production configuration: a complete set passes and every omission or mix-up fails closed", () => {
   assert.deepEqual(productionConfigProblems(production), []);
   assert.deepEqual(productionConfigProblems({ ...production, SUPABASE_SERVICE_ROLE_KEY: jwt({ role: "service_role", ref: REF }), NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: jwt({ role: "anon", ref: REF }), COLLECTION_PAID_EXECUTION: "false", RETENTION_CLEANUP_EXECUTION: "" }), []);
-  for (const name of Object.keys(production).filter(n => n !== "NODE_ENV")) {
+  const required = ["APPRADAR_SUPABASE_PROJECT_REF", "SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY", "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "NEXT_PUBLIC_SITE_URL"];
+  for (const name of required) {
     assert.ok(productionConfigProblems({ ...production, [name]: " " }).includes(`${name}:missing`), name);
   }
   const rejected: [string, string, string][] = [
@@ -104,7 +112,11 @@ test("production configuration: a complete set passes and every omission or mix-
 });
 
 test("production cannot enable demo, collection or retention, and never publishes a server secret", () => {
-  for (const flag of ["APPRADAR_DEMO_MODE", "COLLECTION_PAID_EXECUTION", "APIFY_COLLECTION_ENABLED", "POC_DATA_USE_CONFIRMED", "RETENTION_CLEANUP_EXECUTION"]) {
+  for (const flag of [
+    "APPRADAR_DEMO_MODE", "COLLECTION_PAID_EXECUTION", "APIFY_COLLECTION_ENABLED", "POC_DATA_USE_CONFIRMED",
+    "RETENTION_CLEANUP_EXECUTION", "APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL",
+    "APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED", "APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED",
+  ]) {
     for (const value of ["true", "TRUE", "1"]) assert.deepEqual(productionConfigProblems({ ...production, [flag]: value }), [`${flag}:must_be_false`]);
   }
   assert.deepEqual(productionConfigProblems({ ...production, NEXT_PUBLIC_EXTRA: "sb_secret_other" }), ["NEXT_PUBLIC_EXTRA:exposes_server_secret"]);

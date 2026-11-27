@@ -23,7 +23,14 @@ test("example config covers all six providers and enables nothing", async () => 
   assert.equal(new Set(planned.map(p => p.job.provider)).size, 6);
   assert.equal(planJobs(example, new Date(), { onlyEnabled: true }).length, 0);
   assert.deepEqual(await scheduleDue({ enqueue: async () => { throw new Error("must not write"); } }, example, new Date()), []);
-  assert.equal(closedGates({ APIFY_TOKEN: "t", APIFY_COLLECTION_ENABLED: "true", POC_DATA_USE_CONFIRMED: "true" }, example).length, 3);
+  const closed = closedGates({
+    APIFY_TOKEN: "t", APIFY_COLLECTION_ENABLED: "true",
+    APPRADAR_THIRD_PARTY_RIGHTS_STATUS: "verified", POC_DATA_USE_CONFIRMED: "true",
+  }, example);
+  assert.ok(closed.includes("COLLECTION_PAID_EXECUTION_not_true"));
+  assert.ok(closed.includes("retentionDays_not_configured"));
+  assert.ok(closed.includes("budget_limits_missing"));
+  assert.equal(closed.length, 3);
 });
 
 test("window and dedupe key are stable inside a frequency window", () => {

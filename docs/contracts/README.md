@@ -54,6 +54,9 @@ geçmesi gerçek dataset sözleşmesinin geçtiği anlamına gelmez.
 | Değerlendirme sayısı | `ratingCount` | `ratings_count` |
 | Yazılı yorum sayısı | `reviewCount` | `reviews_count` |
 | Yükleme alt sınırı | `minInstalls` | `installs_min` |
+| Açıklama | (aday) | `description` (**B4.3 doğrulandı**; saklama OK, public gösterim `APPRADAR_STORE_DESCRIPTION_ENABLED`) |
+| Yayın / güncelleme | — | `released_at` / `updated_at` ISO-8601 Z (**B4.3 doğrulandı**) |
+| İkon / ekran | — | `icon_url` / `screenshots` (**B4.3 doğrulandı**; CDN allowlist) |
 | Liste bağlamı | `chartCollection`, `chartCategory`, `chartRank` | `chart`, `chart_genre`, `chart_rank` |
 | Arama bağlamı | `searchTerm`, `searchRank` | Desteklenmiyor |
 

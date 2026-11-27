@@ -133,7 +133,7 @@ Bu tutarları ürün arayüzüne, satış vaadine veya sabit iş kuralına gömm
 
 POC'nin saklama kapsamı dahil kullanım koşullarını kontrol et. Üretim öncesi saklama, kullanıcıya gösterim, türetilmiş analiz, cache, yeniden dağıtım ve silme talepleri için izin dayanağını kaydet. Belirsiz ticari yetki varsa gerekli sağlayıcı açıklamasını/uzman incelemesini tamamlamadan ilgili veriyi yayımlama. İzin verilen alan ve saklama süresi uygulama yapılandırmasına yansıtılmalıdır.
 
-**Açık kısıtlar (26 Kasım 2026; medya bayrakları B4.2’de ayrıldı):** Ticari saklama/gösterim izni henüz onaylanmadı. Ücretli toplama ve zamanlama kapalıdır (`APIFY_COLLECTION_ENABLED`, `COLLECTION_PAID_EXECUTION`, `POC_DATA_USE_CONFIRMED`, `schedulingEnabled`). Okuma katmanında varsayılan kapalı bayraklar: `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`. Eski `APPRADAR_STORE_MEDIA_ENABLED` yok sayılır. Bayrak kapalıyken ikon/ekran görüntüsü, mağaza açıklaması ve yorum metni istemciye dönmez; açıklama/ekran görüntüsü sütunu seçilmez. Sağlayıcı uygunluğu + uygulama düzeyi bastırma ek kapıdır. Hak onayı olmadan bayraklar açılmaz. Önerilen metrik saklama (`retentionDays: 365`) kullanım hakkına bağlıdır. Kapsam ayrımı: `docs/CONTENT_USAGE.md`.
+**Açık kısıtlar (27 Kasım 2026; B4.3 yetki kapsamı):** Ticari/public saklama-gösterim izni henüz onaylanmadı. Ücretli toplama ve zamanlama varsayılan kapalıdır; veri kullanımı `APPRADAR_THIRD_PARTY_RIGHTS_STATUS` ile ayrılır (`verified` / `unconfirmed` / `prohibited`). `POC_DATA_USE_CONFIRMED` yalnız `verified` ile geçerlidir; iç pilot için operatör onayı + unconfirmed risk kabulü ayrı bayraklardır (sahip onayı lisans değildir). Okuma katmanında varsayılan kapalı: `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`, `APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED`. Eski `APPRADAR_STORE_MEDIA_ENABLED` yok sayılır. Kapsam: `docs/CONTENT_USAGE.md` §6.26.
 
 ## 6. Veri sözlüğü ve veri yeterliliği
 
@@ -637,6 +637,20 @@ Sahip, geliştirme Supabase projesinde gerçek e-posta/parola Auth akışların�
 Minimal genişleme: ortak `APPRADAR_STORE_MEDIA_ENABLED` kaldırıldı/yok sayılır; yerine `APPRADAR_STORE_ICONS_ENABLED` ve `APPRADAR_STORE_SCREENSHOTS_ENABLED` (varsayılan false). Açıklama ve yorum içeriği bayrakları aynı. Sağlayıcı medya uygunluğu provenance `source` ile (aurelix/datatrail aday; subimpact/bilinmeyen kapalı) — doküman adaylığı canlı doğrulama veya hukuki onay değildir. HTTPS + mağaza/CDN host allowlist (`mzstatic.com`, `googleusercontent.com`, `ggpht.com`); ikili görüntü saklanmaz. `apps.icons_suppressed_at` / `screenshots_suppressed_at` + `appradar_set_media_suppression` (service_role) koleksiyon yenilemesine rağmen gösterimi keser. UI: mevcut AppIcon/galeri; mağaza listesi bağlantısı; atıf; `/en/contact` içerik bildirimi. EN/TR Terms taslaklarına üçüncü taraf içerik ve kaldırma bölümleri eklendi. İç/public kapsam ayrımı: `docs/CONTENT_USAGE.md`. B4 pilot bütçe/kapsam ve tüm ücretli kapılar korundu; hiçbir display/collection bayrağı açılmadı. Yorumcu kullanıcı adı/avatar zaten normalize/persist/okuma dışında.
 
 **Entegrasyon doğrulama (geliştirme Supabase, 27 Kasım 2026):** `20261126001300_media_suppression.sql` uygulandı; ledger **13/13**. Sütunlar ve `appradar_set_media_suppression` yalnızca `service_role`; anon/authenticated EXECUTE yok. Sentetik geri alma ile ikon/ekran bastırması bağımsız ve listing yenilemesine dayanıklı (kalıcı kayıt yok). Fixture: bayraklar false, legacy media yok sayılır, host allowlist, provenance, expired/suppressed public yanıt dışı, env ile bypass yok, reviewer kimliği hariç, mağaza/atıf/iletişim bağlantıları ve EN/TR Terms bölümleri. Kalite: test 199/199 (+2 skip), typecheck OK, lint (img uyarıları hariç temiz), production build OK. Bayraklar ve ücretli toplama kapalı kaldı.
+
+### 6.26 B4.3 — İç pilot yetki, yürütme ve Aurelix metadata eşlemesi — 27 Kasım 2026
+
+**Politika:** `APPRADAR_THIRD_PARTY_RIGHTS_STATUS` = `verified` | `unconfirmed` | `prohibited` (eksik → kapalı).  
+- `verified` → yalnız kanıtlı dayanak ile `POC_DATA_USE_CONFIRMED=true`.  
+- `unconfirmed` → operatör onayı **ve** ayrı unconfirmed-risk kabulü; pilot sınırları kodda. Operatör onayı lisans değildir.  
+- `prohibited` → her zaman kapalı. `POC_DATA_USE_CONFIRMED` non-verified altında reddedilir.  
+- Production web: pilot/public-display bayrakları fail-closed.
+
+**Yürütme (development, shell-only auth, `POC_DATA_USE_CONFIRMED=false`):** 2 Aurelix details koşusu SUCCEEDED + settled; pin `0.2.23` / `Jv44m9YSKPnrplU1T`. Maliyet **$0.00484 + $0.00484 = $0.00968**; rezervasyon 0. DB: apps/listings/snapshots **6/6/6**, reviews **0**. İkon **6/6** allowlist; ekran **87** URL (0 rejected); CDN `*.mzstatic.com`, `play-lh.googleusercontent.com`. Expiry ~30g. Medya/public bayraklar kapalı kaldı; `.env.local` yazılmadı.
+
+**Metadata eşleme (pilot dataset kanıtı):** Aurelix alanları `description`, `released_at`, `updated_at` (ISO-8601 `…Z`). Normalize artık saklar; geçersiz/gelecek tarihler reddedilir; provenance/freshness korunur. Açıklama gösterimi hâlâ `APPRADAR_STORE_DESCRIPTION_ENABLED` ile kapalı. Mevcut 6 listing bu eşlemeden **önce** yazıldı — description/tarih backfill yok; sonraki detay koşusunda dolar.
+
+**Kalan engel:** üçüncü taraf hakları `unconfirmed`; ticari/public display yok. Ayrıntı: `docs/CONTENT_USAGE.md`, `docs/contracts/README.md`.
 
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 

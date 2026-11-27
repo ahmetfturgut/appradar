@@ -8,7 +8,12 @@ Scheduled and paid execution are **off**. No cron or route calls this code.
 2. Paid work calls `appradar_collection_ensure_budgets` with `DAILY_LIMIT_USD` and `MONTHLY_LIMIT_USD`. Missing limits fail closed. An existing period is not raised.
 3. Copy `config.example.json`, set `retentionDays`, targets and frequencies.
 4. Environment: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `APIFY_TOKEN`; paid work also needs
-   `APIFY_COLLECTION_ENABLED=true`, `POC_DATA_USE_CONFIRMED=true`, `COLLECTION_PAID_EXECUTION=true`.
+   `APIFY_COLLECTION_ENABLED=true`, `COLLECTION_PAID_EXECUTION=true`, budget limits, and a data-use path:
+   - **Verified rights:** `APPRADAR_THIRD_PARTY_RIGHTS_STATUS=verified` and `POC_DATA_USE_CONFIRMED=true`.
+   - **Unconfirmed internal pilot:** `status=unconfirmed`, `APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL=true`,
+     `APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED=true`, and a config within pilot bounds
+     (see `.poc/b43-pilot.config.json` / `docs/CONTENT_USAGE.md`). Not a generic bypass.
+   - **Prohibited** or missing status: always closed. Do not set `POC_DATA_USE_CONFIRMED=true` without verified evidence.
 
 ## Commands
 

@@ -91,7 +91,7 @@ B5 automated suites remain **mocked** HTTP/cookie scenarios. They do not replace
 ## 6. Launch blockers
 
 - Privacy, terms and contact have English/Turkish draft routes linked from the footer, but owner information, a working contact channel and legal approval remain missing. Do not use unapproved drafts to claim publication readiness or data-use permission.
-- Commercial data-use rights and paid/collection gates remain closed (`POC_DATA_USE_CONFIRMED` unset/false until separately authorized).
+- Commercial/public data-use rights remain closed. Collection uses scoped status (`verified` / `unconfirmed` / `prohibited`); `POC_DATA_USE_CONFIRMED` only with verified evidence. See [CONTENT_USAGE.md](CONTENT_USAGE.md).
 - Production needs a **separate** Supabase project, migrations, production env check, custom SMTP + DNS, Auth rate limits at Supabase and the host, and a real production Auth E2E (including OAuth if enabled and two-user isolation).
 - Development used default Supabase SMTP; that is **not** production email readiness.
 - MFA support process and Google-only recovery (if Google is enabled) remain open. Account-deletion security edge cases stay covered by mocks unless re-tested with disposable accounts under explicit authorization.

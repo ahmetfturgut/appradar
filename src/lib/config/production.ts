@@ -4,10 +4,13 @@ import { supabaseKeyKind, supabaseKeyProjectRef } from "../auth/config.ts";
 
 type Env = Record<string, string | undefined>;
 
-/** Web deployments never run collection, retention or the demo; each must be unset or exactly "false". */
+/** Web deployments never run collection, retention, internal pilot opens or the demo; each must be unset or exactly "false". */
 export const PRODUCTION_DISABLED_FLAGS = [
   "APPRADAR_DEMO_MODE", "COLLECTION_PAID_EXECUTION", "APIFY_COLLECTION_ENABLED",
   "POC_DATA_USE_CONFIRMED", "RETENTION_CLEANUP_EXECUTION",
+  "APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL",
+  "APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED",
+  "APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED",
 ] as const;
 
 function parseUrl(value: string): URL | null {

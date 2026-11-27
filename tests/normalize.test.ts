@@ -223,6 +223,46 @@ test("Aurelix iOS liste satırında chart_genre etiketi genre_id ile kategori ba
   assert.equal(normalizeItem({ ...raw, genre_id: "6014" }, job, "Run1", fixtureTime).kind, "invalid");
 });
 
+test("Aurelix description, released_at and updated_at map from verified pilot field names", () => {
+  const job = fixtureJob({
+    provider: "aurelix", store: "ios", country: "US", requestedLanguage: "en", mode: "details", context: "sample",
+    expectedIds: ["1232780281"],
+    input: { apps: ["1232780281"], countries: ["us"], language: "en", maxReviewsPerApp: 0, developers: [], appStoreCharts: [], onlyNewReviews: false, proxyConfiguration: { useApifyProxy: false } },
+  });
+  const raw = {
+    type: "app", store: "app_store", app_id: "1232780281", title: "Notion: Notes, Tasks, AI",
+    url: "https://apps.apple.com/us/app/id1232780281", country: "us", language: "en",
+    developer: "Notion Labs, Incorporated", genre: "Productivity",
+    price: 0, currency: "USD", is_free: true, rating: 4.77, ratings_count: 90_797,
+    description: "Notion is an AI-powered all-in-one workspace.",
+    icon_url: "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/ea/1b/48/icon.png",
+    screenshots: ["https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/aa/bb/cc/shot.png"],
+    released_at: "2017-09-14T19:07:31Z", updated_at: "2026-11-20T17:58:35Z",
+  };
+  const collectedAt = "2026-11-27T14:07:33.536Z";
+  const result = normalizeItem(raw, job, "Run1", collectedAt);
+  assert.equal(result.kind, "valid");
+  if (result.kind !== "valid") return;
+  assert.equal(result.observation.description, "Notion is an AI-powered all-in-one workspace.");
+  assert.equal(result.observation.fieldStatus.description, "available");
+  assert.equal(result.observation.releasedAt, "2017-09-14T19:07:31Z");
+  assert.equal(result.observation.listingUpdatedAt, "2026-11-20T17:58:35Z");
+  assert.equal(result.observation.releasedAtPrecision, "datetime");
+  assert.equal(result.observation.listingUpdatedAtPrecision, "datetime");
+  assert.equal(result.observation.fieldStatus.releasedAt, "available");
+  assert.equal(result.observation.fieldStatus.listingUpdatedAt, "available");
+  assert.equal(normalizeItem({ ...raw, released_at: "not-a-date" }, job, "Run1", collectedAt).kind, "invalid");
+  assert.equal(normalizeItem({ ...raw, updated_at: "32/13/2020" }, job, "Run1", collectedAt).kind, "invalid");
+  assert.equal(normalizeItem({ ...raw, released_at: "2099-01-01T00:00:00Z" }, job, "Run1", collectedAt).kind, "invalid");
+  assert.equal(normalizeItem({ ...raw, updated_at: "2099-06-01T00:00:00Z" }, job, "Run1", collectedAt).kind, "invalid");
+  const missingDates = normalizeItem({ ...raw, released_at: null, updated_at: null, description: null }, job, "Run1", collectedAt);
+  assert.equal(missingDates.kind, "valid");
+  if (missingDates.kind !== "valid") return;
+  assert.equal(missingDates.observation.releasedAt, null);
+  assert.equal(missingDates.observation.fieldStatus.releasedAt, "missing");
+  assert.equal(missingDates.observation.fieldStatus.description, "missing");
+});
+
 test("sağlayıcı hatası geçerli uygulama olarak sayılmaz", () => {
   assert.deepEqual(normalizeItem({ status: "not-found", error: "provider body" }, fixtureJob(), "Run1", fixtureTime), { kind: "source_error", status: "not-found" });
   assert.equal(countDelta(null, 100), null);

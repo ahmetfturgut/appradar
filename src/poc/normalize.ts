@@ -60,6 +60,8 @@ const Aurelix = z.object({
   price: nullable(z.number().nonnegative()), currency: nullable(z.string().regex(/^[A-Z]{3}$/)),
   is_free: nullable(z.boolean()), rating: nullable(Rating), ratings_count: nullable(Count), reviews_count: nullable(Count),
   installs: nullable(Text), installs_min: nullable(Count), genre: nullable(Text), genre_id: nullable(Text), version: nullable(Text),
+  // B4.3 pilot evidence (US EN details): ISO-8601 with Z, e.g. 2017-09-14T19:07:31Z.
+  released_at: nullable(z.string().trim().min(1).max(40)), updated_at: nullable(z.string().trim().min(1).max(40)),
   chart_rank: nullable(z.number().int().positive()), chart: nullable(Text), chart_genre: nullable(Text),
 });
 const DataTrail = z.object({
@@ -76,7 +78,7 @@ const DataTrail = z.object({
 });
 
 // Presentation metadata is untrusted and optional: a bad value is dropped, never the whole row.
-// Field names come from public Actor docs and are not yet verified against live payloads.
+// Aurelix description/icon/screenshots verified against B4.3 development pilot payloads.
 // Host allowlist matches src/lib/media/urls.ts (no binaries stored; https store/CDN URLs only).
 const MediaUrl = z.string().max(2048).refine((value): value is string => validateStoreMediaUrl(value) != null).transform(value => validateStoreMediaUrl(value)!);
 const Description = z.string().trim().min(1).max(20000);
@@ -84,7 +86,7 @@ const ScreenshotUrls = z.array(MediaUrl).min(1).max(30);
 
 function presentation(provider: "subimpact" | "aurelix" | "datatrail", raw: Record<string, unknown>) {
   const names = provider === "datatrail" ? { description: "description", iconUrl: "iconUrl", screenshotUrls: "screenshots" }
-    : provider === "aurelix" ? { description: null, iconUrl: "icon_url", screenshotUrls: "screenshots" }
+    : provider === "aurelix" ? { description: "description", iconUrl: "icon_url", screenshotUrls: "screenshots" }
     : { description: null, iconUrl: null, screenshotUrls: null };
   const read = <T>(name: string | null, schema: z.ZodType<T>): T | null => {
     const parsed = schema.safeParse(name == null ? undefined : raw[name]);
@@ -104,6 +106,11 @@ function storeDateToIso(value: string | null | undefined): string | null {
   if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return z.iso.date().safeParse(value).success ? `${value}T00:00:00.000Z` : null;
   const parsed = DateTime.safeParse(value);
   return parsed.success ? parsed.data : null;
+}
+
+function storeDatePrecision(raw: unknown): "date" | "datetime" | null {
+  if (typeof raw !== "string" || !raw.trim()) return null;
+  return /^\d{4}-\d{2}-\d{2}$/.test(raw.trim()) ? "date" : "datetime";
 }
 
 export interface Observation {
@@ -606,7 +613,7 @@ export function normalizeItem(raw: unknown, job: Job, runId: string, collectedAt
     language: value.language, time: value.scraped_at, price: value.price, currency: value.currency, free: value.is_free,
     rating: value.rating, ratingCount: value.ratings_count, reviewCount: value.reviews_count,
     installs: value.installs, minimum: value.installs_min, category: value.genre, version: value.version,
-    releasedAt: null as string | null, listingUpdatedAt: null as string | null,
+    releasedAt: storeDateToIso(value.released_at), listingUpdatedAt: storeDateToIso(value.updated_at),
     // Aurelix chart_genre is a display label; genre_id carries the App Store category id when present.
     rank: job.mode === "charts" ? value.chart_rank : null,
     rankContext: job.mode === "charts" ? value.chart : job.mode === "developers" ? job.context : null,
@@ -638,6 +645,10 @@ export function normalizeItem(raw: unknown, job: Job, runId: string, collectedAt
     if (trail.data.releaseDate && storeDateToIso(trail.data.releaseDate) == null) return { kind: "invalid", issues: ["invalid_release_date"] };
     if (trail.data.updatedAt && storeDateToIso(trail.data.updatedAt) == null) return { kind: "invalid", issues: ["invalid_listing_updated_at"] };
   }
+  if (job.provider === "aurelix" && "released_at" in value) {
+    if (value.released_at && storeDateToIso(value.released_at) == null) return { kind: "invalid", issues: ["invalid_release_date"] };
+    if (value.updated_at && storeDateToIso(value.updated_at) == null) return { kind: "invalid", issues: ["invalid_listing_updated_at"] };
+  }
   const issues: string[] = [];
   if (row.store !== job.store) issues.push("store_mismatch");
   if (row.country.toUpperCase() !== job.country) issues.push("country_mismatch");
@@ -646,6 +657,8 @@ export function normalizeItem(raw: unknown, job: Job, runId: string, collectedAt
   if (row.price != null && row.currency == null) issues.push("price_without_currency");
   if (row.price != null && row.free != null && (row.price === 0) !== row.free) issues.push("price_free_conflict");
   if (row.time && Date.parse(row.time) > Date.parse(collectedAt) + 5 * 60000) issues.push("future_observation");
+  if (row.releasedAt && Date.parse(row.releasedAt) > Date.parse(collectedAt) + 5 * 60000) issues.push("future_observation");
+  if (row.listingUpdatedAt && Date.parse(row.listingUpdatedAt) > Date.parse(collectedAt) + 5 * 60000) issues.push("future_observation");
   if (job.store === "play" && row.language && row.language.toLowerCase() !== job.requestedLanguage) issues.push("language_mismatch");
   const chartAliases: Record<string, string> = {
     "top-free": "topFree", "top-paid": "topPaid", "top-grossing": "topGrossing",
@@ -673,13 +686,15 @@ export function normalizeItem(raw: unknown, job: Job, runId: string, collectedAt
     installsLowerBound: job.store === "ios" ? null : row.minimum ?? null,
     category: row.category ?? null, version: row.version ?? null,
     releasedAt: row.releasedAt, listingUpdatedAt: row.listingUpdatedAt,
-    releasedAtPrecision: row.releasedAt == null ? null : (typeof record.data.releaseDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(record.data.releaseDate) ? "date" as const : "datetime" as const),
-    listingUpdatedAtPrecision: row.listingUpdatedAt == null ? null : (typeof record.data.updatedAt === "string" && /^\d{4}-\d{2}-\d{2}$/.test(record.data.updatedAt) ? "date" as const : "datetime" as const),
+    releasedAtPrecision: row.releasedAt == null ? null : storeDatePrecision(
+      job.provider === "aurelix" ? record.data.released_at : record.data.releaseDate),
+    listingUpdatedAtPrecision: row.listingUpdatedAt == null ? null : storeDatePrecision(
+      job.provider === "aurelix" ? record.data.updated_at : record.data.updatedAt),
     rank: row.rank ?? null, rankContext: context, rankCategory: row.rankCategory ?? null,
   };
   const fieldStatus: Observation["fieldStatus"] = Object.fromEntries(Object.entries(normalized).map(([key, v]) => [key, v == null ? "missing" : "available"]));
   if (job.store === "ios") { fieldStatus.installsText = "unsupported"; fieldStatus.installsLowerBound = "unsupported"; }
-  if (job.provider !== "datatrail") {
+  if (job.provider !== "datatrail" && job.provider !== "aurelix") {
     fieldStatus.releasedAt = "unsupported";
     fieldStatus.listingUpdatedAt = "unsupported";
   }
