@@ -691,6 +691,16 @@ Minimal genişleme: ortak `APPRADAR_STORE_MEDIA_ENABLED` kaldırıldı/yok sayı
 
 **Kalite kapısı:** test 208/208 (+2 skip); typecheck OK; lint 0 errors (mevcut `@next/next/no-img-element` uyarıları); production build OK (`NODE_ENV` temiz).
 
+### 6.29 Design System V2 — Açık/Koyu/Sistem görünümü — 27 Kasım 2026
+
+**Sahip onayı:** Tamamlanan tasarım onaylandı. Kapsam yalnız sunumdur; iş mantığı, veritabanı, sağlayıcı, yetkilendirme ve veri anlamı değişmedi. Kaynak: [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
+
+**Tamamlanan:** vurgu renkli koyu tema ve erişilebilir açık tema; Light/Dark/System (varsayılan Dark, yalnız tarayıcıda `localStorage`); başlık seçicisi ve Account › Appearance; tema uyumlu rozet, grafik, monogram ve kontroller; seçim kutusu ok boşluğu; tablolarda metrik başına kompakt tazelik göstergesi ve erişilebilir ipucu. Tanıtım ve kimlik doğrulama sayfaları açık temada kalır.
+
+**Doğrulama:** test 219/219 (+2 skip); typecheck OK; lint 0 hata (3 mevcut `<img>` uyarısı); production build OK. Production tema başlatma ve CSP, sahte fixture yapılandırmasıyla yalnız loopback üzerinde doğrulandı; geliştirme yapılandırmasıyla production beklendiği gibi 503 verir (readiness kapısı değiştirilmedi).
+
+**Sınırlar:** gerçek veriyle Dashboard/Explorer görsel kontrolü yapılmadı (oturum yok; kimlik doğrulama atlanmadı); ekran okuyucu, diğer tarayıcı motorları ve fiziksel cihaz testi yok. **Ertelenen** yapısal öneriler `DESIGN_SYSTEM.md` §12'dedir ve tamamlanmış sayılmaz.
+
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
 POC kodu da Bölüm 1'deki plan onayından sonra yazılır. Aşağıdaki eşikler öneridir ve onaylı plana alınmalıdır.

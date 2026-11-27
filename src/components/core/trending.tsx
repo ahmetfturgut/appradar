@@ -14,7 +14,7 @@ import { ChangeBadge, CoveragePanel, IntegrityNote, RankSparkline, elapsedLabel,
 import { DashboardSkeleton } from "./dashboard";
 import { dateLabel, type ReadResult, type Scope } from "./view-models";
 
-export const selectClass = "h-9 min-w-0 rounded-md border bg-card px-2.5 text-sm text-foreground shadow-xs focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/25 focus-visible:outline-none";
+export const selectClass = "h-9 min-w-0 rounded-md border bg-card pl-2.5 pr-[30px] text-sm text-foreground shadow-xs focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/25 focus-visible:outline-none";
 
 export function useQueryUpdate(path: string) {
   const router = useRouter(), params = useSearchParams();

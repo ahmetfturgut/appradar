@@ -8,6 +8,7 @@ import { cn } from "../lib/utils";
 import { isChromelessPath } from "../lib/auth/paths";
 import { landingLocaleFromPath } from "../lib/landing/locale";
 import { signOut } from "../lib/auth/actions";
+import { ThemeSelector } from "./theme-selector";
 import { SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, sidebarMenuButtonVariants } from "./ui/sidebar";
 
 const navigation = [
@@ -54,7 +55,7 @@ export function Shell({ children, demo = false, account = null }: { children: Re
   const title = path.startsWith("/apps/") ? "App details" : path === "/account" ? "Account" : [...navigation, ...intelligence, ...research, ...workspace].find(item => item.href === path)?.label ?? "Workspace";
   return <div className="product-shell flex min-h-screen" onKeyDown={event => { if (open && event.key === "Escape") closeNavigation(); }}>
     <a className="skip-link" href="#main">Skip to content</a>
-    {open && <button className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-[1px] lg:hidden" aria-label="Dismiss navigation" onClick={closeNavigation} />}
+    {open && <button className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[1px] lg:hidden" aria-label="Dismiss navigation" onClick={closeNavigation} />}
     <aside id="product-sidebar" aria-label="Sidebar" className={cn("fixed inset-y-0 left-0 z-50 w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex lg:w-60", open ? "flex shadow-xl" : "hidden")}>
       <SidebarHeader className="gap-3 pt-4">
         <div className="flex items-center justify-between px-1">
@@ -100,7 +101,8 @@ export function Shell({ children, demo = false, account = null }: { children: Re
           <button ref={menuButton} type="button" className="-ml-1.5 grid size-9 place-items-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground lg:hidden" aria-label="Open navigation" aria-expanded={open} aria-controls="product-sidebar" onClick={() => setOpen(!open)}><Menu className="size-[18px]" /></button>
           <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1.5 text-[13px]"><span className="hidden text-muted-foreground sm:inline">Workspace</span><ChevronRight className="hidden size-3.5 text-muted-foreground/70 sm:block" aria-hidden="true" /><span className="truncate font-medium text-foreground" aria-current="page">{title}</span></nav>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <ThemeSelector />
           <form action="/explore" role="search" className="hidden h-9 w-64 items-center gap-2 rounded-md border bg-card px-2.5 text-muted-foreground shadow-xs focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/25 md:flex xl:w-72">
             <Search className="size-4" aria-hidden="true" />{[...context].map(([key, value]) => <input key={key} type="hidden" name={key} value={value} />)}
             <input aria-label="Search the app catalog" name="q" placeholder="Search apps…" maxLength={100} className="h-full min-w-0 flex-1 bg-transparent text-[13px] text-foreground placeholder:text-muted-foreground focus-visible:outline-none" />

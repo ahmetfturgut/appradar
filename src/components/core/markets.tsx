@@ -130,9 +130,9 @@ function MarketBody({ view, explore }: { view: MarketView; explore: string | nul
           <tbody>{view.leading.map((a, i) => <tr key={a.appId} className="border-b last:border-b-0 hover:bg-muted/40">
             <td className="px-4 py-2 text-xs text-muted-foreground tabular-nums">{d.kind === "chart" ? `#${a.position}` : i + 1}</td>
             <td className="max-w-56 px-4 py-2"><span className="block truncate font-medium">{a.name ?? "App name unavailable"}</span><span className="block truncate text-[11px] text-muted-foreground">{a.developerName ?? "Developer unavailable"}</span></td>
-            <td className="px-4 py-2"><FieldValue fields={a.fieldFreshness} field="rating_value"><Rating value={a.rating} /></FieldValue></td>
-            <td className="px-4 py-2 text-xs tabular-nums text-muted-foreground"><FieldValue fields={a.fieldFreshness} field="rating_count">{count(a.ratingCount)}</FieldValue></td>
-            <td className="px-4 py-2 text-xs text-muted-foreground"><FieldValue fields={a.fieldFreshness} field="price">{priceText(a)}</FieldValue></td>
+            <td className="px-4 py-2"><FieldValue fields={a.fieldFreshness} field="rating_value" compact><Rating value={a.rating} /></FieldValue></td>
+            <td className="px-4 py-2 text-xs tabular-nums text-muted-foreground"><FieldValue fields={a.fieldFreshness} field="rating_count" compact>{count(a.ratingCount)}</FieldValue></td>
+            <td className="px-4 py-2 text-xs text-muted-foreground"><FieldValue fields={a.fieldFreshness} field="price" compact>{priceText(a)}</FieldValue></td>
             <td className="px-4 py-2 text-right"><Link href={appHref(a)} aria-label={`View ${a.name ?? "app"} details`} className="inline-grid size-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-primary"><ArrowUpRight className="size-4" /></Link></td>
           </tr>)}</tbody>
         </table></div>

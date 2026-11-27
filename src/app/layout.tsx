@@ -8,6 +8,8 @@ import { getViewer } from "../lib/auth/server";
 import { headers } from "next/headers";
 import { LANDING_LOCALE_HEADER, preferredLandingLocale } from "../lib/landing/locale";
 import { dictionaries } from "../lib/landing/dictionaries";
+import { DEFAULT_THEME_PREFERENCE } from "../lib/ui/theme";
+import { ThemeScript } from "../components/theme-script";
 import "./globals.css";
 import "../components/core/product.css";
 
@@ -24,5 +26,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const viewer = await getViewer();
   const account = viewer.kind === "user" ? { email: viewer.user.email ?? null } : null;
   const locale = preferredLandingLocale((await headers()).get(LANDING_LOCALE_HEADER));
-  return <html lang={locale} data-scroll-behavior="smooth" className={inter.variable}><body><CatalogProvider catalog={catalog}><Suspense fallback={<main className="product-main p-8 text-sm text-muted-foreground">{locale === "tr" ? dictionaries.tr.loading : demo ? "Loading synthetic development demo…" : "Loading workspace…"}</main>}><Shell demo={demo} account={account}>{children}</Shell></Suspense></CatalogProvider></body></html>;
+  // Appearance: the inline script sets data-app-theme from localStorage before first paint (Next.js
+  // "preventing flash before hydration" guide). suppressHydrationWarning covers only this element's
+  // own attributes, which that script intentionally changes; children are still checked.
+  return <html lang={locale} data-scroll-behavior="smooth" data-app-theme={DEFAULT_THEME_PREFERENCE} className={inter.variable} suppressHydrationWarning><body><ThemeScript /><CatalogProvider catalog={catalog}><Suspense fallback={<main className="product-main p-8 text-sm text-muted-foreground">{locale === "tr" ? dictionaries.tr.loading : demo ? "Loading synthetic development demo…" : "Loading workspace…"}</main>}><Shell demo={demo} account={account}>{children}</Shell></Suspense></CatalogProvider></body></html>;
 }

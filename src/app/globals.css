@@ -72,6 +72,121 @@
   --danger:var(--destructive);
 }
 
+/*
+ * Design System V2: application appearance (Light / Dark / System; default Dark).
+ * The inline script in app/layout.tsx sets <html data-app-theme="light|dark"> before first paint.
+ * Every application token below is scoped to documents that render the product shell
+ * (`.product-shell`), so Landing Page V2 and auth pages always keep the light `:root` tokens above.
+ * `:has` on :root also covers the body background, native controls (color-scheme) and portals.
+ *
+ * Light application palette: the Modern Minimal tokens above plus the same accent roles as dark,
+ * at 600–700 steps for white surfaces (tones 5–9:1 on white; chart colours ≥3:1).
+ */
+:root:has(.product-shell){
+  /* Select chevron (lucide chevron-down path), stroke matches --muted-foreground per theme. */
+  --select-chevron:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235b6472' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  --input:#d1d5db;
+  --input-hover:#9ca3af;
+  --table-head:#f9fafb;
+  --table-head-foreground:#4b5563;
+
+  /* Semantic and secondary text one step deeper than the landing tokens, so text on their own
+     tinted badge/banner backgrounds (and on --muted) stays ≥4.5:1. */
+  --muted-foreground:#5b6472;
+  --success:#065f46;
+  --warning:#92400e;
+  --destructive:#b91c1c;
+
+  --info:#2563eb;
+  --tone-blue:#1e40af;
+  --tone-indigo:#3730a3;
+  --tone-violet:#5b21b6;
+  --tone-teal:#115e59;
+  --tone-emerald:#065f46;
+  --tone-amber:#92400e;
+  --tone-orange:#9a3412;
+  --tone-pink:#9d174d;
+  --tone-coral:#9f1239;
+  --tone-slate:#334155;
+
+  --chart-1:#2563eb;
+  --chart-2:#7c3aed;
+  --chart-3:#0d9488;
+  --chart-4:#db2777;
+  --chart-5:#64748b;
+}
+
+/*
+ * Dark application palette. Visual reference: the near-black neutral look of Dashboard 3
+ * (Efferd / 21st.dev), re-implemented as AppRadar tokens; no template code copied.
+ * Contrast (on --card #111113): foreground 17.9:1, muted-foreground 7.3:1, success 9.6:1,
+ * warning 10.4:1, destructive 6.6:1; --ring 7.7:1 against --background.
+ */
+:root[data-app-theme="dark"]:has(.product-shell){
+  color-scheme:dark;
+  --select-chevron:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  --input-hover:#52525b;
+  --table-head:#141416;
+  --table-head-foreground:#b4b4bd;
+
+  --background:#09090b;
+  --foreground:#fafafa;
+  --card:#111113;
+  --card-foreground:#fafafa;
+  --popover:#111113;
+  --popover-foreground:#fafafa;
+  --primary:#e4e4e7;
+  --primary-foreground:#09090b;
+  --secondary:#1c1c1f;
+  --secondary-foreground:#e4e4e7;
+  --muted:#18181b;
+  --muted-foreground:#a1a1aa;
+  --accent:#232326;
+  --accent-foreground:#fafafa;
+  --destructive:#f87171;
+  --destructive-foreground:#09090b;
+  --border:#27272a;
+  --input:#3f3f46;
+  --ring:#60a5fa;
+
+  /* Restrained accent tones (Tailwind 400-step hues, 6–10:1 on --card). Non-semantic: categories,
+     store indicators, chart series, monogram fallbacks. Semantic meaning stays on --success,
+     --warning and --destructive. */
+  --info:#60a5fa;
+  --tone-blue:#60a5fa;
+  --tone-indigo:#818cf8;
+  --tone-violet:#a78bfa;
+  --tone-teal:#2dd4bf;
+  --tone-emerald:#34d399;
+  --tone-amber:#fbbf24;
+  --tone-orange:#fb923c;
+  --tone-pink:#f472b6;
+  --tone-coral:#fb7185;
+  --tone-slate:#94a3b8;
+
+  /* Categorical chart palette. 1 = App Store / primary series, 3 = Google Play / second partition,
+     1/3/5 = overlay series; each ≥3:1 on --card and distinct in hue and lightness. */
+  --chart-1:#60a5fa;
+  --chart-2:#a78bfa;
+  --chart-3:#2dd4bf;
+  --chart-4:#f472b6;
+  --chart-5:#94a3b8;
+
+  --sidebar:#0c0c0e;
+  --sidebar-foreground:#e4e4e7;
+  --sidebar-primary:#e4e4e7;
+  --sidebar-primary-foreground:#09090b;
+  --sidebar-accent:#1c1c1f;
+  --sidebar-accent-foreground:#fafafa;
+  --sidebar-border:#1f1f23;
+  --sidebar-ring:#60a5fa;
+
+  --success:#34d399;
+  --warning:#fbbf24;
+  --rating:#fbbf24;
+  --chart-track:#27272a;
+}
+
 @theme inline{
   --font-sans:var(--font-sans);
   --font-mono:var(--font-mono);
@@ -120,6 +235,74 @@
 *,::after,::before{border-color:var(--border)}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--background);color:var(--foreground);font-family:var(--font-sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}button,input,select{font:inherit}button,a,input,select,summary{-webkit-tap-highlight-color:transparent}a{color:inherit;text-decoration:none}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.4}button,input,select{outline:none}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--ring);outline-offset:2px}button{border:0}h1,h2,h3,p{margin:0}h1,h2,h3{letter-spacing:-.035em}h1{font-size:32px;font-weight:650;line-height:1.3}h2{font-size:19px;font-weight:650}h3{font-size:18px;font-weight:600}svg{flex-shrink:0}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.skip-link{position:fixed;left:20px;top:-70px;background:var(--foreground);color:white;padding:12px 20px;z-index:100;border-radius:8px}.skip-link:focus{top:16px}.muted{color:var(--muted-foreground)}
 body{font-feature-settings:"cv11","ss01";text-rendering:optimizeLegibility}
+}
+
+/* Product shell, both appearances: shared legacy-class components (ui/button, skip link) and
+   product surfaces read the theme tokens above instead of fixed white/violet values. Every rule is
+   scoped to `.product-shell` documents, so landing and auth pages are unaffected. */
+@layer components{
+:root:has(.product-shell) .skip-link{color:var(--background)}
+:root:has(.product-shell) .button-primary{background:var(--primary);color:var(--primary-foreground);box-shadow:none}
+:root:has(.product-shell) .button-primary:hover{background:color-mix(in oklab,var(--primary) 88%,transparent)}
+:root:has(.product-shell) .button-outline{background:var(--card);border-color:var(--border);color:var(--foreground)}
+:root:has(.product-shell) .button-outline:hover{background:var(--accent);border-color:var(--input)}
+:root:has(.product-shell) .button-ghost{color:var(--muted-foreground)}
+:root:has(.product-shell) .button-ghost:hover{background:var(--accent);color:var(--foreground)}
+/* Monogram/icon fallbacks (no store media): tinted dark tiles keyed to the existing colour class.
+   Real store icons (<img>) are untouched; media eligibility rules are unchanged. */
+:root:has(.product-shell) .app-icon{--mono:var(--tone-slate)}
+:root:has(.product-shell) .app-icon:not(:has(img)){background:color-mix(in oklch,var(--mono) 18%,var(--card));color:var(--mono);box-shadow:inset 0 0 0 1px color-mix(in oklch,var(--mono) 32%,transparent)}
+:root:has(.product-shell) .app-icon-indigo{--mono:var(--tone-indigo)}
+:root:has(.product-shell) .app-icon-green{--mono:var(--tone-emerald)}
+:root:has(.product-shell) .app-icon-orange{--mono:var(--tone-orange)}
+:root:has(.product-shell) .app-icon-pink{--mono:var(--tone-pink)}
+:root:has(.product-shell) .app-icon-blue{--mono:var(--tone-blue)}
+:root:has(.product-shell) .app-icon-purple{--mono:var(--tone-violet)}
+:root:has(.product-shell) .app-icon-teal{--mono:var(--tone-teal)}
+:root:has(.product-shell) .app-icon-coral{--mono:var(--tone-coral)}
+:root:has(.product-shell) .app-icon-amber{--mono:var(--tone-amber)}
+
+/* Store indicators: icon tint matches the chart series (App Store = chart-1, Google Play = chart-3);
+   the store name text stays, so colour is never the only cue. */
+:root:has(.product-shell) .product-store .lucide-apple{color:var(--chart-1)}
+:root:has(.product-shell) .product-store .lucide-play{color:var(--chart-3)}
+
+/* Base `button{border:0}` resets border-color to currentColor, so `<button class="border">` drew a
+   text-coloured (near-white) edge. Restore the token border; utility border colours still win. */
+:root:has(.product-shell) button.border{border-color:var(--border)}
+
+/* Hierarchy: active navigation, table headers, selected and form controls. */
+:root:has(.product-shell) [data-sidebar="menu-button"][data-active="true"]{background:var(--sidebar-accent);color:var(--foreground);box-shadow:inset 2px 0 0 var(--info)}
+:root:has(.product-shell) [data-sidebar="menu-button"][data-active="true"] svg{color:var(--info)}
+:root:has(.product-shell) .product-table th{background:var(--table-head);color:var(--table-head-foreground);letter-spacing:.01em}
+:root:has(.product-shell) .product-table th button:hover{color:var(--foreground)}
+:root:has(.product-shell) .product-table tbody tr:hover{background:color-mix(in oklch,var(--foreground) 3.5%,transparent)}
+:root:has(.product-shell) .product-segmented button[aria-pressed=true],
+:root:has(.product-shell) .ed-segmented button[aria-pressed=true]{background:var(--accent);color:var(--foreground);box-shadow:inset 0 0 0 1px var(--input)}
+:root:has(.product-shell) .product-detail-tabs button[aria-pressed=true]{border-color:var(--info)}
+:root:has(.product-shell) .product-filter-row select,
+:root:has(.product-shell) .product-sort select,
+:root:has(.product-shell) .product-chart-toolbar select,
+:root:has(.product-shell) .product-research-toolbar select,
+:root:has(.product-shell) .product-series-select select,
+:root:has(.product-shell) .product-search,
+:root:has(.product-shell) .ed-filters select,
+:root:has(.product-shell) .ed-sort select,
+:root:has(.product-shell) .product-language input{border-color:var(--input)}
+:root:has(.product-shell) .product-filter-row select:hover,
+:root:has(.product-shell) .product-sort select:hover,
+:root:has(.product-shell) .product-chart-toolbar select:hover,
+:root:has(.product-shell) .product-research-toolbar select:hover,
+:root:has(.product-shell) .product-series-select select:hover,
+:root:has(.product-shell) .product-language input:hover{border-color:var(--input-hover)}
+/* Bordered select dropdowns: the native arrow sat ~4–8px from the border (UA inset + 8px padding).
+   Draw the 14px chevron 12px from the right edge (matching the Columns control) and reserve 30px so
+   text never overlaps it. Native <select> keyboard/screen-reader behaviour is unchanged. */
+:root:has(.product-shell) :is(.ed-filters,.ed-sort,.product-filter-row,.product-sort,.product-chart-toolbar,.product-research-toolbar,.product-series-select) select,
+:root:has(.product-shell) select.border{appearance:none;-webkit-appearance:none;padding-right:30px;background-image:var(--select-chevron);background-repeat:no-repeat;background-position:right 12px center;background-size:14px 14px;text-overflow:ellipsis}
+:root:has(.product-shell) .product-detail-identity p>span{color:var(--muted-foreground)}
+:root:has(.product-shell) .product-text-link:hover,
+:root:has(.product-shell) .product-app-identity:hover strong{color:var(--info)}
 }
 
 /* Legacy (pre-redesign) screens. Not part of the product shell. */

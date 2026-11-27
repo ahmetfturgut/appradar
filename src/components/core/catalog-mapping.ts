@@ -1,12 +1,20 @@
 import type { AppDetails, Dashboard, ListingSummary } from "../../lib/read/index";
 import { safeMediaUrl, safeStoreListingUrl, type AppViewModel, type DashboardModel, type DetailsModel } from "./view-models";
 
+/** Monogram fallback tone: deterministic per app (stable across views), varied across a list. Presentation only. */
+const MONOGRAM_TONES = ["blue", "purple", "teal", "indigo", "green", "orange", "pink", "coral", "amber"] as const;
+export function monogramTone(key: string): (typeof MONOGRAM_TONES)[number] {
+  let hash = 0;
+  for (const char of key) hash = (hash * 31 + char.codePointAt(0)!) >>> 0;
+  return MONOGRAM_TONES[hash % MONOGRAM_TONES.length]!;
+}
+
 export function toAppViewModel(listing: ListingSummary): AppViewModel {
   return {
     id: listing.appId, listingId: listing.listingId, storeAppId: listing.storeAppId, name: listing.name ?? "App name unavailable",
     developer: listing.developerName ?? "Developer unavailable", store: listing.store,
     country: listing.country, requestedLanguage: listing.requestedLanguage, effectiveLanguage: listing.effectiveLanguage,
-    category: listing.category ?? "Uncategorized", icon: "orbit", color: listing.store === "ios" ? "indigo" : "green",
+    category: listing.category ?? "Uncategorized", icon: "orbit", color: monogramTone(`${listing.store}:${listing.storeAppId ?? listing.appId}`),
     placeholder: true, iconUrl: safeMediaUrl(listing.iconUrl), description: null,
     rating: listing.rating, ratingCount: listing.ratingCount, price: listing.price.amount, currency: listing.price.currency,
     installsText: listing.installs.supported && listing.store === "play" ? listing.installs.text : null,

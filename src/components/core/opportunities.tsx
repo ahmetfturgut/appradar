@@ -115,7 +115,7 @@ function CategoryDetail({ row, table }: { row: OpportunityRow; table: Opportunit
           <p className="text-xs/relaxed text-muted-foreground">{info.definition(MARKET_THRESHOLDS)} {info.caution}</p>
           {ind.supporting.length > 0 && <ul className="mt-1 flex flex-col gap-1 border-t pt-2 text-xs">{ind.supporting.map(id => { const a = table.apps[id]; return a ? <li key={id} className="flex items-center justify-between gap-2">
             <Link href={appHref(a)} className="min-w-0 truncate font-medium text-foreground hover:text-primary">{a.name ?? "App name unavailable"}</Link>
-            <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums"><FieldValue fields={a.fieldFreshness} field={supportingField[key]}>{supportingFact(key, a)}</FieldValue></span>
+            <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums"><FieldValue fields={a.fieldFreshness} field={supportingField[key]} compact>{supportingFact(key, a)}</FieldValue></span>
           </li> : null; })}</ul>}
         </section>;
       })}

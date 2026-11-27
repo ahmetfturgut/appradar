@@ -10,6 +10,7 @@ import { PageHeading } from "../../components/core/elements";
 import { getViewer, requireViewer } from "../../lib/auth/server";
 import { signOut } from "../../lib/auth/actions";
 import { dateLabel } from "../../components/core/view-models";
+import { AppearanceCard } from "../../components/appearance-card";
 
 export const metadata: Metadata = { title: "Account" };
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -22,7 +23,10 @@ export default async function AccountPage({ searchParams }: Props) {
   const updated = (await searchParams).message === "password_updated";
   if (viewer.kind !== "user") return <>
     <PageHeading title="Account" description="Your AppRadar sign-in details." />
-    <FormMessage status="info">Development demo: authentication is bypassed locally, so there is no signed-in account. No Supabase user or session is created.</FormMessage>
+    <div className="flex max-w-2xl flex-col gap-5">
+      <FormMessage status="info">Development demo: authentication is bypassed locally, so there is no signed-in account. No Supabase user or session is created.</FormMessage>
+      <AppearanceCard />
+    </div>
   </>;
   const { user } = viewer;
   const providers = [...new Set((user.identities ?? []).map(identity => identity.provider))];
@@ -48,6 +52,7 @@ export default async function AccountPage({ searchParams }: Props) {
           <form action={signOut}><button type="submit" className="inline-flex h-9 items-center gap-2 rounded-md border bg-card px-3 text-sm font-medium text-foreground shadow-xs hover:bg-muted"><LogOut className="size-4" />Sign out</button></form>
         </CardFooter>
       </Card>
+      <AppearanceCard />
       <Card className="border-destructive/25">
         <CardHeader><CardTitle role="heading" aria-level={2}>Delete account</CardTitle><CardDescription>Requires a verified email and a fresh password check.</CardDescription></CardHeader>
         <CardContent className="pb-5">{!user.email_confirmed_at
