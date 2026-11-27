@@ -53,12 +53,25 @@ export function assessDataset(
     else if (result.kind === "valid_keyword") keywords.push(result.keyword);
     else invalid++;
   }
+  // Charts: hard persistence bound = job.maxResults, independent of provider overfetch.
+  // Keep best rank per storeAppId, then the first maxResults positions. Do not invent ranks.
+  let persistedApps = apps;
+  if (job.mode === "charts" && job.maxResults > 0 && apps.length > 0) {
+    const bestById = new Map<string, (typeof apps)[number]>();
+    for (const app of apps) {
+      const prior = bestById.get(app.storeAppId);
+      if (!prior || (app.rank ?? Infinity) < (prior.rank ?? Infinity)) bestById.set(app.storeAppId, app);
+    }
+    persistedApps = [...bestById.values()]
+      .sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity) || a.storeAppId.localeCompare(b.storeAppId))
+      .slice(0, job.maxResults);
+  }
   // Rows that count as the mode's actual result. A reviews run that only returned app rows has no result.
-  const primary = job.mode === "reviews" ? reviews.length : job.mode === "keywords" ? keywords.length : apps.length;
-  const valid = apps.length + reviews.length + keywords.length;
+  const primary = job.mode === "reviews" ? reviews.length : job.mode === "keywords" ? keywords.length : persistedApps.length;
+  const valid = persistedApps.length + reviews.length + keywords.length;
   const expected = job.mode === "details" ? job.expectedIds.length : job.mode === "charts" ? job.maxResults : null;
-  const found = job.mode === "details" ? new Set(apps.map(a => a.storeAppId)).size : primary;
-  const base = { apps, reviews, keywords, counts: { received: rows.length, valid, invalid, expected } };
+  const found = job.mode === "details" ? new Set(persistedApps.map(a => a.storeAppId)).size : primary;
+  const base = { apps: persistedApps, reviews, keywords, counts: { received: rows.length, valid, invalid, expected } };
   const rejected = (reason: string): Assessment => ({ ...base, verdict: "rejected", complete: false, reason, apps: [], reviews: [], keywords: [] });
   if (rows.length === 0) return rejected("dataset_empty");
   if (primary === 0) return rejected("dataset_no_valid_rows");
@@ -66,7 +79,7 @@ export function assessDataset(
   if (truncated) {
     // The database only accepts truncated runs for list and keyword snapshots, which record the truncation.
     return ["search", "charts", "developers", "keywords"].includes(job.mode)
-      ? { ...base, apps: job.mode === "keywords" ? [] : apps, verdict: "truncated", complete: false, reason: "dataset_truncated" }
+      ? { ...base, apps: job.mode === "keywords" ? [] : persistedApps, verdict: "truncated", complete: false, reason: "dataset_truncated" }
       : rejected("dataset_truncated");
   }
   let reason = invalid > 0 ? "dataset_has_invalid_rows" : expected != null && found < expected ? "dataset_below_expected" : null;

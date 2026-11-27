@@ -181,6 +181,7 @@ test("server gateway selects demo without network and never falls back on real-d
     const gateway = await import("../src/lib/ui/catalog.server.ts");
     Object.assign(process.env, { NODE_ENV: "development", APPRADAR_DEMO_MODE: "true" });
     delete process.env.SUPABASE_URL; delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL; delete process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
     const dashboard = await gateway.dashboardData(scope);
     assert.equal(dashboard.state, "ready");
     if (dashboard.state === "ready") assert.equal(dashboard.data.stats.apps, 120);

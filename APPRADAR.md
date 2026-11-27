@@ -133,7 +133,7 @@ Bu tutarları ürün arayüzüne, satış vaadine veya sabit iş kuralına gömm
 
 POC'nin saklama kapsamı dahil kullanım koşullarını kontrol et. Üretim öncesi saklama, kullanıcıya gösterim, türetilmiş analiz, cache, yeniden dağıtım ve silme talepleri için izin dayanağını kaydet. Belirsiz ticari yetki varsa gerekli sağlayıcı açıklamasını/uzman incelemesini tamamlamadan ilgili veriyi yayımlama. İzin verilen alan ve saklama süresi uygulama yapılandırmasına yansıtılmalıdır.
 
-**Açık kısıtlar (27 Kasım 2026; B4.4):** Ticari/public saklama-gösterim izni henüz onaylanmadı. Ücretli toplama ve zamanlama varsayılan kapalıdır; veri kullanımı `APPRADAR_THIRD_PARTY_RIGHTS_STATUS` ile ayrılır (`verified` / `unconfirmed` / `prohibited`). `POC_DATA_USE_CONFIRMED` yalnız `verified` ile geçerlidir; iç pilot ve iç medya için operatör onayı + unconfirmed risk kabulü ayrı bayraklardır (sahip onayı lisans değildir; development-only medya public değildir). Okuma katmanında varsayılan kapalı: `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`, `APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED`. Eski `APPRADAR_STORE_MEDIA_ENABLED` yok sayılır. Kapsam: `docs/CONTENT_USAGE.md` §6.26–§6.27.
+**Açık kısıtlar (27 Kasım 2026; B4.5 PARTIAL):** Ticari/public saklama-gösterim izni henüz onaylanmadı. Ücretli toplama ve zamanlama varsayılan kapalıdır; veri kullanımı `APPRADAR_THIRD_PARTY_RIGHTS_STATUS` ile ayrılır (`verified` / `unconfirmed` / `prohibited`). `POC_DATA_USE_CONFIRMED` yalnız `verified` ile geçerlidir; iç pilot (B4.3 / B4.5) ve iç medya için operatör onayı + unconfirmed risk kabulü ayrı bayraklardır (sahip onayı lisans değildir; development-only medya public değildir). Okuma katmanında varsayılan kapalı: `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`, `APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED`. Eski `APPRADAR_STORE_MEDIA_ENABLED` yok sayılır. Kapsam: `docs/CONTENT_USAGE.md`; B4.5 sonuçları §6.28.
 
 ## 6. Veri sözlüğü ve veri yeterliliği
 
@@ -663,6 +663,31 @@ Minimal genişleme: ortak `APPRADAR_STORE_MEDIA_ENABLED` kaldırıldı/yok sayı
 **Gerçek veri sınırları (hâlâ geçerli):** Mevcut 6 listing’de description / release / update tarihleri boş (eşleme sonrası backfill yok). Ranking history çoğu cohort için yok. Üçüncü taraf hakları `unconfirmed`; production/public medya yok.
 
 **Kalite kapısı:** test 207/207 (+2 skip); typecheck OK; lint 0 errors (yalnız mevcut `@next/next/no-img-element` uyarıları: AppIcon + screenshot gallery); production build OK (`NODE_ENV` temiz).
+
+### 6.28 B4.5 — Productivity pilot (PARTIAL) ve gerçek market intelligence — 27 Kasım 2026
+
+**Kapsam:** US/en Productivity; 5 Actor start; shell-only unconfirmed B4.5 onayları; `POC_DATA_USE_CONFIRMED=false`; public/description/review kapalı; scheduling yok.
+
+**Koşular (hepsi settled, rezervasyon 0):**  
+1. Aurelix iOS Top Free `6007` `B9dgnSfV9w3OHGILa` — 50/50, $0.01330  
+2. Subimpact Play Top Free `PRODUCTIVITY` `fnvN6kIHVt2XgNkvx` — 50/50, $0.01500  
+3. DataTrail iOS New Free `6007` `hVk9aqAYxd8eoEBvL` — istenen 10, dönen 24, persist **10**, 1 invalid → `coverage=partial`, $0.04805  
+4. Aurelix iOS details `hF8UTmdlEYeZUia3g` — 50/50, $0.01330  
+5. Aurelix Play details `ab1pRDBdaeuR2oBl6` — **45/50**, $0.01240  
+
+**Pilot maliyet $0.10205**; B4.3+B4.5 kümülatif **$0.11173**. Pinler eşleşti.
+
+**Eksik Play detail ID’leri:** `droom.sleepIfUCan`, `com.google.android.apps.labs.language.tailwind`, `com.boostcleaner.phone.clean`, `com.deepseek.chat`, `app.android.cloaked` (chart’ta discovery-only).
+
+**Snapshot sınıflandırma:** B4.5 `app_snapshots` **205** = **110 discovery** (50+50+10) + **95 detail** (50+45). `observation_role` ayrımı doğru; history serileri role/source ile ayrılır; ranking eligibility `partial` new-apps’i reddeder; tek chart gözleminde Trending değişim uydurmaz.
+
+**DB:** apps/listings **113** (ios 61 / play 52). US/en metadata (saklama): description ~84%, released ~93%, updated ~90%, icon/screenshots ~96%; Play installs %100 (Play). Reviews 0.
+
+**UI (demo off):** Dashboard sayıları doğru; Explorer 113; charts 50/50 bounded; New Releases release tarihleriyle dolu; Market/Opportunity cohort göstergeleri çalışır; App Details detail vs discovery serilerini ayırır; eksik Play detail dürüst discovery metrikleriyle kalır. Description UI’da hâlâ bayrakla withheld.
+
+**Kalan:** üçüncü taraf hakları `unconfirmed`; public medya yok; ranking history yok (tek gözlem); PARTIAL pilot; 5 Play detail eksiği.
+
+**Kalite kapısı:** test 208/208 (+2 skip); typecheck OK; lint 0 errors (mevcut `@next/next/no-img-element` uyarıları); production build OK (`NODE_ENV` temiz).
 
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 

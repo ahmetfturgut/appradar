@@ -11,7 +11,10 @@ Scheduled and paid execution are **off**. No cron or route calls this code.
    `APIFY_COLLECTION_ENABLED=true`, `COLLECTION_PAID_EXECUTION=true`, budget limits, and a data-use path:
    - **Verified rights:** `APPRADAR_THIRD_PARTY_RIGHTS_STATUS=verified` and `POC_DATA_USE_CONFIRMED=true`.
    - **Unconfirmed internal pilot:** `status=unconfirmed`, `APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL=true`,
-     `APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED=true`, and a config within pilot bounds
+     `APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED=true`, and a config within the selected scope bounds
+     (`APPRADAR_INTERNAL_PILOT_SCOPE=b43-details` default, or `b45-productivity` with separate B4.5 approvals).
+   - B4.5 Productivity pilot (2026-11-27, PARTIAL): 5 starts, $0.10205; see `APPRADAR.md` §6.28. Chart persist caps
+     discard DataTrail overfetch beyond `maxResults`. App snapshots keep `observation_role` discovery vs detail.
      (see `.poc/b43-pilot.config.json` / `docs/CONTENT_USAGE.md`). Not a generic bypass.
    - **Prohibited** or missing status: always closed. Do not set `POC_DATA_USE_CONFIRMED=true` without verified evidence.
 

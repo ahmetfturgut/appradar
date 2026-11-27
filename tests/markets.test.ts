@@ -200,6 +200,7 @@ test("gateway: market data is demo-only in development and requires sign-in else
     const gateway = await import("../src/lib/ui/catalog.server.ts");
     Object.assign(process.env, { NODE_ENV: "development", APPRADAR_DEMO_MODE: "true" });
     delete process.env.SUPABASE_URL; delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL; delete process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
     assert.equal((await gateway.marketData({ store: "ios", country: "US", language: "en" })).state, "ready");
     assert.equal((await gateway.opportunityData({ store: "play", country: "US", language: "en" })).state, "ready");
     assert.equal(requests, 0);

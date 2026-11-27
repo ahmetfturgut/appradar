@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  b45ProductivityPilotBoundViolations,
   dataUseAuthorizationClosed,
   internalPilotBoundViolations,
   publicCommercialDisplayAuthorized,
@@ -22,6 +23,20 @@ const pilot = CollectionConfig.parse({
     ],
   }],
 });
+/** Mirrors `.poc/b45-discovery.config.json` (gitignored). */
+const b45Discovery = CollectionConfig.parse({
+  schedulingEnabled: false,
+  retentionDays: 30,
+  maxAttempts: 1,
+  schedules: [
+    { provider: "aurelix", mode: "charts", everyMinutes: 1440, enabled: false,
+      targets: [{ store: "ios", country: "US", language: "en", chart: "topFree", category: "6007", maxResults: 50 }] },
+    { provider: "subimpact", mode: "charts", everyMinutes: 1440, enabled: false,
+      targets: [{ store: "play", country: "US", language: "en", chart: "topFree", category: "PRODUCTIVITY", maxResults: 50 }] },
+    { provider: "datatrail", mode: "charts", everyMinutes: 1440, enabled: false,
+      targets: [{ store: "ios", country: "US", language: "en", chart: "newFreeApps", category: "6007", maxResults: 10 }] },
+  ],
+});
 const openPilotEnv = {
   COLLECTION_PAID_EXECUTION: "true",
   APIFY_COLLECTION_ENABLED: "true",
@@ -31,6 +46,12 @@ const openPilotEnv = {
   APPRADAR_THIRD_PARTY_RIGHTS_STATUS: "unconfirmed",
   APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL: "true",
   APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED: "true",
+};
+const openB45Env = {
+  ...openPilotEnv,
+  APPRADAR_INTERNAL_PILOT_SCOPE: "b45-productivity",
+  APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_OPERATOR_APPROVAL: "true",
+  APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_UNCONFIRMED_RISK_ACCEPTED: "true",
 };
 
 test("rights status is explicit and fail-closed when missing", () => {
@@ -108,10 +129,32 @@ test("operator approval alone does not open paid collection", () => {
   }, pilot).includes("COLLECTION_PAID_EXECUTION_not_true"));
 });
 
+test("B4.5 Productivity scope needs separate approvals and does not widen B4.3", () => {
+  assert.deepEqual(b45ProductivityPilotBoundViolations(b45Discovery), []);
+  assert.deepEqual(dataUseAuthorizationClosed(openB45Env, b45Discovery), []);
+  assert.deepEqual(closedGates(openB45Env, b45Discovery), []);
+  // B4.3 approvals alone cannot open a B4.5 discovery config.
+  assert.ok(dataUseAuthorizationClosed(openPilotEnv, b45Discovery).some(r => r.startsWith("internal_pilot_")));
+  assert.ok(dataUseAuthorizationClosed({
+    ...openPilotEnv,
+    APPRADAR_INTERNAL_PILOT_SCOPE: "b45-productivity",
+  }, b45Discovery).includes("INTERNAL_PILOT_B45_PRODUCTIVITY_OPERATOR_APPROVAL_not_true"));
+  assert.ok(dataUseAuthorizationClosed({
+    ...openB45Env,
+    APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_UNCONFIRMED_RISK_ACCEPTED: "false",
+  }, b45Discovery).includes("INTERNAL_PILOT_B45_PRODUCTIVITY_UNCONFIRMED_RISK_ACCEPTED_not_true"));
+  // A B4.3-sized details config may pass as B4.5 details-only; discovery still cannot use the B4.3 path.
+  assert.deepEqual(dataUseAuthorizationClosed(openB45Env, pilot), []);
+  assert.ok(internalPilotBoundViolations(b45Discovery).includes("internal_pilot_aurelix_details_only"));
+  assert.ok(closedGates(openPilotEnv, b45Discovery).some(r => r.startsWith("internal_pilot_")));
+});
+
 test("production keeps internal pilot and public commercial display fail-closed", () => {
   for (const flag of [
     "APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL",
     "APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED",
+    "APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_OPERATOR_APPROVAL",
+    "APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_UNCONFIRMED_RISK_ACCEPTED",
     "APPRADAR_INTERNAL_MEDIA_OPERATOR_APPROVAL",
     "APPRADAR_INTERNAL_MEDIA_UNCONFIRMED_RISK_ACCEPTED",
     "APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED",
@@ -132,6 +175,8 @@ test("production keeps internal pilot and public commercial display fail-closed"
   for (const flag of [
     "APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL",
     "APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED",
+    "APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_OPERATOR_APPROVAL",
+    "APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_UNCONFIRMED_RISK_ACCEPTED",
     "APPRADAR_INTERNAL_MEDIA_OPERATOR_APPROVAL",
     "APPRADAR_INTERNAL_MEDIA_UNCONFIRMED_RISK_ACCEPTED",
     "APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED",

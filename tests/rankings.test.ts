@@ -175,6 +175,7 @@ test("gateway: ranking data is demo-only in development and requires sign-in eve
     const gateway = await import("../src/lib/ui/catalog.server.ts");
     Object.assign(process.env, { NODE_ENV: "development", APPRADAR_DEMO_MODE: "true" });
     delete process.env.SUPABASE_URL; delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL; delete process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
     assert.equal((await gateway.trendingData({ country: "US", horizon: "1d" })).state, "ready");
     assert.equal((await gateway.newAppChartData({ country: "US", horizon: "1d" })).state, "ready");
     assert.equal((await gateway.knownReleasesData({ store: "play", country: "US", days: 30, page: 1, pageSize: 10 })).state, "ready");

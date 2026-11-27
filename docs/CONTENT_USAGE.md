@@ -36,8 +36,8 @@ While status is `unconfirmed`, the following remain unresolved and are **not** c
 - No recorded provider+store storage or display permission exists in this repository (`APPRADAR.md` §6.22 / §6.26 / §6.27).
 - Metrics and listing text persisted to the development database are still **storage**, even when public media/description flags stay off.
 - B4.3 pilot stored 6 listings / icons / screenshot URLs under unconfirmed rights; public display stayed closed. B4.4 may enable **development-only** internal media with explicit operator approval + unconfirmed-risk acceptance; that path is not public commercial authorization and must not be written as permanent env.
-- Existing pilot listings predate description/`released_at`/`updated_at` mapping — those fields remain empty until a later detail run (no backfill). Ranking history for the pilot cohort is largely absent where charts were not collected.
-- Description and written review content remain disabled regardless of internal media authorization.
+- B4.5 Productivity pilot (PARTIAL) expanded storage under the same unconfirmed status: 113 apps/listings; charts 50/50; DataTrail overfetch 24→10 persist (`coverage=partial`); Play details 45/50. Discovery vs detail `observation_role` must not be conflated. Description/review display remain disabled; description may still be **stored** from detail runs.
+- Ranking history remains largely unavailable (single chart observation per series). Missing Play detail IDs stay chart-visible with discovery-only fields.
 
 An explicit applicable contractual **prohibition** must be recorded as `prohibited` and keeps collection and media scopes closed.
 
@@ -45,13 +45,38 @@ Aurelix `description` may be **stored** when normalized; public release still re
 
 ## Internal pilot bounds (unconfirmed path only)
 
-Enforced in code when rights are `unconfirmed` (not a generic bypass):
+Enforced in code when rights are `unconfirmed` (not a generic bypass). Scope is selected with `APPRADAR_INTERNAL_PILOT_SCOPE` (`b43-details` default when unset; `b45-productivity` for the Productivity market pilot).
+
+### B4.3 details (`b43-details`)
 
 - Development operator shell only; production flags for pilot approval/risk/public display must stay false.
 - Existing pinned Aurelix details build only; config shaped like `.poc/b43-pilot.config.json`.
 - ≤6 app listings, ≤2 Actor targets/starts, `$0.05` per-run cap, `$0.10` planned ceiling.
 - Budgets `$1` / `$5`; `retentionDays: 30`; `maxAttempts: 1`; `schedulingEnabled: false`.
+- Requires `APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL` + `APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED`.
 - No reviewer personal information; no image binary storage; no public data/media display flags.
+
+### B4.5 Productivity (`b45-productivity`)
+
+Expanded provider/store collection for US/en Productivity. **Does not widen B4.3 bounds.** Requires the B4.3 approval pair **and** separate:
+
+- `APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_OPERATOR_APPROVAL=true`
+- `APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_UNCONFIRMED_RISK_ACCEPTED=true`
+
+Allowed schedules only (discovery-only, details-only, or full):
+
+| Step | Provider / mode | Requested | Hard accept/persist |
+|---|---|---|---|
+| 1 | Aurelix iOS charts topFree `6007` | 50 | ≤50 chart entries |
+| 2 | Subimpact Play charts topFree `PRODUCTIVITY` | 50 | ≤50 chart entries |
+| 3 | DataTrail iOS newFreeApps `6007` | 10 | ≤10 entries (overfetch discarded) |
+| 4–5 | Aurelix details iOS + Play | deduped IDs | ≤50 IDs/store, ≤100 total; chart IDs first |
+
+- ≤5 Actor starts; `$0.05` per-run cap; planned reservation ceiling **$0.25**.
+- `maxAttempts: 1`; `retentionDays: 30`; `schedulingEnabled: false`.
+- `POC_DATA_USE_CONFIRMED` stays false; public commercial display stays closed.
+- Known unconfirmed restrictions still apply per provider/store (see risks above). `prohibited` remains blocking.
+- Config: gitignored `.poc/b45-discovery.config.json` then `.poc/b45-details.config.json` after ID validation.
 
 ## Approved pilot technical scope (B4 budget, unchanged)
 

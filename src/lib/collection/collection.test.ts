@@ -53,6 +53,13 @@ test("empty, invalid and truncated datasets are not successes", async () => {
   assert.equal(assessDataset(job, "r1", at, rows.slice(0, 2), false, { usageConfirmedBelowCap: true }).complete, false);
   assert.equal(assessDataset(job, "r1", at, [...rows, {}], false).complete, false);
   assert.equal(assessDataset(job, "r1", at, rows, true).verdict, "truncated");
+  // Hard persist bound: provider overfetch beyond maxResults is discarded, not ranked.
+  if (rows.length > 3) {
+    const capped = assessDataset(job, "r1", at, rows, false, { usageConfirmedBelowCap: true });
+    assert.equal(capped.apps.length, 3);
+    assert.equal(capped.counts.expected, 3);
+    assert.ok(capped.counts.received >= 3);
+  }
   assert.deepEqual(reportedCost({ usageTotalUsd: 0, chargedEventCounts: {} }), { kind: "confirmed", usd: 0 });
   assert.equal(reportedCost({ usageTotalUsd: 0 }).kind, "unknown");
   assert.equal(reportedCost({ usageTotalUsd: null }).kind, "unknown");

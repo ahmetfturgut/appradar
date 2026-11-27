@@ -151,7 +151,9 @@ async function loadHistory(client: ReadClient, listingId: number, days: number, 
     const key = String(row.series_key);
     let s = series.get(key);
     if (!s) {
-      s = { seriesKey: key, source: String(row.source), role: row.observation_role === "discovery" ? "discovery" : "detail", points: [], comparable: false };
+      // Unknown roles stay out of history series — never default discovery rows to "detail".
+      if (row.observation_role !== "detail" && row.observation_role !== "discovery") continue;
+      s = { seriesKey: key, source: String(row.source), role: row.observation_role, points: [], comparable: false };
       series.set(key, s);
     }
     s.points.push({
