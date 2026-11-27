@@ -16,6 +16,8 @@ bağlanarak engellenmez. Güncel yerel kurulum `README.md` içindedir.
 
 **Belgenin amacı:** AppRadar'ın ürün sınırlarını, veri gerçekliğini, mimarisini ve kabul kapılarını tek dosyada tanımlamak. Bu dosya bir AI coding agent'a doğrudan verilebilir. Bu belgenin teslim edilmesi uygulama kodlamasının, ücretli API çalıştırılmasının veya yayına almanın onaylandığı anlamına gelmez.
 
+**27 Kasım 2026 Landing V2:** Kullanıcının seçtiği “Evidence before code” yönü, EN/TR sentetik örnek uygulaması, karar kaydı ve kalan yayın bağımlılıkları [docs/LANDING_PAGE.md](docs/LANDING_PAGE.md) içinde tutulur. Bu kapsam kamuya açık kayıt, veri hakları, fiyatlandırma, marka hukuku veya üretim yayını onayı değildir.
+
 ## 1. AI coding agent için zorunlu başlangıç talimatı
 
 **Önce analiz ve plan; açık kullanıcı onayından sonra kodlama.**

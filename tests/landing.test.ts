@@ -25,12 +25,12 @@ test("English and Turkish have complete non-empty dictionaries and all required 
   for (const [key, text] of [...en, ...tr]) assert.ok(text.trim().length > 0, key);
   for (const locale of ["en", "tr"] as const) {
     const text = dictionaries[locale];
-    assert.equal(text.features.items.length, 6); assert.equal(text.how.items.length, 3);
-    assert.equal(text.useCases.questions.length, 5); assert.equal(text.faq.items.length, 6);
-    assert.equal(text.audience.items.length, 3); assert.equal(text.preview.categoryNames.length, 5);
+    assert.equal(text.features.items.length, 4); assert.equal(text.how.items.length, 3);
+    assert.equal(text.faq.items.length, 8); assert.equal(text.audience.items.length, 3);
+    assert.equal(Object.keys(text.market.metrics).length, 6);
   }
-  assert.match(dictionaries.tr.hero.title, /harika uygulama/);
-  assert.match(dictionaries.tr.faq.items[5]!.answer, /kesin gelir/);
+  assert.equal(dictionaries.en.hero.title, "Check the market before you write the code.");
+  assert.equal(dictionaries.tr.hero.title, "Koda başlamadan önce pazarı araştırın.");
 });
 
 test("locale URLs are independent of store filters and first visits default to English", () => {
@@ -62,17 +62,18 @@ test("landing renders both languages without a store-data request and retains se
   for (const locale of ["en", "tr"] as const) {
     const text = dictionaries[locale];
     const html = renderToStaticMarkup(createElement(LandingPage, { locale, signedIn: false }));
-    assert.ok(html.includes(text.hero.title)); assert.ok(html.includes(text.preview.illustrative));
-    assert.ok(html.includes(text.preview.caption)); assert.ok(html.includes(text.footer.unpublished));
-    for (const id of ["main", "features", "how-it-works", "problem-title", "use-cases-title", "audience-title", "faq-title", "cta-title"]) assert.ok(html.includes(`id="${id}"`), id);
+    assert.ok(html.includes(text.hero.title)); assert.ok(html.includes(text.market.synthetic));
+    assert.ok(html.includes(text.features.illustrative)); assert.ok(html.includes(text.footer.unpublished));
+    for (const id of ["main", "features", "how-it-works", "market-check", "evidence", "comparison-title", "audience-title", "faq-title", "cta-title"]) assert.ok(html.includes(`id="${id}"`), id);
     assert.equal((html.match(/<h1\b/g) ?? []).length, 1);
-    assert.equal((html.match(/<details\b/g) ?? []).length, 6);
-    assert.equal((html.match(/<summary\b/g) ?? []).length, 6);
-    assert.match(html, /href="\/login"/); assert.match(html, /href="\/signup"/);
+    assert.equal((html.match(/<details\b/g) ?? []).length, 14);
+    assert.equal((html.match(/<summary\b/g) ?? []).length, 14);
+    assert.match(html, /href="\/login"/); assert.doesNotMatch(html, /href="\/signup"/);
+    assert.match(html, /href="#market-check"/);
     assert.match(html, /href="\/en" hrefLang="en"/);
     assert.match(html, /href="\/tr" hrefLang="tr"/);
     assert.match(html, /aria-current="page"/);
-    assert.ok(html.includes(text.preview.historyLabel));
+    assert.ok(html.includes(text.features.visual.history));
     assert.doesNotMatch(html, /<img\b|<iframe\b|supabase\.co|apps\.apple\.com|play\.google\.com/);
     if (locale === "tr") {
       assert.doesNotMatch(html, /Illustrative data|Sample value|coming soon|Skip to content|Store coverage/);
@@ -125,4 +126,13 @@ test("proxy supplies URL-based SSR language, persists preferences and preserves 
     for (const key of Object.keys(process.env)) if (!(key in previous)) delete process.env[key];
     Object.assign(process.env, previous);
   }
+});
+
+test("header action is hidden below xl by a variant, not a conflicting base display utility", () => {
+  const html = renderToStaticMarkup(createElement(LandingPage, { locale: "en", signedIn: false }));
+  const header = html.slice(html.indexOf("<header"), html.indexOf("</header>"));
+  const action = header.match(/<a [^>]*href="\/en#market-check"[^>]*class="([^"]*bg-primary[^"]*)"/)?.[1] ?? header.match(/<a [^>]*class="([^"]*bg-primary[^"]*)"[^>]*href="\/en#market-check"/)?.[1];
+  assert.ok(action, "header action present");
+  assert.match(action, /\bmax-xl:hidden\b/);
+  assert.doesNotMatch(action, /(^|\s)hidden(\s|$)/);
 });
