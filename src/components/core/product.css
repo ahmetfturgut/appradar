@@ -184,7 +184,17 @@
 .product-series-select{display:flex;align-items:center;gap:10px;margin:0 0 16px;color:var(--muted-foreground);font-size:12px}
 .product-series-select select{max-width:75%}
 .product-screenshots{display:flex;overflow:auto;gap:12px;margin-top:20px}
-.product-screenshots img{height:230px;width:auto;max-width:100%;object-fit:contain;border:1px solid var(--border);border-radius:10px}
+.product-screenshot-trigger{display:block;padding:0;border:0;background:transparent;cursor:zoom-in;border-radius:10px}
+.product-screenshot-trigger:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+.product-screenshots img,.product-screenshot-trigger img{height:230px;width:auto;max-width:100%;object-fit:contain;border:1px solid var(--border);border-radius:10px;display:block}
+.product-screenshot-dialog{border:0;padding:0;max-width:min(96vw,960px);width:100%;background:transparent}
+.product-screenshot-dialog::backdrop{background:color-mix(in oklab,var(--foreground) 45%,transparent)}
+.product-screenshot-dialog-panel{display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--card-foreground);box-shadow:0 16px 48px color-mix(in oklab,var(--foreground) 18%,transparent)}
+.product-screenshot-dialog-bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.product-screenshot-dialog-title{margin:0;font-size:14px;font-weight:600}
+.product-screenshot-dialog-close{display:inline-grid;place-items:center;width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--muted-foreground)}
+.product-screenshot-dialog-close:hover{background:var(--muted);color:var(--foreground)}
+.product-screenshot-dialog-image{display:block;width:100%;max-height:min(78vh,820px);object-fit:contain;border-radius:8px;background:var(--muted)}
 .product-review-summary{padding:18px 20px;border-bottom:1px solid var(--border)}
 .product-review-summary>p{font-size:12px;color:var(--muted-foreground);margin-bottom:12px}
 .product-review-summary>div{display:flex;align-items:center;gap:12px;max-width:500px;margin:6px 0;font-size:12px;color:var(--muted-foreground)}

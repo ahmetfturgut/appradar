@@ -133,7 +133,7 @@ Bu tutarları ürün arayüzüne, satış vaadine veya sabit iş kuralına gömm
 
 POC'nin saklama kapsamı dahil kullanım koşullarını kontrol et. Üretim öncesi saklama, kullanıcıya gösterim, türetilmiş analiz, cache, yeniden dağıtım ve silme talepleri için izin dayanağını kaydet. Belirsiz ticari yetki varsa gerekli sağlayıcı açıklamasını/uzman incelemesini tamamlamadan ilgili veriyi yayımlama. İzin verilen alan ve saklama süresi uygulama yapılandırmasına yansıtılmalıdır.
 
-**Açık kısıtlar (27 Kasım 2026; B4.3 yetki kapsamı):** Ticari/public saklama-gösterim izni henüz onaylanmadı. Ücretli toplama ve zamanlama varsayılan kapalıdır; veri kullanımı `APPRADAR_THIRD_PARTY_RIGHTS_STATUS` ile ayrılır (`verified` / `unconfirmed` / `prohibited`). `POC_DATA_USE_CONFIRMED` yalnız `verified` ile geçerlidir; iç pilot için operatör onayı + unconfirmed risk kabulü ayrı bayraklardır (sahip onayı lisans değildir). Okuma katmanında varsayılan kapalı: `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`, `APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED`. Eski `APPRADAR_STORE_MEDIA_ENABLED` yok sayılır. Kapsam: `docs/CONTENT_USAGE.md` §6.26.
+**Açık kısıtlar (27 Kasım 2026; B4.4):** Ticari/public saklama-gösterim izni henüz onaylanmadı. Ücretli toplama ve zamanlama varsayılan kapalıdır; veri kullanımı `APPRADAR_THIRD_PARTY_RIGHTS_STATUS` ile ayrılır (`verified` / `unconfirmed` / `prohibited`). `POC_DATA_USE_CONFIRMED` yalnız `verified` ile geçerlidir; iç pilot ve iç medya için operatör onayı + unconfirmed risk kabulü ayrı bayraklardır (sahip onayı lisans değildir; development-only medya public değildir). Okuma katmanında varsayılan kapalı: `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`, `APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED`. Eski `APPRADAR_STORE_MEDIA_ENABLED` yok sayılır. Kapsam: `docs/CONTENT_USAGE.md` §6.26–§6.27.
 
 ## 6. Veri sözlüğü ve veri yeterliliği
 
@@ -651,6 +651,18 @@ Minimal genişleme: ortak `APPRADAR_STORE_MEDIA_ENABLED` kaldırıldı/yok sayı
 **Metadata eşleme (pilot dataset kanıtı):** Aurelix alanları `description`, `released_at`, `updated_at` (ISO-8601 `…Z`). Normalize artık saklar; geçersiz/gelecek tarihler reddedilir; provenance/freshness korunur. Açıklama gösterimi hâlâ `APPRADAR_STORE_DESCRIPTION_ENABLED` ile kapalı. Mevcut 6 listing bu eşlemeden **önce** yazıldı — description/tarih backfill yok; sonraki detay koşusunda dolar.
 
 **Kalan engel:** üçüncü taraf hakları `unconfirmed`; ticari/public display yok. Ayrıntı: `docs/CONTENT_USAGE.md`, `docs/contracts/README.md`.
+
+### 6.27 B4.4 — Gerçek veri UI doğrulama, polish ve iç medya kapsamı — 27 Kasım 2026
+
+**Sahip ekran incelemesi:** Dashboard, Explorer, App Details, Compare ve Watchlist gerçek pilot veri ekran görüntüleriyle incelendi; mevcut tasarım yönü kabul edildi (yeniden tasarım yok).
+
+**İç medya yetkisi (yalnız development):** `APPRADAR_INTERNAL_MEDIA_OPERATOR_APPROVAL` + `APPRADAR_INTERNAL_MEDIA_UNCONFIRMED_RISK_ACCEPTED` + kind bayrakları; `prohibited` ve production fail-closed; public commercial bayrak ayrı ve kapalı. Provider uygunluğu, URL allowlist, expiry ve suppression korunur. Açıklama/yorum içeriği kapalı kaldı. Kalıcı bayrak `.env.local`’e yazılmadı.
+
+**UI polish:** Watchlist/Compare satır ve başlıklarına mevcut AppIcon; rutin observation zamanları erişilebilir tooltip’e; stale/unknown uyarıları görünür; tablolarda K/M/B (tam değer tooltip); ekran galerisinde yükleme hatası + native dialog büyütme; Save göstergeleri Explorer/Compare/Watchlist ile tutarlı.
+
+**Gerçek veri sınırları (hâlâ geçerli):** Mevcut 6 listing’de description / release / update tarihleri boş (eşleme sonrası backfill yok). Ranking history çoğu cohort için yok. Üçüncü taraf hakları `unconfirmed`; production/public medya yok.
+
+**Kalite kapısı:** test 207/207 (+2 skip); typecheck OK; lint 0 errors (yalnız mevcut `@next/next/no-img-element` uyarıları: AppIcon + screenshot gallery); production build OK (`NODE_ENV` temiz).
 
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 

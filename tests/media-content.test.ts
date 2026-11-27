@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
-import { mediaDisplayAllowed, mediaEnabled, providerMediaEligible, storeIconsEnabled, storeScreenshotsEnabled } from "../src/lib/media/flags.ts";
+import {
+  internalMediaDisplayAuthorized, mediaDisplayAllowed, mediaEnabled, mediaScopeAuthorized,
+  providerMediaEligible, storeIconsEnabled, storeScreenshotsEnabled,
+} from "../src/lib/media/flags.ts";
 import { safeMediaUrl, safeStoreListingUrl, validateStoreMediaUrl } from "../src/lib/media/urls.ts";
 import { releaseScreenshotUrls } from "../src/lib/read/shared.ts";
 import { getAppDetails } from "../src/lib/read/app-details.ts";
@@ -18,10 +21,23 @@ const now = "2026-11-27T12:00:00.000Z";
 const appleIcon = "https://is1-ssl.mzstatic.com/image/thumb/Purple/icon.png";
 const playShot = "https://play-lh.googleusercontent.com/example-screenshot";
 
+function setNodeEnv(value: string) {
+  Object.defineProperty(process.env, "NODE_ENV", { value, configurable: true, writable: true, enumerable: true });
+}
+
+function authorizeInternalMedia() {
+  setNodeEnv("development");
+  process.env.APPRADAR_INTERNAL_MEDIA_OPERATOR_APPROVAL = "true";
+  process.env.APPRADAR_INTERNAL_MEDIA_UNCONFIRMED_RISK_ACCEPTED = "true";
+  delete process.env.APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED;
+  delete process.env.APPRADAR_THIRD_PARTY_RIGHTS_STATUS;
+}
+
 test("independent icon and screenshot flags default off; legacy media flag cannot enable display", () => {
   delete process.env.APPRADAR_STORE_ICONS_ENABLED;
   delete process.env.APPRADAR_STORE_SCREENSHOTS_ENABLED;
   process.env.APPRADAR_STORE_MEDIA_ENABLED = "true";
+  authorizeInternalMedia();
   assert.equal(storeIconsEnabled(), false);
   assert.equal(storeScreenshotsEnabled(), false);
   assert.equal(mediaEnabled(), false);
@@ -29,6 +45,30 @@ test("independent icon and screenshot flags default off; legacy media flag canno
   process.env.APPRADAR_STORE_SCREENSHOTS_ENABLED = "false";
   assert.equal(storeIconsEnabled(), true);
   assert.equal(storeScreenshotsEnabled(), false);
+});
+
+test("kind flags require development internal media authorization or public commercial scope", () => {
+  setNodeEnv("development");
+  process.env.APPRADAR_STORE_ICONS_ENABLED = "true";
+  process.env.APPRADAR_STORE_SCREENSHOTS_ENABLED = "true";
+  delete process.env.APPRADAR_INTERNAL_MEDIA_OPERATOR_APPROVAL;
+  delete process.env.APPRADAR_INTERNAL_MEDIA_UNCONFIRMED_RISK_ACCEPTED;
+  delete process.env.APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED;
+  assert.equal(internalMediaDisplayAuthorized(), false);
+  assert.equal(storeIconsEnabled(), false);
+  assert.equal(storeScreenshotsEnabled(), false);
+  process.env.APPRADAR_INTERNAL_MEDIA_OPERATOR_APPROVAL = "true";
+  assert.equal(storeIconsEnabled(), false);
+  process.env.APPRADAR_INTERNAL_MEDIA_UNCONFIRMED_RISK_ACCEPTED = "true";
+  assert.equal(storeIconsEnabled(), true);
+  setNodeEnv("production");
+  assert.equal(internalMediaDisplayAuthorized(), false);
+  assert.equal(storeIconsEnabled(), false);
+  process.env.APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED = "true";
+  assert.equal(mediaScopeAuthorized(), true);
+  assert.equal(storeIconsEnabled(), true);
+  process.env.APPRADAR_THIRD_PARTY_RIGHTS_STATUS = "prohibited";
+  assert.equal(storeIconsEnabled(), false);
 });
 
 test("provider eligibility allows aurelix/datatrail candidates and rejects subimpact and unknown", () => {
@@ -53,6 +93,7 @@ test("media URL allowlist rejects http, credentials, untrusted hosts and javascr
 });
 
 test("suppression and ineligible provenance withhold screenshots even when the flag is on", () => {
+  authorizeInternalMedia();
   process.env.APPRADAR_STORE_SCREENSHOTS_ENABLED = "true";
   const row = {
     screenshot_urls: [playShot],

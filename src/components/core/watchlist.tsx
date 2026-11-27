@@ -2,16 +2,17 @@
 import { FieldValue } from "./field-freshness";
 import Link from "next/link";
 import { ArrowUpRight, Bookmark, FlaskConical } from "lucide-react";
+import { AppIcon } from "../app-icon";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
 import { cn } from "../../lib/utils";
 import { WATCHLIST_LIMIT } from "../../lib/watchlist/model";
 import type { WatchRow } from "../../lib/watchlist/server";
-import { PageHeading, Rating, StoreLabel } from "./elements";
+import { CompactCount, FreshnessLabel, PageHeading, Rating, StoreLabel } from "./elements";
 import { ChangeBadge, IntegrityNote, seriesTitle } from "./rank-elements";
 import { Segmented, selectClass, useQueryUpdate } from "./trending";
 import { CompareLink, WatchButton } from "./app-actions";
-import { count, countryLabel, dateLabel, detailsHref, price } from "./view-models";
+import { countryLabel, dateLabel, detailsHref, price } from "./view-models";
 import { toAppViewModel } from "./catalog-mapping";
 
 export function WatchlistView({ mode, rows, store, country, error }: { mode: "account" | "demo" | null; rows: WatchRow[]; store: "all" | "ios" | "play"; country: string | null; error: string | null }) {
@@ -39,19 +40,19 @@ export function WatchlistView({ mode, rows, store, country, error }: { mode: "ac
         <div className="relative overflow-x-auto">
           <table className="w-full min-w-[880px] border-collapse text-left text-sm">
             <caption className="sr-only">Saved apps with current metrics</caption>
-            <thead><tr className="border-b bg-muted/60 text-[11px] text-muted-foreground">{["App", "Context", "Rating", "Ratings", "Price", "Last update", "Chart", "Listing observed", "Actions"].map(h => <th key={h} scope="col" className="px-4 py-2.5 font-medium">{h}</th>)}</tr></thead>
+            <thead><tr className="border-b bg-muted/60 text-[11px] text-muted-foreground">{["App", "Context", "Rating", "Ratings", "Price", "Last update", "Chart", "Listing", "Actions"].map(h => <th key={h} scope="col" className="px-4 py-2.5 font-medium">{h}</th>)}</tr></thead>
             <tbody>{visible.map(({ item, listing, ranking, rankingsAvailable }) => {
               const app = listing ? toAppViewModel(listing) : null;
               return <tr key={`${item.appId}|${item.country}|${item.language}`} className="border-b align-top last:border-b-0 hover:bg-muted/40">
-                <td className="max-w-60 px-4 py-2.5">{app ? <Link href={detailsHref(app)} className="group block min-w-0"><span className="block truncate font-medium group-hover:text-primary">{app.name}</span><span className="block truncate text-[11px] text-muted-foreground">{app.developer} · <StoreLabel store={app.store} /></span></Link>
+                <td className="max-w-64 px-4 py-2.5">{app ? <Link href={detailsHref(app)} className="product-app-identity group"><AppIcon app={app} /><span className="min-w-0"><strong className="block truncate group-hover:text-primary">{app.name}</strong><small className="block truncate">{app.developer} · <StoreLabel store={app.store} /></small></span></Link>
                   : <span className="text-xs text-warning">No current listing (expired or removed)</span>}</td>
                 <td className="px-4 py-2.5 text-xs text-muted-foreground whitespace-nowrap">{item.country} · {item.language}<span className="block text-[11px]">saved {dateLabel(item.createdAt)}</span></td>
                 <td className="px-4 py-2.5"><FieldValue fields={listing?.fieldFreshness} field="rating_value"><Rating value={listing?.rating ?? null} /></FieldValue></td>
-                <td className="px-4 py-2.5 text-xs tabular-nums"><FieldValue fields={listing?.fieldFreshness} field="rating_count">{count(listing?.ratingCount ?? null)}</FieldValue></td>
+                <td className="px-4 py-2.5 text-xs tabular-nums"><FieldValue fields={listing?.fieldFreshness} field="rating_count"><CompactCount value={listing?.ratingCount ?? null} /></FieldValue></td>
                 <td className="px-4 py-2.5 text-xs"><FieldValue fields={listing?.fieldFreshness} field="price">{listing ? price({ price: listing.price.amount, currency: listing.price.currency }) : "Not available"}</FieldValue></td>
                 <td className="px-4 py-2.5 text-xs whitespace-nowrap"><FieldValue fields={listing?.fieldFreshness} field="store_updated_at">{dateLabel(listing?.storeUpdatedAt ?? null)}</FieldValue></td>
                 <td className="px-4 py-2.5 text-xs">{ranking ? <span className="flex flex-col items-start gap-1"><span><span className="font-medium">#{ranking.position}</span> <span className="text-muted-foreground">{seriesTitle(ranking.series.summary)}</span></span><ChangeBadge change={ranking.change1d} available={ranking.series.summary.horizons["1d"]} /></span> : <span className="text-muted-foreground">{rankingsAvailable ? "Not in a comparable chart" : "Rankings unavailable"}</span>}</td>
-                <td className={cn("px-4 py-2.5 text-xs whitespace-nowrap", listing?.freshness.status === "stale" && "text-warning")}>{dateLabel(listing?.freshness.lastObservedAt ?? null)}{listing?.freshness.status === "stale" ? " · stale" : ""}</td>
+                <td className={cn("px-4 py-2.5 text-xs", listing?.freshness.status === "stale" && "text-warning")}>{listing ? <FreshnessLabel freshness={listing.freshness} /> : "Not available"}</td>
                 <td className="px-4 py-2.5"><span className="flex items-start gap-1">
                   <WatchButton appId={item.appId} country={item.country} language={item.language} watched compact appName={app?.name} />
                   {listing && <CompareLink appId={item.appId} country={item.country} language={item.language} compact appName={app?.name} />}

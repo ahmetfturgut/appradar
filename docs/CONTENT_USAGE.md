@@ -22,22 +22,24 @@ Nothing in this file enables collection, retention or media display. Default fla
 | **Internal pilot operator approval** | Owner/operator product decision to run a bounded development pilot | `APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL=true` (not a licence) |
 | **Unconfirmed-risk acceptance** | Separate explicit decision to proceed while third-party rights remain unconfirmed | `APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED=true` |
 | **Verified third-party usage rights** | Evidence-backed storage/use basis | `APPRADAR_THIRD_PARTY_RIGHTS_STATUS=verified` + `POC_DATA_USE_CONFIRMED=true` |
-| **Internal development media display** | Showing icons/screenshots to operators on development hosts | `APPRADAR_STORE_ICONS_ENABLED` / `APPRADAR_STORE_SCREENSHOTS_ENABLED` plus recorded basis for **internal display**; provider eligibility; app-level suppression still applies |
-| **Public commercial data & media** | End-user product with shared catalog and media | `APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED` (default closed) **plus** production project, legal review, Terms publication, and recorded basis for **public storage and display** per provider **and** store. Do not reuse development confirmation alone |
+| **Internal development media display** | Showing icons/screenshots to operators on development hosts only | `NODE_ENV=development` + `APPRADAR_INTERNAL_MEDIA_OPERATOR_APPROVAL` + `APPRADAR_INTERNAL_MEDIA_UNCONFIRMED_RISK_ACCEPTED` + kind flags (`APPRADAR_STORE_ICONS_ENABLED` / `APPRADAR_STORE_SCREENSHOTS_ENABLED`). Not a third-party licence. Provider eligibility, URL allowlist, expiry and suppression still apply. Distinct from collection pilot approval. |
+| **Public commercial data & media** | End-user product with shared catalog and media | `APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED` (default closed; production web fail-closed) **plus** kind flags, production project, legal review, Terms publication, and recorded basis for **public storage and display** per provider **and** store. Do not reuse development confirmation alone. Kind flags alone never open production media. |
 
 Paid execution still requires `APIFY_COLLECTION_ENABLED`, `COLLECTION_PAID_EXECUTION`, token, budget caps and configured `retentionDays`.
 
-## Unconfirmed rights — known risks (B4.3)
+## Unconfirmed rights — known risks (B4.3 / B4.4)
 
 While status is `unconfirmed`, the following remain unresolved and are **not** cured by operator approval, attribution or API payment:
 
 - App Store / Google Play terms may restrict scraping, bulk storage or redistribution of listing content.
 - Apify Actor terms assign third-party IP compliance to the user; Actor payment is not a store licence.
-- No recorded provider+store storage or display permission exists in this repository (`APPRADAR.md` §6.22 / §6.26).
+- No recorded provider+store storage or display permission exists in this repository (`APPRADAR.md` §6.22 / §6.26 / §6.27).
 - Metrics and listing text persisted to the development database are still **storage**, even when public media/description flags stay off.
-- B4.3 pilot stored 6 listings / icons / screenshot URLs under unconfirmed rights; public and media display flags remained false.
+- B4.3 pilot stored 6 listings / icons / screenshot URLs under unconfirmed rights; public display stayed closed. B4.4 may enable **development-only** internal media with explicit operator approval + unconfirmed-risk acceptance; that path is not public commercial authorization and must not be written as permanent env.
+- Existing pilot listings predate description/`released_at`/`updated_at` mapping — those fields remain empty until a later detail run (no backfill). Ranking history for the pilot cohort is largely absent where charts were not collected.
+- Description and written review content remain disabled regardless of internal media authorization.
 
-An explicit applicable contractual **prohibition** must be recorded as `prohibited` and keeps collection closed.
+An explicit applicable contractual **prohibition** must be recorded as `prohibited` and keeps collection and media scopes closed.
 
 Aurelix `description` may be **stored** when normalized; public release still requires `APPRADAR_STORE_DESCRIPTION_ENABLED` plus a recorded display basis. Do not treat storage as display authorization.
 
@@ -62,10 +64,12 @@ Budget/scope approval is **not** verified commercial or public display approval.
 
 ## Media controls
 
-- Independent flags: `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED` (legacy `APPRADAR_STORE_MEDIA_ENABLED` ignored).
-- Description / review text flags unchanged.
+- Independent kind flags: `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED` (legacy `APPRADAR_STORE_MEDIA_ENABLED` ignored).
+- Kind flags require a **scope**: internal media authorization (development) or `APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED`.
+- Description / review text flags unchanged and stay off for B4.4 validation.
 - HTTPS store/CDN allowlist only; no image binary storage.
 - App-level suppression via `apps.icons_suppressed_at` / `apps.screenshots_suppressed_at` (`appradar_set_media_suppression`, service_role).
+- `prohibited` third-party status blocks media scopes.
 
 ## Reviewer privacy
 

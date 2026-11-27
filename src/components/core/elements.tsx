@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
 import { Skeleton } from "../ui/skeleton";
 import { StatCard } from "../ui/stat-card";
-import { countryLabels, countryLabel, dateLabel, detailsHref, type AppViewModel, type Scope, type ReadResult } from "./view-models";
+import { countryLabels, countryLabel, count, compact, dateLabel, detailsHref, type AppViewModel, type Scope, type ReadResult } from "./view-models";
 import type { Freshness } from "../../lib/read/index";
 
 export function ReadNotice({ result, resetHref }: { result: ReadResult<unknown>; resetHref?: string }) {
@@ -22,7 +22,16 @@ export function ScopeControls({ scope, onChange }: { scope: Scope; onChange: (va
   return <div className="product-scope-controls"><label className="product-country"><Globe2 size={16} /><select aria-label="Country" value={scope.country} onChange={event => onChange({ country: event.target.value })}>{Object.entries(countries).map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label><form className="product-language" onSubmit={event => { event.preventDefault(); onChange({ language: String(new FormData(event.currentTarget).get("language") ?? "").trim() }); }}><label>Requested language<input key={scope.language ?? ""} aria-label="Requested language" name="language" defaultValue={scope.language ?? ""} placeholder="All languages" maxLength={35} /></label><Button type="submit" variant="outline" size="sm">Apply</Button></form></div>;
 }
 export function FreshnessLabel({ freshness }: { freshness: Freshness }) {
-  return <span className={`product-freshness product-freshness-${freshness.status}`}>{freshness.status !== "unknown" && freshness.lastObservedAt ? `Listing ${freshness.status === "stale" ? "stale · " : "observed "}${dateLabel(freshness.lastObservedAt)}` : "Listing freshness unknown"}</span>;
+  const title = freshness.lastObservedAt
+    ? `Last listing check ${freshness.lastObservedAt} (UTC)`
+    : "No usable listing observation time";
+  if (freshness.status === "stale" && freshness.lastObservedAt) {
+    return <span className="product-freshness product-freshness-stale" title={title}>Listing stale · {dateLabel(freshness.lastObservedAt)}</span>;
+  }
+  if (freshness.status === "unknown" || !freshness.lastObservedAt) {
+    return <span className="product-freshness product-freshness-unknown" title={title}>Listing freshness unknown</span>;
+  }
+  return <span className="product-freshness product-freshness-fresh" title={title}>Listing current</span>;
 }
 export function PageHeading({ title, description, children }: { title: string; description: string; children?: React.ReactNode }) {
   return <div className="product-heading"><div><h1>{title}</h1><p>{description}</p></div>{children}</div>;
@@ -50,5 +59,12 @@ export function Metric({ label, value, note }: { label: string; value: React.Rea
   return <StatCard variant="plain" className="product-metric -m-px border-t border-l px-5 py-4" label={label} value={shown} hint={note} />;
 }
 export function InstallValue({ app }: { app: AppViewModel }) {
-  return app.store === "ios" ? <span className="product-muted" title="App Store does not publish install counts">Not published</span> : <span>{app.installsText ?? "Not available"}</span>;
+  if (app.store === "ios") return <span className="product-muted" title="App Store does not publish install counts">Not published</span>;
+  const text = app.installsText ?? "Not available";
+  // Store ranges keep their trailing "+" semantics; exact copy stays available to assistive tech via title.
+  return <span title={text}>{text}</span>;
+}
+export function CompactCount({ value }: { value: number | null }) {
+  if (value == null) return <span className="product-muted">Not available</span>;
+  return <span title={count(value)}>{compact(value)}</span>;
 }

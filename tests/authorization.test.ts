@@ -112,6 +112,8 @@ test("production keeps internal pilot and public commercial display fail-closed"
   for (const flag of [
     "APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL",
     "APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED",
+    "APPRADAR_INTERNAL_MEDIA_OPERATOR_APPROVAL",
+    "APPRADAR_INTERNAL_MEDIA_UNCONFIRMED_RISK_ACCEPTED",
     "APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED",
     "POC_DATA_USE_CONFIRMED",
   ]) {
@@ -130,6 +132,8 @@ test("production keeps internal pilot and public commercial display fail-closed"
   for (const flag of [
     "APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL",
     "APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED",
+    "APPRADAR_INTERNAL_MEDIA_OPERATOR_APPROVAL",
+    "APPRADAR_INTERNAL_MEDIA_UNCONFIRMED_RISK_ACCEPTED",
     "APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED",
   ]) {
     assert.deepEqual(productionConfigProblems({ ...production, [flag]: "true" }), [`${flag}:must_be_false`]);

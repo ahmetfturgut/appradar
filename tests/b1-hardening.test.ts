@@ -55,9 +55,9 @@ test("unrelated updates do not refresh metrics; missing, malformed and future pr
 test("stale and unknown field indicators are visible, including aggregate metrics", () => {
   const fields = mapListing(raw, now).fieldFreshness;
   const stale = renderToStaticMarkup(createElement(FieldValue, { fields, field: "rating_value" }, "3.5"));
-  assert.match(stale, /Stale metric/); assert.match(stale, /2026-01-01T00:00:00Z/);
+  assert.match(stale, /Stale/); assert.match(stale, /2026-01-01T00:00:00Z/);
   const unknown = renderToStaticMarkup(createElement(FieldValue, { field: "rating_count" }, "100"));
-  assert.match(unknown, /Metric freshness unknown/); assert.doesNotMatch(unknown, /Metric observed/);
+  assert.match(unknown, /Freshness unknown/); assert.doesNotMatch(unknown, /Metric observed/);
   const apps = Array.from({ length: 6 }, (_, i) => toMarketApp({ ...raw, id: i + 1, app_id: `fixture-${i}` }, now));
   const indicators = computeIndicators(apps, Date.parse(now));
   assert.equal(indicators.qualityGap.value, 100);
@@ -66,7 +66,7 @@ test("stale and unknown field indicators are visible, including aggregate metric
   assert.equal(indicators.pricing.freshness!.stale, 6);
   assert.equal(indicators.concentration.freshness!.unknown, 6, "identity freshness cannot be borrowed from developer name");
   const html = renderToStaticMarkup(createElement(MetricFreshnessSummary, { value: indicators.pricing.freshness }));
-  assert.match(html, /6 stale/); assert.match(html, /Listing observations do not refresh retained metrics/);
+  assert.match(html, /6 stale/); assert.match(html, /Listing checks do not refresh retained metrics/);
 });
 
 test("legacy admin is unavailable before auth or demo and no obsolete post-login target remains", async () => {
