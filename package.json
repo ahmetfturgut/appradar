@@ -21,6 +21,7 @@
     "poc:report": "node --import tsx tools/poc.ts report",
     "retention": "node --import tsx src/lib/retention/cli.ts",
     "check:env": "node --import tsx src/lib/config/check.ts",
+    "db:migrate": "node --import tsx src/lib/migrate/cli.ts",
     "data:fetch": "node --import tsx tools/local-fetch.ts",
     "data:subimpact": "node --import tsx tools/subimpact-fetch.ts",
     "data:aurelix-charts": "node --import tsx tools/aurelix-charts-fetch.ts",

@@ -3,6 +3,7 @@ import { mediaDisplayAllowed, storeIconsEnabled, storeScreenshotsEnabled } from 
 import { validateStoreMediaUrl } from "../media/urls.ts";
 import { ReadError, type ReadClient } from "./client.ts";
 import { fieldFreshness, freshness, type FieldFreshness, type Freshness } from "./field-freshness.ts";
+import { catalogDisplayClosed } from "./display-policy.ts";
 export { freshness, STALE_AFTER_HOURS, type Freshness, type FreshnessStatus } from "./field-freshness.ts";
 export { storeIconsEnabled, storeScreenshotsEnabled };
 
@@ -78,9 +79,9 @@ export function sanitizeText(value: unknown, max = 20000): string | null {
 /** @deprecated Always false; legacy APPRADAR_STORE_MEDIA_ENABLED is ignored. Use storeIconsEnabled / storeScreenshotsEnabled. */
 export const mediaEnabled = () => false;
 /** Store description rights are unconfirmed; listing text is withheld unless explicitly enabled. */
-export const storeDescriptionEnabled = () => process.env.APPRADAR_STORE_DESCRIPTION_ENABLED === "true";
+export const storeDescriptionEnabled = () => !catalogDisplayClosed() && process.env.APPRADAR_STORE_DESCRIPTION_ENABLED === "true";
 /** Review usage rights are unconfirmed; text is withheld unless explicitly enabled. */
-export const reviewContentEnabled = () => process.env.APPRADAR_REVIEW_CONTENT_ENABLED === "true";
+export const reviewContentEnabled = () => !catalogDisplayClosed() && process.env.APPRADAR_REVIEW_CONTENT_ENABLED === "true";
 
 function provenanceSource(raw: unknown, field: string): string | null {
   if (!raw || typeof raw !== "object") return null;

@@ -4,6 +4,7 @@
 // --execute also needs RETENTION_CLEANUP_EXECUTION=true and an "approval" block in the policy.
 import { readFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
+import { collectionTargetProblems, developmentCollectionRpc } from "../collection/target.ts";
 import { supabaseRpc } from "../persistence/rpc.ts";
 import { executionBlocks, parsePolicy } from "./policy.ts";
 import { runCleanup } from "./run.ts";
@@ -21,11 +22,13 @@ async function main() {
   const blocks = executionBlocks(env, policy);
   if (values.execute && blocks.length) throw new Error(`retention_execution_closed:${blocks.join(",")}`);
   if (!env.SUPABASE_URL?.trim() || !env.SUPABASE_SERVICE_ROLE_KEY?.trim()) throw new Error("supabase_configuration_missing");
-  const rpc = supabaseRpc({ url: env.SUPABASE_URL, serviceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY });
-  return runCleanup(rpc, {
+  // Deleting requires the declared development project; the read-only dry run is unchanged.
+  const rpc = values.execute ? developmentCollectionRpc(env) : supabaseRpc({ url: env.SUPABASE_URL, serviceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY });
+  const result = await runCleanup(rpc, {
     policy, env, execute: values.execute,
     batchSize: Number(values["batch-size"]), maxBatches: Number(values["max-batches"]),
   });
+  return result.dryRun ? { ...result, closedTargetGates: collectionTargetProblems(env) } : result;
 }
 
 main().then(

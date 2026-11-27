@@ -8,10 +8,10 @@
 import { readFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
 import { ApifyClient } from "../../poc/apify.ts";
-import { supabaseRpc } from "../persistence/rpc.ts";
 import { closedGates, CollectionConfig, configuredBudgetLimits } from "./config.ts";
 import { enqueue, planJobs, scheduleDue } from "./jobs.ts";
 import { collectionStore } from "./store.ts";
+import { collectionTargetProblems, developmentCollectionRpc } from "./target.ts";
 import { reconcileCosts, runNextJob } from "./worker.ts";
 
 async function main() {
@@ -35,13 +35,16 @@ async function main() {
     const planned = planJobs(config, new Date(), { ...selection, onlyEnabled: command === "schedule" });
     return {
       dryRun: true, command, schedulingEnabled: config.schedulingEnabled, closedGates: closedGates(env, config),
+      closedTargetGates: collectionTargetProblems(env),
       reservationCeilingUsd: Number(planned.reduce((n, p) => n + p.job.maxChargeUsd, 0).toFixed(2)),
       jobs: planned.map(p => ({ provider: p.job.provider, mode: p.job.mode, store: p.job.store, country: p.job.country,
         context: p.job.context, scheduledFor: p.scheduledFor, dedupeKey: p.dedupeKey, input: p.job.input })),
     };
   }
 
-  const rpc = supabaseRpc({ url: env.SUPABASE_URL ?? "", serviceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY ?? "" });
+  // Every command below mutates the database (and `work` also pays a provider): the target project is
+  // verified first, before a client exists. Data-use and paid gates below are unchanged.
+  const rpc = developmentCollectionRpc(env);
   const store = collectionStore(rpc);
   if (command === "resolve") {
     const decision = values.decision;

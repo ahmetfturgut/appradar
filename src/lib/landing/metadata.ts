@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import { publicIndexingApproved } from "../config/indexing";
 import { dictionaries } from "./dictionaries";
 import { landingHref, type LandingLocale } from "./locale";
 import { legalDictionaries, type LegalDocument } from "./legal";
 
-export function landingMetadata(locale: LandingLocale, env: { NEXT_PUBLIC_SITE_URL?: string; NODE_ENV?: string } = process.env): Metadata {
+type MetadataEnv = { NEXT_PUBLIC_SITE_URL?: string; NODE_ENV?: string; APPRADAR_PUBLIC_INDEXING_APPROVED?: string };
+
+export function landingMetadata(locale: LandingLocale, env: MetadataEnv = process.env): Metadata {
   let origin: string | null = null;
   try {
     const url = new URL(env.NEXT_PUBLIC_SITE_URL || (env.NODE_ENV === "development" ? "http://127.0.0.1:3000" : ""));
@@ -11,9 +14,11 @@ export function landingMetadata(locale: LandingLocale, env: { NEXT_PUBLIC_SITE_U
     if (!url.username && !url.password && (url.protocol === "https:" || (url.protocol === "http:" && local))) origin = url.origin;
   } catch { /* No guessed production domain. Keep indexing off until the site origin is configured. */ }
   const text = dictionaries[locale].meta;
+  // Canonical and language alternates below do not depend on this; only robots does.
+  const indexable = !!origin && env.NODE_ENV === "production" && publicIndexingApproved(env);
   return {
     title: { absolute: text.title }, description: text.description,
-    robots: { index: !!origin && env.NODE_ENV === "production", follow: !!origin && env.NODE_ENV === "production" },
+    robots: { index: indexable, follow: indexable },
     ...(origin ? { metadataBase: new URL(origin), alternates: {
       canonical: `${origin}${landingHref(locale)}`,
       languages: { en: `${origin}/en`, tr: `${origin}/tr`, "x-default": `${origin}/en` },
@@ -22,7 +27,7 @@ export function landingMetadata(locale: LandingLocale, env: { NEXT_PUBLIC_SITE_U
   };
 }
 
-export function legalMetadata(locale: LandingLocale, document: LegalDocument, env: { NEXT_PUBLIC_SITE_URL?: string; NODE_ENV?: string } = process.env): Metadata {
+export function legalMetadata(locale: LandingLocale, document: LegalDocument, env: MetadataEnv = process.env): Metadata {
   const base = landingMetadata(locale, env);
   const text = legalDictionaries[locale].documents[document];
   const origin = base.metadataBase?.toString().replace(/\/$/, "");

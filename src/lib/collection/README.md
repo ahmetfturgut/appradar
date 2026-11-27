@@ -4,6 +4,13 @@ Scheduled and paid execution are **off**. No cron or route calls this code.
 
 ## Before it can run against Supabase
 
+0. **Target project.** Every command that writes (`enqueue`, `schedule`, `work`, `reconcile`, `resolve` with `--execute`)
+   runs only against the development project: set `APPRADAR_DEVELOPMENT_PROJECT_REF=<dev ref>` and `SUPABASE_URL`
+   must be exactly `https://<dev ref>.supabase.co`. Unknown, mismatched, local, `rest/v1` or production targets are
+   refused (`collection_target_closed:…`) before any request. The dry run lists this as `closedTargetGates`.
+   There is no production collection path or override. This guard is in addition to the gates below.
+   The same check protects `retention --execute`, `tools/*-fetch.ts --execute` and `tools/poc.ts run|resume`
+   (coverage table: `docs/PRODUCTION.md` §10).
 1. Migration `supabase/migrations/20261126000700_collection_bridge.sql` grants the private trigger helpers to `service_role` and exposes narrow public wrappers. The proposed SQL file is not applied separately.
 2. Paid work calls `appradar_collection_ensure_budgets` with `DAILY_LIMIT_USD` and `MONTHLY_LIMIT_USD`. Missing limits fail closed. An existing period is not raised.
 3. Copy `config.example.json`, set `retentionDays`, targets and frequencies.

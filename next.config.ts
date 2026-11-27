@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { indexingHeaderRules, publicIndexingApproved } from "./src/lib/config/indexing.ts";
 
 /**
  * Response headers for every route. The CSP has no nonces (Next's documented static form), so inline
@@ -33,6 +34,10 @@ export function securityHeaders(development: boolean): { key: string; value: str
 const config: NextConfig = {
   poweredByHeader: false,
   devIndicators: false,
-  headers: async () => [{ source: "/:path*", headers: securityHeaders(process.env.NODE_ENV === "development") }],
+  // Evaluated at build time: changing APPRADAR_PUBLIC_INDEXING_APPROVED needs a rebuild/redeploy.
+  headers: async () => [
+    { source: "/:path*", headers: securityHeaders(process.env.NODE_ENV === "development") },
+    ...indexingHeaderRules(publicIndexingApproved(process.env)),
+  ],
 };
 export default config;

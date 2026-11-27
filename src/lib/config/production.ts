@@ -15,6 +15,9 @@ export const PRODUCTION_DISABLED_FLAGS = [
   "APPRADAR_INTERNAL_MEDIA_OPERATOR_APPROVAL",
   "APPRADAR_INTERNAL_MEDIA_UNCONFIRMED_RISK_ACCEPTED",
   "APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED",
+  // Store content rights are unconfirmed: production refuses to serve with any content flag on.
+  "APPRADAR_STORE_ICONS_ENABLED", "APPRADAR_STORE_SCREENSHOTS_ENABLED",
+  "APPRADAR_STORE_DESCRIPTION_ENABLED", "APPRADAR_REVIEW_CONTENT_ENABLED",
 ] as const;
 
 function parseUrl(value: string): URL | null {
@@ -36,6 +39,8 @@ export function productionConfigProblems(env: Env): string[] {
   // This is what stops a development URL or key from being used in production by mistake.
   let ref = required("APPRADAR_SUPABASE_PROJECT_REF");
   if (ref && !/^[a-z0-9]{15,40}$/.test(ref)) { problems.push("APPRADAR_SUPABASE_PROJECT_REF:invalid"); ref = ""; }
+
+  if (ref && value("APPRADAR_DEVELOPMENT_PROJECT_REF") === ref) problems.push("APPRADAR_SUPABASE_PROJECT_REF:is_development_project");
 
   for (const name of ["SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL"]) {
     const raw = required(name);

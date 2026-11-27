@@ -43,6 +43,10 @@ An explicit applicable contractual **prohibition** must be recorded as `prohibit
 
 Aurelix `description` may be **stored** when normalized; public release still requires `APPRADAR_STORE_DESCRIPTION_ENABLED` plus a recorded display basis. Do not treat storage as display authorization.
 
+## Production catalog display (27 November 2026)
+
+A production build never reads the third-party catalog, whatever the flags say (`src/lib/read/display-policy.ts`), and production configuration refuses to serve with any content flag on. Collection writes are limited to the declared development project. Neither is a rights approval.
+
 ## Internal pilot bounds (unconfirmed path only)
 
 Enforced in code when rights are `unconfirmed` (not a generic bypass). Scope is selected with `APPRADAR_INTERNAL_PILOT_SCOPE` (`b43-details` default when unset; `b45-productivity` for the Productivity market pilot).

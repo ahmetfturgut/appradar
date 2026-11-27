@@ -1,6 +1,6 @@
 # AppRadar production runbook
 
-Nothing in this document has been executed: no production project, deployment or remote setting exists yet. Plan features, limits and prices of Supabase, Vercel, Google and the SMTP provider were not verified; check them before relying on them. Paid options need explicit approval.
+Nothing in this document has been executed: no production project, deployment or remote setting exists yet. Preparation for a private deployment (§12) was added on 27 November 2026. Plan features, limits and prices of Supabase, Vercel, Google and the SMTP provider were not verified; check them before relying on them. Paid options need explicit approval.
 
 ## 1. Environments
 
@@ -32,9 +32,9 @@ Required. In production the app answers **503** until all are present and consis
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_…` (or legacy `anon`) | public |
 | `NEXT_PUBLIC_SITE_URL` | `https://your-domain`, origin only | public |
 
-Unset or exactly `false` (anything else is also a 503): `APPRADAR_DEMO_MODE`, `COLLECTION_PAID_EXECUTION`, `APIFY_COLLECTION_ENABLED`, `POC_DATA_USE_CONFIRMED`, `RETENTION_CLEANUP_EXECUTION`, `APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL`, `APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED`, `APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_OPERATOR_APPROVAL`, `APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_UNCONFIRMED_RISK_ACCEPTED`, `APPRADAR_INTERNAL_MEDIA_OPERATOR_APPROVAL`, `APPRADAR_INTERNAL_MEDIA_UNCONFIRMED_RISK_ACCEPTED`, `APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED`.
+Unset or exactly `false` (anything else is also a 503): `APPRADAR_DEMO_MODE`, `COLLECTION_PAID_EXECUTION`, `APIFY_COLLECTION_ENABLED`, `POC_DATA_USE_CONFIRMED`, `RETENTION_CLEANUP_EXECUTION`, `APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL`, `APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED`, `APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_OPERATOR_APPROVAL`, `APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_UNCONFIRMED_RISK_ACCEPTED`, `APPRADAR_INTERNAL_MEDIA_OPERATOR_APPROVAL`, `APPRADAR_INTERNAL_MEDIA_UNCONFIRMED_RISK_ACCEPTED`, `APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED`, `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`.
 
-Keep `false` until usage rights are recorded (not enforced by the check): `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`. Legacy `APPRADAR_STORE_MEDIA_ENABLED` is ignored. See [CONTENT_USAGE.md](CONTENT_USAGE.md).
+**Catalog display is closed in production.** Independently of every flag, a production build never reads the third-party catalog (names, developers, metrics, rankings, aggregates, content): signed-in screens show "Catalog data is not available in this deployment". Watchlist entries, if any, appear without catalog values. Opening this needs a documented rights basis and a reviewed code change (`src/lib/read/display-policy.ts`). Legacy `APPRADAR_STORE_MEDIA_ENABLED` is ignored. See [CONTENT_USAGE.md](CONTENT_USAGE.md).
 
 Do **not** set on the web host: `APIFY_TOKEN`, `POC_LIMIT_USD`, `DAILY_LIMIT_USD`, `MONTHLY_LIMIT_USD`, database connection strings.
 
@@ -52,17 +52,38 @@ Limits of the check: it compares URLs and legacy JWT keys with the declared ref.
 
 ## 4. Migrations
 
-Apply all files in `supabase/migrations/` to the empty production database in filename order (`000100` → `001300` media suppression), each in its own transaction, stopping at the first error:
+Use the runner (`src/lib/migrate/cli.ts`, `npm run db:migrate`). It needs the `psql` client (PostgreSQL 15+). On this machine `postgresql@17` is installed (keg-only): `export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"`. Elsewhere: `brew install postgresql@17` or `libpq`.
+
+**What it enforces**
+- Inventory: `supabase/migrations/` must match `supabase/migrations.manifest.json` (13 files, order and SHA-256). A new or edited migration needs a reviewed manifest update.
+- Target: `--target-ref` must equal the ref inside the connection string (`db.<ref>.supabase.co`, or session pooler user `postgres.<ref>` on port 5432, TLS). `APPRADAR_DEVELOPMENT_PROJECT_REF` is required; that ref, and any ref in `.env.local`, are refused. No `?host=`-style parameters.
+- Preflight before any write: a Supabase database on PostgreSQL 15+, and either no AppRadar tables, or a ledger with this tool's shape. The development ledger (no checksums) is not adopted.
+- Ledger `appradar_meta.schema_migrations(version, checksum, applied_at)` (`supabase/bootstrap/ledger.sql`), hidden from API roles.
+- One transaction per migration with its ledger row; first error stops. Re-running resumes; applied files must be an unchanged prefix.
+- The connection string is read only from `APPRADAR_MIGRATION_DATABASE_URL`; psql receives it through its environment, never arguments. Errors are reduced to one redacted line.
+
+**Procedure** (run from the repository root; use a shell without `.env.local` loaded):
 
 ```bash
-psql "$PRODUCTION_DATABASE_URL" --single-transaction --set=ON_ERROR_STOP=1 --file supabase/migrations/20261126000100_catalog_core.sql
+export APPRADAR_DEVELOPMENT_PROJECT_REF=<development ref>
+read -rs APPRADAR_MIGRATION_DATABASE_URL && export APPRADAR_MIGRATION_DATABASE_URL
 ```
 
-- Record each applied file in `appradar_meta.schema_migrations`, as in development. The repository does not create this ledger; create it first, in a schema that is not exposed to clients.
-- Do not run `supabase/tests/*.sql` against production.
-- The "Not applied remotely" header comments in `000800` and `001000` are older than `APPRADAR.md`'s application records; trust each database's ledger, not the comments.
-- Afterwards confirm: every `public` table has RLS; `anon` has no table or function access; `authenticated` only has SELECT/INSERT/DELETE on `watchlist_items`.
-- Deploy the web app only after the migrations.
+```bash
+npm run db:migrate -- --target-ref <production ref>
+```
+
+Copy the connection string from the new project's **Connect** panel (session pooler, port 5432, or direct) and put your database password in it; percent-encode characters such as `@ : / ? # %`, or choose a long password of letters and digits. That first run is offline: it checks the inventory and the target and prints the order. Then add, one at a time, `--status` (read-only), `--apply`, and `--verify` (read-only). Afterwards `unset APPRADAR_MIGRATION_DATABASE_URL`.
+
+**Post-migration verification** (`--verify`, `supabase/bootstrap/verify.sql`): 15 tables present with RLS; `anon` has no table or column privilege; `authenticated` only SELECT/INSERT/DELETE on `watchlist_items` with its three policies; `private` and `appradar_meta` closed to API roles; no client EXECUTE on `appradar_*`; no `SECURITY DEFINER`. In the Dashboard also confirm exposed schemas do not include `private` or `appradar_meta`, and the Security Advisor shows nothing unexpected.
+
+**Rehearsed locally (27 November 2026, PostgreSQL 17.12, same version as development).** `tests/migration-rehearsal.test.ts` creates a disposable loopback-only cluster with a Supabase stand-in (`supabase/tests/local-supabase-shim.sql`: API roles, non-superuser `postgres`, `auth.users`, `auth.uid()`, open default privileges), then runs the real runner and `psql`: all 13 migrations in order; a deliberately failing migration rolled back with later ones not started; resumption; changed, missing and duplicate migrations refused; `verify.sql` passing and catching six injected weakenings; two-user watchlist isolation, the 50-item limit and account-deletion cascade; refusal of non-Supabase, unrecorded and foreign-ledger databases. The cluster is deleted afterwards. Rerun:
+
+```bash
+APPRADAR_REHEARSAL_PG_BIN=/opt/homebrew/opt/postgresql@17/bin node --import tsx --test tests/migration-rehearsal.test.ts
+```
+
+**Still only provable on the hosted project:** the real `auth` schema, platform roles, event triggers and default privileges; Supavisor/direct connection and TLS (the rehearsal connects without TLS and bypasses the hosted-target parser, which is deliberately unchanged); PostgREST exposure and GoTrue behaviour. A passing `--verify` on the new project is required. Do not run `supabase/tests/*.sql` or the shim against any hosted database, and deploy the web app only after verification passes.
 
 ## 5. Supabase Auth
 
@@ -122,6 +143,18 @@ These lines carry codes only. Next.js and the host log unhandled errors and requ
 ## 10. Collection and retention safeguards
 
 - The web app has no code path that starts collection or cleanup, and nothing is scheduled.
+- Collection commands that write refuse every database except the declared development project (`APPRADAR_DEVELOPMENT_PROJECT_REF`, see `src/lib/collection/README.md`). There is no production collection path. The guard trusts the declared ref: never declare a production ref as development.
+
+| Entry point | Covered | What still works without a verified target |
+|---|---|---|
+| `src/lib/collection/cli.ts` `enqueue`, `schedule`, `work`, `reconcile`, `resolve` with `--execute` | Target + server key | `plan` / dry run |
+| `src/lib/retention/cli.ts --execute` | Target + server key, after the existing policy and flag gates | Read-only dry run (reports `closedTargetGates`) |
+| `tools/*-fetch.ts --execute` (9 scripts, `data:*`) | Development environment, before the provider token is used | Preview and reuse of earlier results |
+| `tools/poc.ts run`, `resume` | Development environment | `plan`, `report` |
+| `src/lib/migrate/cli.ts` | Its own rules (§4): production-bound by design, refuses development | |
+| `src/lib/import/cli.ts` | Remote writes disabled in code | |
+
+"Development environment" means `NODE_ENV` is not production, `APPRADAR_DEVELOPMENT_PROJECT_REF` is declared and `SUPABASE_URL` is exactly that project. There is no override. **Retention against a production database is therefore not possible with this CLI**; it needs an approved policy and a separately reviewed production path. Old compiled copies in the git-ignored `dist/` folder predate these guards: delete them and never run them.
 - Collection needs `COLLECTION_PAID_EXECUTION`, `APIFY_COLLECTION_ENABLED`, a token, budget limits, `retentionDays`, `--execute`, and a scoped data-use path from an operator shell (`verified`+`POC_DATA_USE_CONFIRMED`, or bounded `unconfirmed` internal pilot — see [CONTENT_USAGE.md](CONTENT_USAGE.md)). Do not set `POC_DATA_USE_CONFIRMED` without verified evidence. Production web must keep pilot/public-display flags false.
 - Retention needs a human-approved policy, `RETENTION_CLEANUP_EXECUTION=true` and `--execute` (see `APPRADAR.md` 6.20). Dry-run and verify a backup first.
 - Keep production operator env files separate from development ones, and check which project they point to before any `--execute`.
@@ -137,3 +170,68 @@ These lines carry codes only. Next.js and the host log unhandled errors and requ
 - [ ] Backup confirmed and restore rehearsed
 - [ ] Real **production** end-to-end test: sign-up, verification, sign-in, session expiry, sign-out, reset, password change, OAuth if enabled, watchlist with two users; deletion happy path plus any authorized edge cases. Development Auth verification (APPRADAR §6.24) does not cover production, OAuth, MFA or live isolation.
 - [ ] Headers and CSP checked on the deployed site (browser console clean, Google sign-in works if enabled)
+
+## 12. Private deployment checklist (Option A: owner testing only)
+
+The catalog stays empty and closed. Plan features, prices, limits, terms and exact dashboard labels were not verified.
+
+**Two different kinds of "private"**
+- **Application authentication** (what this setup relies on): product routes require a signed-in user; with sign-ups off, only accounts you create exist.
+- **Hosting access protection** (optional extra): restricting who can load the site at all. Availability for the production domain depends on your Vercel plan; do not assume it, and do not buy it without deciding to.
+- Without hosting protection, anyone with the URL can load the landing page, legal **drafts**, `/login` and `/signup`.
+- Indexing is off by default (§13): pages send `noindex`. That only asks search engines not to list them; it protects nothing and does not stop anyone with the URL.
+
+**Supabase (new project, separate from development)**
+- [ ] MFA on your Supabase and Vercel accounts.
+- [ ] Create the project. Region: close to you; note it to match the Vercel function region. Save the database password in a password manager.
+- [ ] Record: project ref; Project URL (origin only); publishable key; secret key; **session pooler** or direct connection string (port 5432).
+- [ ] Data API: exposed schemas exclude `private` and `appradar_meta`.
+
+**Database**
+- [ ] Install `psql`; run §4: offline check → `--status` → `--apply` → `--verify`.
+
+**Authentication**
+- [ ] Email provider on; **Confirm email on**; anonymous sign-ins **off**; Google **off**; CAPTCHA **off**.
+- [ ] **Allow new users to sign up: off.**
+- [ ] Create your own user in Authentication → Users, marked as email-confirmed, with a strong unique password. Without custom SMTP, do not rely on password-reset or verification email.
+
+**Vercel**
+- [ ] Import the repository; Next.js preset; default build command; Node.js 22.18 or newer; function region near the database. Check the plan's terms fit your use.
+- [ ] Environment variables, **Production scope only** (Preview and Development get none of these):
+
+| Name | Value | Note |
+|---|---|---|
+| `APPRADAR_SUPABASE_PROJECT_REF` | production ref | |
+| `SUPABASE_URL` | `https://<ref>.supabase.co` | |
+| `SUPABASE_SERVICE_ROLE_KEY` | secret key | mark Sensitive |
+| `NEXT_PUBLIC_SUPABASE_URL` | same origin | public, fixed at build |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | publishable key | public, fixed at build |
+| `NEXT_PUBLIC_SITE_URL` | `https://<your-domain-or-vercel.app>` | origin only, fixed at build |
+
+- [ ] Leave `APPRADAR_PUBLIC_INDEXING_APPROVED` unset.
+- [ ] Do not set: any flag in §3, `APIFY_TOKEN`, budget limits, `APPRADAR_DEVELOPMENT_PROJECT_REF`, `APPRADAR_MIGRATION_DATABASE_URL`, `DATABASE_URL`.
+- [ ] Deploy. If the final domain was unknown, set `NEXT_PUBLIC_SITE_URL` once the project has one and **redeploy**.
+- [ ] Supabase → URL configuration: Site URL = `NEXT_PUBLIC_SITE_URL`; the only redirect URL is `<site>/auth/callback`.
+- [ ] Optional: enable whatever deployment protection your plan includes; protect or disable preview deployments.
+
+**Smoke tests**
+- [ ] `/en` and `/tr` load; no 503; browser console clean.
+- [ ] `curl -sI https://<site>/en` shows `x-robots-tag: noindex, nofollow`, and the page source has the robots `noindex` meta tag.
+- [ ] `/dashboard` signed out redirects to `/login`.
+- [ ] Signing up at `/signup` is refused ("New sign-ups are currently disabled").
+- [ ] Your account signs in; Dashboard, Explorer, Markets, Compare and Watchlist show the unavailable or empty state, never sample data.
+- [ ] Theme selector and Account → Appearance persist across reload.
+- [ ] Sign out; protected pages redirect again.
+- [ ] Response headers include CSP, HSTS and `X-Frame-Options: DENY`; `/admin` is 404.
+- [ ] Host logs show no `appradar_config_invalid` or secrets.
+
+## 13. Search indexing and future public launch
+
+Default: **no indexing**. Every route sends `X-Robots-Tag: noindex, nofollow` and page metadata says the same. Canonical and language-alternate links are unaffected. No `robots.txt` blocks crawling, so crawlers can see the `noindex`.
+
+Activate only after the owner approves a public launch (legal pages published, naming and data-rights decisions made):
+1. Set `APPRADAR_PUBLIC_INDEXING_APPROVED=true` (exact value) in the Production scope only.
+2. Ensure `NEXT_PUBLIC_SITE_URL` is the final domain, then **rebuild and redeploy** (headers are fixed at build time).
+3. Verify: `/en` and `/tr` have no `x-robots-tag` and `index, follow` metadata; legal drafts, sign-in and all other routes still send `noindex`.
+
+Legal drafts stay `noindex` until their draft status is removed in a separate reviewed change. To withdraw, unset the variable and redeploy; already indexed pages disappear only when search engines recrawl.

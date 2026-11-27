@@ -5,6 +5,7 @@ import { ApifyClient } from "../src/poc/apify.js";
 import { PocJournal } from "../src/poc/journal.js";
 import { Job, stableHash } from "../src/poc/plan.js";
 import { collectJob } from "../src/poc/runner.js";
+import { assertDevelopmentEnvironment } from "../src/lib/collection/target.js";
 
 // Dedicated Aurelix Google Play reviews validation. Caps: $0.05/run, $0.10 total.
 // App id from prior successful Play detail/reviews runs (ChatGPT).
@@ -40,6 +41,8 @@ async function main() {
     console.log(JSON.stringify({ mode: "preview", provider: "aurelixplayreviews", jobs: [{ id: job.id, store: job.store, mode: job.mode, context: job.context, maxReviewsPerApp: job.input.maxReviewsPerApp, sort: job.input.sort }], maxReservedUsd: VALIDATION_CEILING_USD, note: "Gerçek çekim için --execute; sayfa açmak veri çekmez." }));
     return;
   }
+  // Paid path: refused unless this shell is the declared development project.
+  assertDevelopmentEnvironment(process.env);
   const token = process.env.APIFY_TOKEN?.trim() ?? "";
   if (!token) throw new Error("APIFY_TOKEN_missing");
   const limitUsd = Number(process.env.POC_LIMIT_USD);

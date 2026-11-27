@@ -33,6 +33,7 @@ export function contextResetHref(path: string, params: SearchValues): string {
 }
 export function readFailure(error: unknown): { state: "unavailable" | "error"; message: string } {
   const code = error && typeof error === "object" && "code" in error ? String(error.code) : "";
+  if (code === "catalog_display_closed") return { state: "unavailable", message: "Catalog data is not available in this deployment. No sample data is substituted." };
   if (code === "supabase_not_configured") return { state: "unavailable", message: "The data source is not configured on the server. No sample data is substituted." };
   if (code === "read_function_unavailable" || /read_rejected_(PGRST20[025]|42P01|42703|404)$/.test(code)) return { state: "unavailable", message: "The required read schema or functions are unavailable. The pending T8 migration must be applied by the backend team." };
   if (code === "invalid_input" || code === "page_out_of_range") return { state: "error", message: "These filters or this page are not supported. Check the URL or clear the filters." };

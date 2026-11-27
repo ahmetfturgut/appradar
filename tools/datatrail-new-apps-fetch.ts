@@ -5,6 +5,7 @@ import { ApifyClient } from "../src/poc/apify.js";
 import { PocJournal } from "../src/poc/journal.js";
 import { Job, stableHash } from "../src/poc/plan.js";
 import { collectJob } from "../src/poc/runner.js";
+import { assertDevelopmentEnvironment } from "../src/lib/collection/target.js";
 
 // DataTrail iOS new-free-apps validation. Caps: $0.05/run, $0.10 total.
 // Live validation already completed for US Productivity (6007); reuse unless forced.
@@ -47,6 +48,8 @@ async function main() {
     }, null, 2));
     return;
   }
+  // Paid path: refused unless this shell is the declared development project.
+  assertDevelopmentEnvironment(process.env);
   const token = process.env.APIFY_TOKEN?.trim() ?? "";
   if (!token) throw new Error("APIFY_TOKEN_missing");
   const limitUsd = Number(process.env.POC_LIMIT_USD);

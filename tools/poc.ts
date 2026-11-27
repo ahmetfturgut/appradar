@@ -7,6 +7,7 @@ import { PocJournal } from "../src/poc/journal.js";
 import { createPlan, planSummary, stableHash } from "../src/poc/plan.js";
 import { buildReport } from "../src/poc/report.js";
 import { collectJob, requireLiveSettings } from "../src/poc/runner.js";
+import { assertDevelopmentEnvironment } from "../src/lib/collection/target.js";
 
 async function main() {
   if (existsSync(".env.local")) process.loadEnvFile(".env.local");
@@ -37,6 +38,8 @@ async function main() {
     console.log(`${report.decision}: ${report.completedJobs}/${report.plannedJobs} iş. Ayrıntılar: .poc/report.json`);
     return;
   }
+  // run and resume use the provider token: plan and report above stay offline.
+  assertDevelopmentEnvironment(process.env);
   const settings = {
     token: process.env.APIFY_TOKEN ?? "", enabled: process.env.APIFY_COLLECTION_ENABLED === "true",
     dataUseConfirmed: process.env.POC_DATA_USE_CONFIRMED === "true", limitUsd: Number(process.env.POC_LIMIT_USD ?? ""),

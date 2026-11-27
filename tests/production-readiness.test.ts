@@ -278,7 +278,8 @@ test("read failures log a code only", async () => {
 
 test("security headers cover every route; HSTS and strict script rules outside development", async () => {
   const rules = await config.headers!();
-  assert.deepEqual(rules.map(rule => rule.source), ["/:path*"]);
+  assert.deepEqual(rules.map(rule => rule.source), ["/:path*", "/:path*"]);
+  assert.deepEqual(rules[1]!.headers, [{ key: "X-Robots-Tag", value: "noindex, nofollow" }], "indexing is off by default");
   assert.equal(config.poweredByHeader, false);
   const live = new Map(securityHeaders(false).map(h => [h.key, h.value]));
   assert.equal(live.get("X-Frame-Options"), "DENY");
@@ -309,4 +310,24 @@ test("existing request bounds stay in place", async () => {
   assert.throws(() => parsePage({ page: "1252" }));
   assert.throws(() => parseExplorer({ q: "a".repeat(101) }));
   assert.deepEqual(parseCompareIds(Array.from({ length: 4 }, (_, i) => `de000000-0000-4000-8000-00000000000${i}`).join(",")), { ok: false, error: "too_many" });
+});
+
+test("signed-in production viewers get an honest unavailable state and no catalog request", async () => {
+  Object.assign(process.env, production, { APPRADAR_DEMO_MODE: "false" });
+  jar.set(COOKIE, sessionCookie(jwt({ sub: user().id, exp: 9999999999 })));
+  reply = url => url.pathname === "/auth/v1/user" ? { body: user() } : undefined;
+  const gateway = await import("../src/lib/ui/catalog.server.ts");
+  const scope = { country: "US" };
+  const results = await Promise.all([
+    gateway.dashboardData(scope), gateway.categoryData(scope), gateway.appData(user().id, scope),
+    gateway.appRankingsData(user().id, "US"), gateway.compareData([user().id], "US", "en"),
+    gateway.explorerData({ country: "US", category: "all" } as Parameters<typeof gateway.explorerData>[0]),
+    gateway.marketData({} as Parameters<typeof gateway.marketData>[0]), gateway.opportunityData({} as Parameters<typeof gateway.opportunityData>[0]),
+    gateway.trendingData({} as Parameters<typeof gateway.trendingData>[0]), gateway.knownReleasesData({} as Parameters<typeof gateway.knownReleasesData>[0]),
+    gateway.newAppChartData({} as Parameters<typeof gateway.newAppChartData>[0]),
+  ]);
+  for (const result of results) assert.deepEqual(result, { state: "unavailable", message: "Catalog data is not available in this deployment. No sample data is substituted." });
+  assert.equal((await gateway.listingsForContexts([{ appId: user().id, country: "US", language: "en" }])).size, 0);
+  assert.deepEqual(calls.filter(c => c.url.pathname.startsWith("/rest/")), []);
+  assert.deepEqual(logs, []);
 });

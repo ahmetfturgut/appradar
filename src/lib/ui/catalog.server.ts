@@ -6,6 +6,7 @@ import type { DetailsSections, ExplorerFilters, ReadResult, Scope } from "../../
 import { isDevelopmentDemo } from "./demo-mode";
 import { requireViewer } from "../auth/server";
 import { defaultReadClient } from "../read/client";
+import { catalogDisplayClosed } from "../read/display-policy";
 import { listingsFor, type ListingSummary } from "../read/shared";
 import { buildCompareModel } from "../intel/compare";
 
@@ -17,6 +18,8 @@ export async function readResult<T>(load: () => Promise<T>): Promise<ReadResult<
   // Authorization lives at the data source: every catalog read requires a verified Supabase user
   // (or the development-only demo bypass). Outside the try so the login redirect is not swallowed.
   await requireViewer();
+  // Production: honest "unavailable" state, nothing loaded and nothing logged per request.
+  if (catalogDisplayClosed()) return readFailure({ code: "catalog_display_closed" });
   try { return { state: "ready", data: await load() }; } catch (error) {
     // The page shows fixed copy; operators get the error code only (no message, query or row content).
     const code = error && typeof error === "object" && "code" in error ? String(error.code) : "";
@@ -79,6 +82,8 @@ export async function listingsForContexts(keys: readonly { appId: string; countr
     for (const k of keys) { const row = demo.listingFor(k.appId, k.country, k.language); if (row) out.set(`${k.appId}|${k.country}|${k.language}`, row); }
     return out;
   }
+  // Production: saved items stay listed without any catalog values.
+  if (catalogDisplayClosed()) return out;
   const groups = new Map<string, string[]>();
   for (const k of keys) groups.set(`${k.country}|${k.language}`, [...(groups.get(`${k.country}|${k.language}`) ?? []), k.appId]);
   const client = defaultReadClient();

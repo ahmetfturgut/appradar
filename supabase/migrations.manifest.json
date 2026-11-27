@@ -1,0 +1,54 @@
+[
+  {
+    "file": "20261126000100_catalog_core.sql",
+    "sha256": "ecb0e5e3e18118b135eabb055a1935ec52fea471baa179b6a03885931bdf530a"
+  },
+  {
+    "file": "20261126000200_collection_budget.sql",
+    "sha256": "798dfc9f63d6b6ca85d001356cbabb274720f2fbd8bccce59bea814de2e2a145"
+  },
+  {
+    "file": "20261126000300_app_persistence.sql",
+    "sha256": "dd34c6b3df49b54461257c31cd59a76384a7641593ec65ecb063a00849122e29"
+  },
+  {
+    "file": "20261126000400_discovery.sql",
+    "sha256": "45e37cba73e71e663529660bdb7eb5488dba351f55a8a786f34e2f12022902a5"
+  },
+  {
+    "file": "20261126000500_reviews.sql",
+    "sha256": "da5250d74ff0d3997fb83bcea6cfa8b64d78529621eac28c514473a8e8635343"
+  },
+  {
+    "file": "20261126000600_keywords.sql",
+    "sha256": "a65fb5922a2fc3cb50f9c834af7771b9221173aaa6d2ffef545abc0a2b4025c5"
+  },
+  {
+    "file": "20261126000700_collection_bridge.sql",
+    "sha256": "087fa53c3a5553eb616abe61f94c4b7e88ec1fdc592c656a055b822d329728c6"
+  },
+  {
+    "file": "20261126000800_read_services.sql",
+    "sha256": "4d6f3ffc40e8428c6adbb83875b4abc81ec2d3a6b69ee57762970e4d0d878f72"
+  },
+  {
+    "file": "20261126000900_ranking_intelligence.sql",
+    "sha256": "a51ec623ec5f87f38a74bfd971d22e9e44142aadbc198a06c72caf8b74162b02"
+  },
+  {
+    "file": "20261126001000_watchlist.sql",
+    "sha256": "f5a68e59d17580c1654fa4ef9a6cc943a82dc7eab49f56d30a25e18ba6e6a870"
+  },
+  {
+    "file": "20261126001100_field_freshness.sql",
+    "sha256": "bab3cc82b39ec4d9897672ed08957345375bc2afccc08394ad21c3e15f9e7fa6"
+  },
+  {
+    "file": "20261126001200_data_retention.sql",
+    "sha256": "27b92996cdc0660c0abfe8128f506ca50f849bc7690a3ebaecf8f67c16ecf719"
+  },
+  {
+    "file": "20261126001300_media_suppression.sql",
+    "sha256": "03fcec2762bdb97d6fbd0ad63404bb4ac12ac313db62c19dc6ad9c377730229d"
+  }
+]

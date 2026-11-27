@@ -701,6 +701,20 @@ Minimal genişleme: ortak `APPRADAR_STORE_MEDIA_ENABLED` kaldırıldı/yok sayı
 
 **Sınırlar:** gerçek veriyle Dashboard/Explorer görsel kontrolü yapılmadı (oturum yok; kimlik doğrulama atlanmadı); ekran okuyucu, diğer tarayıcı motorları ve fiziksel cihaz testi yok. **Ertelenen** yapısal öneriler `DESIGN_SYSTEM.md` §12'dedir ve tamamlanmış sayılmaz.
 
+### 6.30 Özel production hazırlığı (Seçenek A) — 27 Kasım 2026
+
+Production projesi, deployment, uzak veritabanı işlemi veya sağlayıcı çağrısı **yapılmadı**. Ayrıntı ve sahip kontrol listesi: [docs/PRODUCTION.md](docs/PRODUCTION.md) §3–4, §12.
+
+- **Toplama hedefi:** yazan tüm collection komutları yalnız `APPRADAR_DEVELOPMENT_PROJECT_REF` ile açıkça tanımlanan geliştirme projesine çalışır; bilinmeyen/uyuşmayan/production hedef istemci oluşmadan reddedilir. B4.3/B4.5 yetki ve bütçe kapıları değişmedi. Production toplama yolu yoktur. **Operatör `.env.local` içine bu ref'i eklemeden collection komutları artık çalışmaz.**
+- **Katalog gösterimi:** production build üçüncü taraf kataloğu hiç okumaz (bayrakla açılmaz); açıklama/yorum/medya bayrakları production yapılandırmasında 503. Development ve demo davranışı değişmedi.
+- **Migration aracı:** `npm run db:migrate` (manifest + checksum, hedef ref doğrulaması, geliştirme projesi reddi, migration başına tek transaction, devam edebilir).
+- **Yerel prova (PostgreSQL 17.12, tek kullanımlık, yalnız loopback, Supabase taklidi):** 13 migration, hata geri alma, devam etme, değiştirilmiş/yinelenen migration reddi, `verify.sql` (6 kasıtlı zayıflatmayı yakaladı), iki kullanıcılı watchlist izolasyonu ve preflight reddi geçti. **Barındırılan Supabase doğrulaması değildir**; yeni projede `--verify` zorunlu.
+- **Arama dizini:** varsayılan `noindex` (metadata + `X-Robots-Tag`); yalnız `APPRADAR_PUBLIC_INDEXING_APPROVED=true` ve yeniden derleme ile `/en` `/tr` açılır. noindex erişim koruması değildir.
+- **Araç izolasyonu:** retention `--execute`, `tools/*-fetch --execute` ve `poc run|resume` da geliştirme projesi doğrulaması ister. Production retention yolu henüz yok.
+- **Kalite kapısı:** test 244/244 (+2 PGlite atlandı, prova dahil); typecheck OK; lint 0 hata (3 mevcut `<img>` uyarısı); production build OK. Production `noindex` (kapalı/açık) ve içerik bayrağında 503, sahte fixture ile loopback üzerinde doğrulandı.
+- **Gizlilik taslakları:** tarayıcı içi tema tercihi EN/TR eklendi; belgeler taslak kalır.
+- **Açık:** barındırılan Supabase projesi ve deployment yok; ticari veri hakkı, yasal bilgiler ve yayın onayı değişmedi.
+
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
 POC kodu da Bölüm 1'deki plan onayından sonra yazılır. Aşağıdaki eşikler öneridir ve onaylı plana alınmalıdır.

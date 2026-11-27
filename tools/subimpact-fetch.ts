@@ -5,6 +5,7 @@ import { ApifyClient } from "../src/poc/apify.js";
 import { PocJournal } from "../src/poc/journal.js";
 import { Job, stableHash } from "../src/poc/plan.js";
 import { collectJob } from "../src/poc/runner.js";
+import { assertDevelopmentEnvironment } from "../src/lib/collection/target.js";
 
 // Subimpact discovery-only subset: keyword search + Play charts. Caps: $0.05/run, $0.15 total.
 const VALIDATION_CEILING_USD = 0.15;
@@ -42,6 +43,8 @@ async function main() {
     console.log(JSON.stringify({ mode: "preview", provider: "subimpact", jobs: jobs.map(j => ({ id: j.id, store: j.store, mode: j.mode, context: j.context, maxItems: j.input.maxItems })), maxReservedUsd: VALIDATION_CEILING_USD, note: "Gerçek çekim için --execute; sayfa açmak veri çekmez." }));
     return;
   }
+  // Paid path: refused unless this shell is the declared development project.
+  assertDevelopmentEnvironment(process.env);
   const token = process.env.APIFY_TOKEN?.trim() ?? "";
   if (!token) throw new Error("APIFY_TOKEN_missing");
   const limitUsd = Number(process.env.POC_LIMIT_USD);

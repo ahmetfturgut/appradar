@@ -43,7 +43,11 @@ test("locale URLs are independent of store filters and first visits default to E
 
 test("localized metadata has stable canonical, hreflang and localized social descriptions", () => {
   for (const locale of ["en", "tr"] as const) {
-    const metadata = landingMetadata(locale, { NEXT_PUBLIC_SITE_URL: "https://example.test/", NODE_ENV: "production" });
+    // Indexing is opt-in; canonical and alternates are identical with or without approval.
+    const unapproved = landingMetadata(locale, { NEXT_PUBLIC_SITE_URL: "https://example.test/", NODE_ENV: "production" });
+    assert.deepEqual(unapproved.robots, { index: false, follow: false });
+    const metadata = landingMetadata(locale, { NEXT_PUBLIC_SITE_URL: "https://example.test/", NODE_ENV: "production", APPRADAR_PUBLIC_INDEXING_APPROVED: "true" });
+    assert.deepEqual(unapproved.alternates, metadata.alternates);
     assert.deepEqual(metadata.title, { absolute: dictionaries[locale].meta.title });
     assert.equal(metadata.description, dictionaries[locale].meta.description);
     assert.equal(metadata.alternates!.canonical, `https://example.test/${locale}`);

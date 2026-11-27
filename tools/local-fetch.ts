@@ -5,6 +5,7 @@ import { ApifyClient } from "../src/poc/apify.js";
 import { PocJournal } from "../src/poc/journal.js";
 import { createPlan } from "../src/poc/plan.js";
 import { collectJob } from "../src/poc/runner.js";
+import { assertDevelopmentEnvironment } from "../src/lib/collection/target.js";
 
 // Fixed local-research subset explicitly requested by the user. No full POC,
 // automatic refresh, reviews, images, descriptions, publishing or commercial-rights attestation.
@@ -17,6 +18,8 @@ async function main() {
     console.log(JSON.stringify({ mode: "preview", jobs: jobs.length, expectedObservations: 40, maxReservedUsd: 0.2, scope: "private-local-research", note: "Gerçek çekim için --execute; sayfa açmak veri çekmez." }));
     return;
   }
+  // Paid path: refused unless this shell is the declared development project.
+  assertDevelopmentEnvironment(process.env);
   const token = process.env.APIFY_TOKEN?.trim() ?? "";
   if (!token) throw new Error("APIFY_TOKEN_missing");
   const limitUsd = Number(process.env.POC_LIMIT_USD);

@@ -1,6 +1,7 @@
 // Server-only. Reads the catalog through PostgREST with the service role key, which bypasses RLS:
 // it must never reach a client bundle, and only allowlisted public tables and read RPCs are reachable.
 import { supabaseRpc, type Rpc } from "../persistence/rpc.ts";
+import { catalogDisplayClosed } from "./display-policy.ts";
 
 export class ReadError extends Error {
   readonly code: string;
@@ -49,7 +50,11 @@ export function createReadClient(settings: ReadSettings = readSettingsFromEnv(),
   if (/[\r\n]/.test(key)) throw new ReadError("invalid_service_role_configuration");
   const rpc: Rpc = supabaseRpc(settings, fetcher);
 
+  // Checked per request, before any network call, so every present and future read service is covered.
+  const assertDisplayable = () => { if (catalogDisplayClosed()) throw new ReadError("catalog_display_closed"); };
+
   const request = async (table: string, query: Record<string, string>, method: "GET" | "HEAD", count: boolean) => {
+    assertDisplayable();
     if (!TABLES.has(table)) throw new ReadError("table_not_readable");
     const url = new URL(`/rest/v1/${table}`, base);
     for (const [name, value] of Object.entries(query)) url.searchParams.set(name, value);
@@ -86,6 +91,7 @@ export function createReadClient(settings: ReadSettings = readSettingsFromEnv(),
     },
     async rpc(name, args) {
       if (!READ_RPC.test(name)) throw new ReadError("rpc_not_readable");
+      assertDisplayable();
       try {
         return await rpc(name, args);
       } catch (error) {
