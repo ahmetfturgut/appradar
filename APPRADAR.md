@@ -623,6 +623,15 @@ Aşağıdakiler **onaylandı**: günlük bütçe **USD 1**; aylık bütçe **USD
 - **Dosyalar:** `src/lib/landing/{legal,locale,metadata,dictionaries}.ts`, `src/components/landing/{public-chrome,legal-page,landing-page}.tsx`, `src/app/[locale]/[document]/page.tsx`, `src/lib/auth/delete-account{,-action}.ts`, `src/components/auth/delete-account-form.tsx`, `src/app/{account,settings}/page.tsx`, `src/app/(auth)/auth-card.tsx`, `tests/beta-readiness.test.ts`; işletim ayrıntıları `docs/BETA_READINESS.md`, güncellenen `docs/{AUTH_SETUP,PRODUCTION}.md`.
 - **Beta kararı:** teknik hazırlık doğrulandı, **yayına hazır değil**. B4 ticari kullanım engeli ve bütün veri/toplama kapıları korundu. Sahip/hukuk onayı + çalışan iletişim kanalı, gerçek Auth ve production yapılandırması, onaylı saklama politikası, veri kullanım dayanağı ve yetkilendirilmiş pilot beklenir. Ücretli API/toplama, gerçek hesap silme, uzak DB işlemi, deployment, dış kaynak oluşturma, zamanlama/temizlik veya ödeme işlemi yapılmadı. Onaylı kusur bulunmadı; kod düzeltmesi yapılmadı.
 
+### 6.24 Gerçek geliştirme Auth doğrulaması — 27 Kasım 2026
+
+Sahip, geliştirme Supabase projesinde gerçek e-posta/parola Auth akışlarını manuel doğruladı. Bu kayıt **B5 mock testlerinin yerine geçmez**; mock güvenlik senaryoları ile canlı happy-path ayrı kanıtlardır. Uygulama kodu değişmedi (`ae3ecfc` baseline).
+
+- **Yapılandırma düzeltmeleri (yalnızca `.env.local`, git dışı):** `NEXT_PUBLIC_SUPABASE_URL` ve `SUPABASE_URL` yanlışlıkla `/rest/v1/` yolunu içeriyordu. Birincisi kayıtta HTTP 404; ikincisi `accountDeletionConfig` doğrulamasını düşürüp hesap sayfasında “Account deletion is not configured” gösteriyordu. Her iki değişken de artık proje origin’i (`https://<ref>.supabase.co`, path/query/hash yok). Ayrıntı: `docs/AUTH_SETUP.md`.
+- **Sahip tarafından doğrulanan (geliştirme projesi, varsayılan Supabase SMTP):** kayıt; e-posta teslimi; e-posta onayı; giriş; Dashboard ve Explorer erişimi; oturum kalıcılığı; çıkış; korumalı rota yönlendirmeleri; parola sıfırlama; hesap silme (happy-path).
+- **Doğrulanmadı / iddia edilmez:** Google OAuth; MFA; üretim SMTP veya production Auth; silme kenar durumları (MFA fail-closed, belirsiz sağlayıcı yanıtı, kimlik uyuşmazlığı, çapraz origin, vb. — bunlar B5 mock suite’te kaldı); canlı ortamda iki kullanıcılı watchlist izolasyonu; production deployment.
+- **Kalan yayın engelleri:** ticari veri kullanım dayanağı ve ücretli/pilot kapıları; sahip/hukuk onayı + çalışan iletişim kanalı; production Supabase projesi + migration + env; özel SMTP/DNS ve production Auth E2E; OAuth (istenirse) + yasal sayfa onayı; host/Auth rate limit; yedek/geri yükleme; onaylı saklama politikası; izleme. B4 `POC_DATA_USE_CONFIRMED` false kaldı.
+
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
 POC kodu da Bölüm 1'deki plan onayından sonra yazılır. Aşağıdaki eşikler öneridir ve onaylı plana alınmalıdır.

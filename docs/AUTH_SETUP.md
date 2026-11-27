@@ -8,12 +8,37 @@ Set them in `.env.local` for development and in the hosting provider for product
 
 | Variable | Where it comes from | Notes |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API → Project URL | https only, except localhost |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API → **Project URL** | Project **origin only**: `https://<ref>.supabase.co`. No `/rest/v1`, `/auth/v1`, trailing API path, query or hash. https only, except localhost. |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase → Project Settings → API Keys → **Publishable** key (`sb_publishable_…`), or the legacy `anon` key | Safe for browsers. `sb_secret_…` and `service_role` keys are rejected at runtime. |
-| `NEXT_PUBLIC_SITE_URL` | Your public origin, e.g. `https://app.example.com` | Required in production. Used for email links and the OAuth callback. |
-| `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Supabase project API settings | Server-only catalog reads and current-user Auth deletion. Must target the same project as the session client. Never prefix with `NEXT_PUBLIC_`. |
+| `NEXT_PUBLIC_SITE_URL` | Your public origin, e.g. `https://app.example.com` | Required in production. Used for email links and the OAuth callback. Locally use `http://127.0.0.1:3000` or `http://localhost:3000` when testing email links. |
+| `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Supabase project API settings | Server-only catalog reads and current-user Auth deletion. `SUPABASE_URL` must be the **same project origin** as `NEXT_PUBLIC_SUPABASE_URL` (no `/rest/v1`). Never prefix with `NEXT_PUBLIC_`. |
 
 Without the two `NEXT_PUBLIC_SUPABASE_*` values, auth pages show "Authentication is not configured", and protected routes redirect to `/login`. That is development behaviour: in production the whole app answers 503 until the variables in [PRODUCTION.md](PRODUCTION.md) are complete.
+
+### Project-origin URL requirement
+
+Both `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_URL` must be the Project URL origin copied from the Dashboard, not a PostgREST or Auth endpoint.
+
+| Correct | Incorrect |
+|---|---|
+| `https://<ref>.supabase.co` | `https://<ref>.supabase.co/rest/v1/` |
+| | `https://<ref>.supabase.co/auth/v1` |
+| | any URL with path, query, hash or embedded credentials |
+
+- Session/sign-up uses `NEXT_PUBLIC_SUPABASE_URL`. A `/rest/v1/` suffix can produce Auth HTTP **404** on registration.
+- Account deletion (`accountDeletionConfig`) also requires `SUPABASE_URL` with pathname `/`. A `/rest/v1/` suffix makes the Account page show **"Account deletion is not configured"** even when login works.
+- Origins of the two URLs must match. Legacy JWT service-role keys must carry the same project `ref` as the hostname when a ref is present.
+
+After fixing `.env.local`, restart `next dev` so the process reloads environment variables.
+
+### Troubleshooting
+
+| Symptom | Likely cause |
+|---|---|
+| Sign-up / Auth requests return HTTP 404 | `NEXT_PUBLIC_SUPABASE_URL` includes `/rest/v1` or another API path |
+| Login works, but Account shows deletion not configured | `SUPABASE_URL` includes `/rest/v1` or differs from the public project origin; or service-role key missing / wrong kind |
+| "Authentication is not configured" | Missing `NEXT_PUBLIC_SUPABASE_URL` or publishable key |
+| Redirect loop or lost `next` path | Site URL / Redirect URLs in the Dashboard do not include this origin’s `/auth/callback` |
 
 ## 2. Supabase Dashboard
 
@@ -27,7 +52,7 @@ Without the two `NEXT_PUBLIC_SUPABASE_*` values, auth pages show "Authentication
    - **Change email address:** `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email_change&next=/account`
 
    The default templates (`{{ .ConfirmationURL }}`) also work, but only in the browser that started the flow (PKCE).
-4. **Authentication → Emails → SMTP:** configure a custom SMTP provider before launch. The built-in sender is rate-limited and meant for testing only.
+4. **Authentication → Emails → SMTP:** configure a custom SMTP provider before **production** launch. The built-in sender is rate-limited and meant for testing only. Development verification may use the default Supabase SMTP (see §6).
 5. **Authentication → Attack Protection:** a minimum password length of 8 or more is recommended. The app enforces 8–72. Consider leaked-password protection. Do **not** enable CAPTCHA: the forms send no CAPTCHA token yet, so sign-in, sign-up and reset would all fail.
 6. **Authentication → Sign In / Providers:** keep **anonymous sign-ins** off. The app treats anonymous users as signed out.
 
@@ -53,8 +78,20 @@ The "Continue with Google" button appears only when the Google provider is enabl
 - `/settings` redirects verified viewers to `/account`. Account deletion requires a real verified session, exact confirmation and password reauthentication in the same request (60-second maximum), then deletes only that Auth user; the existing FK cascades its watchlist. Demo cannot delete. MFA accounts fail closed; Google-only password recovery must be verified on the configured project. See [BETA_READINESS.md](BETA_READINESS.md) for authorization, partial failures and retention limitations.
 - **Development demo:** with `NODE_ENV=development` and `APPRADAR_DEMO_MODE=true`, protected pages open without signing in. No fake user or session is created, and data comes from local fixtures only. This bypass is impossible in production.
 
-## 5. Launch blockers
+## 5. Development verification status (27 November 2026)
 
-- Privacy, terms and contact now have English/Turkish draft routes linked from the footer, but owner information, a working contact channel and legal approval remain missing. Do not use unapproved drafts to claim publication readiness or data-use permission.
-- Custom SMTP and the email templates above must be configured.
-- End-to-end sign-up, verification, Google sign-in and logout have not been tested against a real Supabase project yet, because no publishable key was configured and no test account has been approved.
+Owner-reported **manual** checks against the **development** Supabase project (default Supabase SMTP), after correcting both project-origin URLs:
+
+**Verified:** registration; email delivery; email confirmation; login; Dashboard and Explorer access; session persistence; logout; protected-route redirects; password reset; account deletion (happy path).
+
+**Not verified (do not claim):** Google OAuth; MFA; production SMTP; production Auth; deletion edge cases beyond the owner’s happy path; live two-user watchlist isolation.
+
+B5 automated suites remain **mocked** HTTP/cookie scenarios. They do not replace this live development check, and this live check does not re-prove the mocked edge cases. Details: [APPRADAR.md](../APPRADAR.md) §6.24 and [BETA_READINESS.md](BETA_READINESS.md).
+
+## 6. Launch blockers
+
+- Privacy, terms and contact have English/Turkish draft routes linked from the footer, but owner information, a working contact channel and legal approval remain missing. Do not use unapproved drafts to claim publication readiness or data-use permission.
+- Commercial data-use rights and paid/collection gates remain closed (`POC_DATA_USE_CONFIRMED` unset/false until separately authorized).
+- Production needs a **separate** Supabase project, migrations, production env check, custom SMTP + DNS, Auth rate limits at Supabase and the host, and a real production Auth E2E (including OAuth if enabled and two-user isolation).
+- Development used default Supabase SMTP; that is **not** production email readiness.
+- MFA support process and Google-only recovery (if Google is enabled) remain open. Account-deletion security edge cases stay covered by mocks unless re-tested with disposable accounts under explicit authorization.

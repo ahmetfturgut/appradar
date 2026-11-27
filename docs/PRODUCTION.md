@@ -26,9 +26,9 @@ Required. In production the app answers **503** until all are present and consis
 | Variable | Value | Visibility |
 |---|---|---|
 | `APPRADAR_SUPABASE_PROJECT_REF` | production project ref | server |
-| `SUPABASE_URL` | `https://<ref>.supabase.co` | server |
+| `SUPABASE_URL` | `https://<ref>.supabase.co` (project **origin only**; no `/rest/v1`) | server |
 | `SUPABASE_SERVICE_ROLE_KEY` | `sb_secret_…` (or legacy `service_role`) | **server secret** |
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://<ref>.supabase.co` | public |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://<ref>.supabase.co` (same origin; no `/rest/v1`) | public |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_…` (or legacy `anon`) | public |
 | `NEXT_PUBLIC_SITE_URL` | `https://your-domain`, origin only | public |
 
@@ -47,6 +47,8 @@ node --env-file=.env.production.local --import tsx src/lib/config/check.ts
 `npm run check:env` checks the current shell environment instead.
 
 Limits of the check: it compares URLs and legacy JWT keys with the declared ref. The newer `sb_…` keys carry no ref, and it cannot tell if the declared ref is itself the development one. `NEXT_PUBLIC_*` values are compiled in at build time, so rebuild after changing them. A local `next start` is production too and returns 503 with development values; use `npm run dev` locally.
+
+**URL pitfall (seen in development):** pasting the PostgREST URL (`…/rest/v1/`) into `NEXT_PUBLIC_SUPABASE_URL` breaks sign-up (Auth HTTP 404); the same suffix on `SUPABASE_URL` hides the account-deletion form. Always use the Dashboard Project URL origin. See [AUTH_SETUP.md](AUTH_SETUP.md).
 
 ## 4. Migrations
 
@@ -73,7 +75,7 @@ Dashboard steps are in [AUTH_SETUP.md](AUTH_SETUP.md). Required for production:
 - If "Secure password change" is enabled, changing the password from an old session will fail; the reset-email route still works. Test it.
 - Asymmetric JWT signing keys are recommended; a key rotation signs users out only if the old key is revoked early.
 
-**Email and SMTP:** configure custom SMTP (the built-in sender is for testing), set SPF, DKIM and DMARC for the sending domain, install the `token_hash` templates, and turn link tracking off. Some mail scanners open links and consume the one-time token; test with the mail providers your users have.
+**Email and SMTP:** configure custom SMTP (the built-in sender is for testing only; a development pass with default Supabase SMTP does **not** satisfy production), set SPF, DKIM and DMARC for the sending domain, install the `token_hash` templates, and turn link tracking off. Some mail scanners open links and consume the one-time token; test with the mail providers your users have.
 
 **OAuth (optional):** Google only. The client secret stays in Supabase. Redirect URI is `https://<ref>.supabase.co/auth/v1/callback`. The consent screen needs the privacy policy and terms, which do not exist yet.
 
@@ -127,11 +129,11 @@ These lines carry codes only. Next.js and the host log unhandled errors and requ
 ## 11. Launch checklist
 
 - [ ] Commercial data-use permissions recorded per provider and store
-- [ ] Owner/legal approval of B5 bilingual privacy/terms/contact drafts, real contact channel and retention/request procedures; review [BETA_READINESS.md](BETA_READINESS.md). Account deletion is implemented with mocked verification only.
+- [ ] Owner/legal approval of B5 bilingual privacy/terms/contact drafts, real contact channel and retention/request procedures; review [BETA_READINESS.md](BETA_READINESS.md)
 - [ ] Production Supabase project; migrations applied and privileges checked
-- [ ] Env vars set; offline check prints `production_config_ok`
-- [ ] Auth settings, redirect URL, templates, custom SMTP and DNS records
+- [ ] Env vars set (project-origin URLs, no `/rest/v1`); offline check prints `production_config_ok`
+- [ ] Auth settings, redirect URL, templates, **custom** SMTP and DNS records (development default SMTP is not enough)
 - [ ] Rate limits at Supabase and the host
 - [ ] Backup confirmed and restore rehearsed
-- [ ] Real end-to-end test: sign-up, verification, sign-in, session expiry, sign-out, reset, password change, OAuth if enabled, watchlist with two users
-- [ ] Headers and CSP checked on the deployed site (browser console clean, Google sign-in works)
+- [ ] Real **production** end-to-end test: sign-up, verification, sign-in, session expiry, sign-out, reset, password change, OAuth if enabled, watchlist with two users; deletion happy path plus any authorized edge cases. Development Auth verification (APPRADAR §6.24) does not cover production, OAuth, MFA or live isolation.
+- [ ] Headers and CSP checked on the deployed site (browser console clean, Google sign-in works if enabled)
