@@ -1,4 +1,6 @@
 // Server-only. The service role key bypasses RLS and must never reach a client bundle.
+import { supabaseApiKeyHeaders } from "../auth/api-headers.ts";
+
 export type Rpc = (name: string, args: Record<string, unknown>) => Promise<unknown>;
 
 export class PersistenceError extends Error {
@@ -21,7 +23,7 @@ export function supabaseRpc(settings: { url: string; serviceRoleKey: string }, f
     try {
       response = await fetcher(new URL(`/rest/v1/rpc/${name}`, base), {
         method: "POST", redirect: "error", signal: AbortSignal.timeout(30000),
-        headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        headers: { ...supabaseApiKeyHeaders(key), "Content-Type": "application/json" },
         body: JSON.stringify(args),
       });
     } catch {

@@ -32,6 +32,12 @@ Required. In production the app answers **503** until all are present and consis
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_…` (or legacy `anon`) | public |
 | `NEXT_PUBLIC_SITE_URL` | `https://your-domain`, origin only | public |
 
+`SUPABASE_SERVICE_ROLE_KEY` is the existing application variable name and remains unchanged when
+using a new `sb_secret_…` key. Direct Data API requests send new publishable/secret keys only in
+the `apikey` header; legacy JWT keys retain the existing `Authorization: Bearer` fallback. This
+compatibility is covered by synthetic tests, but remains unverified against the hosted production
+project until the post-deployment smoke tests are completed.
+
 Unset or exactly `false` (anything else is also a 503): `APPRADAR_DEMO_MODE`, `COLLECTION_PAID_EXECUTION`, `APIFY_COLLECTION_ENABLED`, `POC_DATA_USE_CONFIRMED`, `RETENTION_CLEANUP_EXECUTION`, `APPRADAR_INTERNAL_PILOT_OPERATOR_APPROVAL`, `APPRADAR_INTERNAL_PILOT_UNCONFIRMED_RISK_ACCEPTED`, `APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_OPERATOR_APPROVAL`, `APPRADAR_INTERNAL_PILOT_B45_PRODUCTIVITY_UNCONFIRMED_RISK_ACCEPTED`, `APPRADAR_INTERNAL_MEDIA_OPERATOR_APPROVAL`, `APPRADAR_INTERNAL_MEDIA_UNCONFIRMED_RISK_ACCEPTED`, `APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED`, `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`.
 
 **Catalog display is closed in production.** Independently of every flag, a production build never reads the third-party catalog (names, developers, metrics, rankings, aggregates, content): signed-in screens show "Catalog data is not available in this deployment". Watchlist entries, if any, appear without catalog values. Opening this needs a documented rights basis and a reviewed code change (`src/lib/read/display-policy.ts`). Legacy `APPRADAR_STORE_MEDIA_ENABLED` is ignored. See [CONTENT_USAGE.md](CONTENT_USAGE.md).
@@ -102,7 +108,8 @@ Dashboard steps are in [AUTH_SETUP.md](AUTH_SETUP.md). Required for production:
 
 ## 6. Hosting (Vercel)
 
-- Next.js preset, default build command, Node.js 22.18 or newer. No cron jobs, no `vercel.json` needed.
+- Next.js preset, default build command, **Node.js 22.x** deployment baseline (the repository requires
+  22.18 or newer). No cron jobs, no `vercel.json` needed.
 - Production env vars in the Production scope; mark the service-role key Sensitive. Preview deployments must not receive production values. Without a complete set of their own (development project and its ref) they answer 503.
 - Enable HTTPS-only custom domain and deployment protection for previews.
 - Check that the plan's terms allow commercial use.
@@ -196,14 +203,14 @@ The catalog stays empty and closed. Plan features, prices, limits, terms and exa
 - [ ] Create your own user in Authentication → Users, marked as email-confirmed, with a strong unique password. Without custom SMTP, do not rely on password-reset or verification email.
 
 **Vercel**
-- [ ] Import the repository; Next.js preset; default build command; Node.js 22.18 or newer; function region near the database. Check the plan's terms fit your use.
+- [ ] Import the repository; Next.js preset; default build command; Node.js 22.x (22.18 or newer); function region near the database. Check the plan's terms fit your use.
 - [ ] Environment variables, **Production scope only** (Preview and Development get none of these):
 
 | Name | Value | Note |
 |---|---|---|
 | `APPRADAR_SUPABASE_PROJECT_REF` | production ref | |
 | `SUPABASE_URL` | `https://<ref>.supabase.co` | |
-| `SUPABASE_SERVICE_ROLE_KEY` | secret key | mark Sensitive |
+| `SUPABASE_SERVICE_ROLE_KEY` | `sb_secret_…` (variable name unchanged) | mark Sensitive |
 | `NEXT_PUBLIC_SUPABASE_URL` | same origin | public, fixed at build |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | publishable key | public, fixed at build |
 | `NEXT_PUBLIC_SITE_URL` | `https://<your-domain-or-vercel.app>` | origin only, fixed at build |

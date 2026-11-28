@@ -1,6 +1,7 @@
 // Server-only. Reads the catalog through PostgREST with the service role key, which bypasses RLS:
 // it must never reach a client bundle, and only allowlisted public tables and read RPCs are reachable.
 import { supabaseRpc, type Rpc } from "../persistence/rpc.ts";
+import { supabaseApiKeyHeaders } from "../auth/api-headers.ts";
 import { catalogDisplayClosed } from "./display-policy.ts";
 
 export class ReadError extends Error {
@@ -62,7 +63,7 @@ export function createReadClient(settings: ReadSettings = readSettingsFromEnv(),
     try {
       response = await fetcher(url, {
         method, redirect: "error", cache: "no-store", signal: AbortSignal.timeout(15000),
-        headers: { apikey: key, Authorization: `Bearer ${key}`, Accept: "application/json", ...(count ? { Prefer: "count=exact" } : {}) },
+        headers: { ...supabaseApiKeyHeaders(key), Accept: "application/json", ...(count ? { Prefer: "count=exact" } : {}) },
       });
     } catch {
       throw new ReadError("read_network_error");

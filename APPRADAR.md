@@ -715,6 +715,16 @@ Production projesi, deployment, uzak veritabanı işlemi veya sağlayıcı çağ
 - **Gizlilik taslakları:** tarayıcı içi tema tercihi EN/TR eklendi; belgeler taslak kalır.
 - **Açık:** barındırılan Supabase projesi ve deployment yok; ticari veri hakkı, yasal bilgiler ve yayın onayı değişmedi.
 
+### 6.31 Production Supabase yeni anahtar uyumluluğu — 28 Kasım 2026
+
+`SUPABASE_SERVICE_ROLE_KEY` değişken adı korunarak `sb_secret_…` desteği tamamlandı. Ortak başlık
+yardımcısı yeni `sb_secret_…` ve `sb_publishable_…` anahtarlarını yalnız `apikey` başlığında gönderir;
+eski JWT tabanlı `service_role` anahtarlarında mevcut `apikey` + `Authorization: Bearer` davranışı
+devam eder. Değişiklik doğrudan PostgREST okuma ve RPC istemcileriyle sınırlıdır; kullanıcı oturumu
+JWT akışı değişmedi. Vercel baseline Node.js 22.x'tir (en az 22.18). Sentetik regresyon testleri
+yereldir; production projesiyle barındırılan uyumluluk ilk deployment sonrası smoke testine kadar
+doğrulanmış sayılmaz. Veritabanı, sağlayıcı veya deployment işlemi yapılmadı.
+
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
 POC kodu da Bölüm 1'deki plan onayından sonra yazılır. Aşağıdaki eşikler öneridir ve onaylı plana alınmalıdır.
