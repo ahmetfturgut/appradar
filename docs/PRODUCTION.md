@@ -1,6 +1,6 @@
 # AppRadar production runbook
 
-Nothing in this document has been executed: no production project, deployment or remote setting exists yet. Preparation for a private deployment (§12) was added on 27 November 2026. Plan features, limits and prices of Supabase, Vercel, Google and the SMTP provider were not verified; check them before relying on them. Paid options need explicit approval.
+**Private deployment (Option A) completed 28 November 2026** — owner testing only. Public launch is **not** approved. Live values: production URL `https://appradar-sigma.vercel.app`; source commit `99b75316ab3999ab7617355cdd68ae0331a97176`; production Supabase ref `ppngqbaisoroxfyybpix`. Catalog display, public signup, indexing and collection remain closed. Plan features, prices, limits, commercial-use terms and exact dashboard labels were not fully verified; check them before relying on them. Paid hosting options need explicit approval and were not activated.
 
 ## 1. Environments
 
@@ -168,43 +168,58 @@ These lines carry codes only. Next.js and the host log unhandled errors and requ
 
 ## 11. Launch checklist
 
+Public launch remains blocked. Items checked below reflect the **private** Option A deployment only (§12); they do not approve commercial redistribution or indexing.
+
 - [ ] Commercial data-use permissions recorded per provider and store
 - [ ] Owner/legal approval of B5 bilingual privacy/terms/contact drafts, real contact channel and retention/request procedures; review [BETA_READINESS.md](BETA_READINESS.md)
-- [ ] Production Supabase project; migrations applied and privileges checked
-- [ ] Env vars set (project-origin URLs, no `/rest/v1`); offline check prints `production_config_ok`
-- [ ] Auth settings, redirect URL, templates, **custom** SMTP and DNS records (development default SMTP is not enough)
+- [x] Production Supabase project; migrations applied and privileges checked (`ppngqbaisoroxfyybpix`, 13/13, hosted verify passed — 28 Nov 2026)
+- [x] Env vars set (six required Production-scope variables; project-origin URLs)
+- [ ] Auth settings, redirect URL, templates, **custom** SMTP and DNS records (production Auth URLs configured; custom SMTP still open; development default SMTP is not enough)
 - [ ] Rate limits at Supabase and the host
 - [ ] Backup confirmed and restore rehearsed
-- [ ] Real **production** end-to-end test: sign-up, verification, sign-in, session expiry, sign-out, reset, password change, OAuth if enabled, watchlist with two users; deletion happy path plus any authorized edge cases. Development Auth verification (APPRADAR §6.24) does not cover production, OAuth, MFA or live isolation.
+- [ ] Real **production** end-to-end test: sign-up, verification, sign-in, session expiry, sign-out, reset, password change, OAuth if enabled, watchlist with two users; deletion happy path plus any authorized edge cases. Owner signed in and visually checked screens; logout, session persistence, account deletion and hosted user isolation are **not** fully verified. Development Auth verification (APPRADAR §6.24) does not cover these.
 - [ ] Headers and CSP checked on the deployed site (browser console clean, Google sign-in works if enabled)
+- [ ] Inspect the five outstanding Vercel build warnings
+- [ ] Confirm the actual deployed Node.js runtime version (Vercel setting is 22.x; runtime not yet verified)
+- [ ] Exercise hosted direct PostgREST secret-key compatibility once a controlled catalog-read path exists (deferred while catalog stays closed)
 
 ## 12. Private deployment checklist (Option A: owner testing only)
 
-The catalog stays empty and closed. Plan features, prices, limits, terms and exact dashboard labels were not verified.
+**Status (28 November 2026):** private Option A deployment is live for owner testing. Public launch, commercial catalog display, indexing and collection remain closed. This checklist records what the owner completed and what is still open.
+
+Live reference: URL `https://appradar-sigma.vercel.app`; commit `99b75316ab3999ab7617355cdd68ae0331a97176`; production Supabase `ppngqbaisoroxfyybpix`; Vercel Hobby (no paid hosting subscription); latest redeploy ~51 s; Node.js **22.x selected** in Vercel (actual runtime version not yet verified). Five Vercel build warnings are not yet inspected.
+
+The catalog stays empty and closed. Plan features, prices, limits, commercial-use terms and exact dashboard labels were not fully verified.
 
 **Two different kinds of "private"**
 - **Application authentication** (what this setup relies on): product routes require a signed-in user; with sign-ups off, only accounts you create exist.
-- **Hosting access protection** (optional extra): restricting who can load the site at all. Availability for the production domain depends on your Vercel plan; do not assume it, and do not buy it without deciding to.
-- Without hosting protection, anyone with the URL can load the landing page, legal **drafts**, `/login` and `/signup`.
-- Indexing is off by default (§13): pages send `noindex`. That only asks search engines not to list them; it protects nothing and does not stop anyone with the URL.
+- **Hosting access protection** (in use): Vercel Authentication is enabled for **All Deployments**. Incognito access redirects to Vercel authentication. Do not assume every plan offers the same controls, and do not buy a paid plan without deciding to.
+- Indexing is off by default (§13): pages send `noindex`. That only asks search engines not to list them; it is not an access control.
 
 **Supabase (new project, separate from development)**
 - [ ] MFA on your Supabase and Vercel accounts.
-- [ ] Create the project. Region: close to you; note it to match the Vercel function region. Save the database password in a password manager.
-- [ ] Record: project ref; Project URL (origin only); publishable key; secret key; **session pooler** or direct connection string (port 5432).
-- [ ] Data API: exposed schemas exclude `private` and `appradar_meta`.
+- [x] Create the project. Ref `ppngqbaisoroxfyybpix`. Save the database password in a password manager.
+- [x] Record: project ref; Project URL (origin only); publishable key; secret key; connection string as used for migrations.
+- [ ] Data API: exposed schemas exclude `private` and `appradar_meta` (confirm again in Dashboard if not already noted).
 
 **Database**
-- [ ] Install `psql`; run §4: offline check → `--status` → `--apply` → `--verify`.
+- [x] Install `psql`; run §4: offline check → `--status` → `--apply` → `--verify`. All 13 migrations applied; hosted verification passed.
 
 **Authentication**
-- [ ] Email provider on; **Confirm email on**; anonymous sign-ins **off**; Google **off**; CAPTCHA **off**.
-- [ ] **Allow new users to sign up: off.**
-- [ ] Create your own user in Authentication → Users, marked as email-confirmed, with a strong unique password. Without custom SMTP, do not rely on password-reset or verification email.
+- [x] Production Supabase Auth URLs configured (Site URL / callback aligned with the deployment).
+- [ ] Email provider on; **Confirm email on**; anonymous sign-ins **off**; Google **off**; CAPTCHA **off** (confirm each Dashboard toggle still matches).
+- [x] **Allow new users to sign up: off** (public signup remains closed).
+- [x] Owner user can sign in. Without custom SMTP, do not rely on password-reset or verification email.
+- [ ] Logout, session persistence, account deletion and hosted two-user isolation fully verified.
 
 **Vercel**
-- [ ] Import the repository; Next.js preset; default build command; Node.js 22.x (22.18 or newer); function region near the database. Check the plan's terms fit your use.
-- [ ] Environment variables, **Production scope only** (Preview and Development get none of these):
+- [x] Import the repository; Next.js preset; default build; Node.js 22.x selected; Hobby plan. Check the plan's terms fit any future commercial use before opening the product publicly.
+- [x] Environment variables, **Production scope only** — all six required names from the table below.
+- [x] Leave `APPRADAR_PUBLIC_INDEXING_APPROVED` unset.
+- [x] Do not set: any flag in §3, `APIFY_TOKEN`, budget limits, `APPRADAR_DEVELOPMENT_PROJECT_REF`, `APPRADAR_MIGRATION_DATABASE_URL`, `DATABASE_URL`.
+- [x] Deployed and redeployed with `NEXT_PUBLIC_SITE_URL` = `https://appradar-sigma.vercel.app`.
+- [x] Supabase → URL configuration: Site URL = `NEXT_PUBLIC_SITE_URL`; redirect URL includes `<site>/auth/callback`.
+- [x] Vercel Authentication enabled for All Deployments.
 
 | Name | Value | Note |
 |---|---|---|
@@ -215,22 +230,18 @@ The catalog stays empty and closed. Plan features, prices, limits, terms and exa
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | publishable key | public, fixed at build |
 | `NEXT_PUBLIC_SITE_URL` | `https://<your-domain-or-vercel.app>` | origin only, fixed at build |
 
-- [ ] Leave `APPRADAR_PUBLIC_INDEXING_APPROVED` unset.
-- [ ] Do not set: any flag in §3, `APIFY_TOKEN`, budget limits, `APPRADAR_DEVELOPMENT_PROJECT_REF`, `APPRADAR_MIGRATION_DATABASE_URL`, `DATABASE_URL`.
-- [ ] Deploy. If the final domain was unknown, set `NEXT_PUBLIC_SITE_URL` once the project has one and **redeploy**.
-- [ ] Supabase → URL configuration: Site URL = `NEXT_PUBLIC_SITE_URL`; the only redirect URL is `<site>/auth/callback`.
-- [ ] Optional: enable whatever deployment protection your plan includes; protect or disable preview deployments.
-
 **Smoke tests**
-- [ ] `/en` and `/tr` load; no 503; browser console clean.
-- [ ] `curl -sI https://<site>/en` shows `x-robots-tag: noindex, nofollow`, and the page source has the robots `noindex` meta tag.
-- [ ] `/dashboard` signed out redirects to `/login`.
+- [x] Owner signed in; application screens visually checked; production catalog unavailable as designed; no demo or development catalog substituted.
+- [x] Incognito access redirected to Vercel authentication.
+- [ ] `/en` and `/tr` load; no 503; browser console clean (not fully recorded).
+- [ ] `curl -sI https://appradar-sigma.vercel.app/en` shows `x-robots-tag: noindex, nofollow`, and the page source has the robots `noindex` meta tag.
+- [ ] `/dashboard` signed out redirects to `/login` (behind Vercel Authentication).
 - [ ] Signing up at `/signup` is refused ("New sign-ups are currently disabled").
-- [ ] Your account signs in; Dashboard, Explorer, Markets, Compare and Watchlist show the unavailable or empty state, never sample data.
 - [ ] Theme selector and Account → Appearance persist across reload.
 - [ ] Sign out; protected pages redirect again.
 - [ ] Response headers include CSP, HSTS and `X-Frame-Options: DENY`; `/admin` is 404.
 - [ ] Host logs show no `appradar_config_invalid` or secrets.
+- [ ] Hosted direct PostgREST secret-key path exercised (deferred while catalog remains closed).
 
 ## 13. Search indexing and future public launch
 

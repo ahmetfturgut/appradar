@@ -135,7 +135,7 @@ Bu tutarları ürün arayüzüne, satış vaadine veya sabit iş kuralına gömm
 
 POC'nin saklama kapsamı dahil kullanım koşullarını kontrol et. Üretim öncesi saklama, kullanıcıya gösterim, türetilmiş analiz, cache, yeniden dağıtım ve silme talepleri için izin dayanağını kaydet. Belirsiz ticari yetki varsa gerekli sağlayıcı açıklamasını/uzman incelemesini tamamlamadan ilgili veriyi yayımlama. İzin verilen alan ve saklama süresi uygulama yapılandırmasına yansıtılmalıdır.
 
-**Açık kısıtlar (27 Kasım 2026; B4.5 PARTIAL):** Ticari/public saklama-gösterim izni henüz onaylanmadı. Ücretli toplama ve zamanlama varsayılan kapalıdır; veri kullanımı `APPRADAR_THIRD_PARTY_RIGHTS_STATUS` ile ayrılır (`verified` / `unconfirmed` / `prohibited`). `POC_DATA_USE_CONFIRMED` yalnız `verified` ile geçerlidir; iç pilot (B4.3 / B4.5) ve iç medya için operatör onayı + unconfirmed risk kabulü ayrı bayraklardır (sahip onayı lisans değildir; development-only medya public değildir). Okuma katmanında varsayılan kapalı: `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`, `APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED`. Eski `APPRADAR_STORE_MEDIA_ENABLED` yok sayılır. Kapsam: `docs/CONTENT_USAGE.md`; B4.5 sonuçları §6.28.
+**Açık kısıtlar (28 Kasım 2026; özel production var, public launch yok):** Ticari/public saklama-gösterim izni henüz onaylanmadı. Özel Vercel deployment (Seçenek A) vardır; public launch, indeksleme, açık kayıt ve ticari katalog gösterimi onaylanmamıştır. Ücretli toplama ve zamanlama varsayılan kapalıdır; veri kullanımı `APPRADAR_THIRD_PARTY_RIGHTS_STATUS` ile ayrılır (`verified` / `unconfirmed` / `prohibited`). `POC_DATA_USE_CONFIRMED` yalnız `verified` ile geçerlidir; iç pilot (B4.3 / B4.5) ve iç medya için operatör onayı + unconfirmed risk kabulü ayrı bayraklardır (sahip onayı lisans değildir; development-only medya public değildir). Okuma katmanında varsayılan kapalı: `APPRADAR_STORE_ICONS_ENABLED`, `APPRADAR_STORE_SCREENSHOTS_ENABLED`, `APPRADAR_STORE_DESCRIPTION_ENABLED`, `APPRADAR_REVIEW_CONTENT_ENABLED`, `APPRADAR_PUBLIC_COMMERCIAL_DISPLAY_AUTHORIZED`. Eski `APPRADAR_STORE_MEDIA_ENABLED` yok sayılır. Kapsam: `docs/CONTENT_USAGE.md`; B4.5 §6.28; özel deployment §6.32.
 
 ## 6. Veri sözlüğü ve veri yeterliliği
 
@@ -724,6 +724,27 @@ devam eder. Değişiklik doğrudan PostgREST okuma ve RPC istemcileriyle sınır
 JWT akışı değişmedi. Vercel baseline Node.js 22.x'tir (en az 22.18). Sentetik regresyon testleri
 yereldir; production projesiyle barındırılan uyumluluk ilk deployment sonrası smoke testine kadar
 doğrulanmış sayılmaz. Veritabanı, sağlayıcı veya deployment işlemi yapılmadı.
+
+### 6.32 Özel production deployment (Seçenek A) — 28 Kasım 2026
+
+Sahip tarafından tamamlanan **özel** production deployment kaydı. Bu bölüm **public launch onayı değildir**. Ayrıntı: [docs/PRODUCTION.md](docs/PRODUCTION.md) §12–§13.
+
+**Tamamlanan (sahip bildirimi):**
+- Vercel Hobby deployment başarılı; URL `https://appradar-sigma.vercel.app`; kaynak commit `99b75316ab3999ab7617355cdd68ae0331a97176`; son yeniden dağıtım ~51 sn.
+- Production Supabase projesi `ppngqbaisoroxfyybpix` (geliştirmeden ayrı); 13 migration uygulandı; barındırılan `--verify` geçti.
+- Altı zorunlu production ortam değişkeni Production kapsamında; Vercel’de Node.js 22.x seçildi.
+- Vercel Authentication: All Deployments. Incognito erişim Vercel kimlik doğrulamasına yönlenir.
+- Production Supabase Auth URL’leri yapılandırıldı. Sahip giriş yaptı ve uygulama ekranlarını görsel olarak kontrol etti.
+- Production katalog kasıtlı olarak kapalı/erişilemez; demo veya development verisi ikame edilmedi.
+- Ücretli hosting aboneliği açılmadı.
+
+**Henüz doğrulanmayan / açık kalan:**
+- Beş Vercel build uyarısı henüz incelenmedi.
+- Gerçek deploy edilen Node.js çalışma zamanı sürümü henüz doğrulanmadı (ayar 22.x).
+- Çıkış, oturum kalıcılığı, hesap silme ve barındırılan kullanıcı izolasyonu tam doğrulanmadı.
+- Katalog kapalı kaldığı için barındırılan doğrudan PostgREST secret-key uyumluluğu bu ortamda denenmedi (§6.31 yerel/sentetik kaldı).
+- Public signup, ticari katalog gösterimi, arama indeksleme ve toplama kapalı.
+- Public-launch engelleri değişmedi: ticari veri hakları; yasal belgeler; marka; hosting ticari-kullanım uygunluğu; özel SMTP; rate limit; yedek/geri yükleme; onaylı saklama.
 
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
