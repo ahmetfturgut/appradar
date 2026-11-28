@@ -756,7 +756,7 @@ Sahip Privacy, Terms, Contact sayfalarının tasarımını ve Nomind markalamas�
 
 Açıkça beklemede: yasal işletmeci kimliği ve gereken adres; hukuk incelemesi; hukuki dayanaklar; aktarım güvenceleri; üretim veritabanı bölgesi (pooler adresi `eu-west-1`/İrlanda düşündürüyor, bağımsız doğrulanmadı); saklama süreleri; yürürlük tarihi; hesap silmenin canlı ortam doğrulaması; giriş ve e-posta ayarlarının teyidi. Sayfalar taslak ve `noindex` kalır. Vercel Authentication, kapalı kayıt, kapalı katalog, kapalı ücretli toplama/ticari görüntüleme ve üçüncü taraf içerik kısıtları değişmedi.
 
-: POC doğrulama kapısı
+## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
 POC kodu da Bölüm 1'deki plan onayından sonra yazılır. Aşağıdaki eşikler öneridir ve onaylı plana alınmalıdır.
 
