@@ -60,7 +60,7 @@ export const dictionaries = {
       { question: "Is the product available in Turkish?", answer: "This public page is available in English and Turkish. Account and product screens are currently in English. Choosing Turkish here does not change the store, country or research-language filters in the workspace." },
     ] },
     cta: { title: "Give your next build a better starting point.", description: "Start with a question. Look at the evidence. Decide what deserves a closer check.", button: "Start your research" },
-    footer: { description: "Evidence before code. Mobile app market research for independent builders.", legal: "Legal drafts and contact", privacy: "Privacy", terms: "Terms", contact: "Contact", pending: "draft", unpublished: "Draft — owner and legal review required" },
+    footer: { description: "Evidence before code. Mobile app market research for independent builders.", legal: "Legal and contact", privacy: "Privacy", terms: "Terms", contact: "Contact", byline: "A product by", unpublished: "Draft legal documents: pending legal review, not yet approved." },
   },
   tr: {
     meta: { title: `${LANDING_BRAND.name} · Geliştiriciler İçin Mobil Uygulama Pazar Araştırması`, description: "Geliştirmeye başlamadan önce uygulama pazarlarını araştırın. Rakipleri karşılaştırın; puanları, güncelleme bilgilerini ve mevcut gözlemleri AppRadar ile inceleyin." },
@@ -120,7 +120,7 @@ export const dictionaries = {
       { question: "Ürünü Türkçe kullanabilir miyim?", answer: "Bu tanıtım sayfası İngilizce ve Türkçedir. Hesap ve ürün ekranları şimdilik İngilizcedir. Burada Türkçeyi seçmek çalışma alanındaki mağaza, ülke veya araştırma dili filtrelerini değiştirmez." },
     ] },
     cta: { title: "Bir sonraki uygulamanıza daha iyi bir başlangıç yapın.", description: "Bir soruyla başlayın. Veriyi inceleyin. Neyi daha yakından araştıracağınıza karar verin.", button: "Araştırmaya başlayın" },
-    footer: { description: "Koddan önce kanıt. Bağımsız geliştiriciler için mobil uygulama pazar araştırması.", legal: "Yasal taslaklar ve iletişim", privacy: "Gizlilik", terms: "Kullanım koşulları", contact: "İletişim", pending: "taslak", unpublished: "Taslak — sahip ve hukuk onayı gerekli" },
+    footer: { description: "Koddan önce kanıt. Bağımsız geliştiriciler için mobil uygulama pazar araştırması.", legal: "Yasal belgeler ve iletişim", privacy: "Gizlilik", terms: "Kullanım koşulları", contact: "İletişim", byline: "ürünü", unpublished: "Yasal metinler taslaktır: hukuk incelemesi bekliyor, henüz onaylanmadı." },
   },
 };
 

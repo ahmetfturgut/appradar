@@ -99,7 +99,10 @@ test("all six legal routes render localized drafts, unresolved facts and working
     for (const other of ["en", "tr"]) assert.ok(html.includes(`href="/${other}/${document}"`));
     for (const target of legalDocuments) assert.ok(html.includes(`href="/${locale}/${target}"`));
     assert.equal((html.match(/<h1\b/g) ?? []).length, 1);
-    assert.doesNotMatch(html, /mailto:|<form\b|@appradar|<img\b/);
+    assert.doesNotMatch(html, /<form\b|@appradar|<img\b/);
+    // Only the owner-supplied address may be published, and only as plain mailto links.
+    for (const [, address] of html.matchAll(/mailto:([^"?]+)/g)) assert.equal(address, "a.farukturgut@gmail.com");
+    for (const [address] of html.matchAll(/[\w.+-]+@[\w-]+\.[\w.]+/g)) assert.equal(address.replace(/\.$/, ""), "a.farukturgut@gmail.com");
     assert.equal(landingLocaleFromPath(`/${locale}/${document}`), locale);
     const metadata = legalMetadata(locale, document, { NODE_ENV: "production", NEXT_PUBLIC_SITE_URL: "https://example.test" });
     assert.deepEqual(metadata.robots, { index: false, follow: false });
@@ -235,10 +238,65 @@ test("deletion server action redirects only after confirmed completion", async (
   await assert.rejects(deleteAccountAction({ status: "idle" }, form()), { digest: /\/login\?message=account_deleted/ });
 });
 
-test("drafts stay explicit in both languages without owner email or jurisdiction invention", () => {
+test("drafts stay explicit in both languages and invent no company, address or jurisdiction", () => {
+  for (const locale of ["en", "tr"] as const) for (const document of legalDocuments) {
+    const html = renderToStaticMarkup(createElement(LegalPage, { locale, document, signedIn: false }));
+    const copy = legalDictionaries[locale];
+    assert.ok(html.includes(copy.draft));
+    assert.match(html, locale === "en" ? /awaits legal review/ : /hukuk incelemesini bekliyor/);
+    assert.ok(copy.documents[document].open.length > 0);
+    assert.match(JSON.stringify(copy.documents[document].open), locale === "en" ? /pending owner confirmation/i : /sahip onayı/i);
+    assert.doesNotMatch(JSON.stringify(copy.documents[document]), /\b(Ltd|LLC|Inc\.|GmbH|A\.Ş\.|Limited Şirketi)\b|\bVAT\b|Vergi No|is compliant|fully compliant/i);
+    // Section anchors used by the on-page navigation all exist exactly once.
+    for (const section of copy.documents[document].sections) assert.equal(html.split(`id="${section.id}"`).length - 1, 1, section.id);
+  }
+  // Both locales have the same structure.
+  for (const document of legalDocuments) {
+    const [en, tr] = [legalDictionaries.en.documents[document], legalDictionaries.tr.documents[document]];
+    const shape = (d: typeof en) => d.sections.map(s => [s.id, s.paragraphs?.length ?? 0, s.list?.length ?? 0, s.note?.length ?? 0]);
+    assert.deepEqual(shape(tr), shape(en));
+    assert.deepEqual(tr.open.map(g => g.items.length), en.open.map(g => g.items.length));
+  }
+});
+
+test("contact offers four prefixed mailto categories without a form, plus the account link", () => {
+  const subjects = { en: ["General support", "Feedback and feature request", "Privacy and personal data request", "Content or intellectual property report"], tr: ["Genel destek", "Geri bildirim ve özellik isteği", "Gizlilik ve kişisel veri talebi", "İçerik veya fikri mülkiyet bildirimi"] };
   for (const locale of ["en", "tr"] as const) {
     const html = renderToStaticMarkup(createElement(LegalPage, { locale, document: "contact", signedIn: false }));
-    assert.ok(html.includes(legalDictionaries[locale].notice));
+    for (const subject of subjects[locale]) assert.ok(html.includes(`href="mailto:a.farukturgut@gmail.com?subject=${encodeURIComponent(`[AppRadar] ${subject}`)}"`), subject);
+    assert.equal((html.match(/mailto:a\.farukturgut@gmail\.com\?subject=/g) ?? []).length, 4);
+    assert.doesNotMatch(html, /<form\b|<input\b|<textarea\b/);
     assert.match(html, /href="\/account"/);
+  }
+});
+
+test("approved brand description, 18+ age, pending identity and unverified settings are stated consistently", () => {
+  const brand = {
+    en: "AppRadar is an independent software product developed and operated under the Nomind (nomind.tech) brand.",
+    tr: "AppRadar, Nomind (nomind.tech) markası altında geliştirilen ve işletilen bağımsız bir yazılım ürünüdür.",
+  };
+  for (const locale of ["en", "tr"] as const) {
+    const { privacy, terms, contact } = legalDictionaries[locale].documents;
+    for (const document of [privacy, terms, contact]) assert.ok(document.sections[0]!.paragraphs!.includes(brand[locale]));
+    const all = JSON.stringify(legalDictionaries[locale]);
+    assert.doesNotMatch(all, /incorporated|registered company|kurulmuş bir şirket|tescilli şirket/i);
+    assert.match(JSON.stringify(terms.sections), locale === "en" ? /at least 18 years old/ : /en az 18 yaşında/);
+    assert.match(JSON.stringify(privacy.sections), locale === "en" ? /aged 18 or over/ : /18 yaş ve üzeri/);
+    assert.match(JSON.stringify(privacy.sections), locale === "en" ? /eu-west-1 \(Ireland\)\. This is pending confirmation/ : /eu-west-1 \(İrlanda\).*teyit beklemektedir/);
+    assert.match(JSON.stringify(privacy.sections), locale === "en" ? /verification on the hosted production service is still pending/ : /canlı ortamdaki doğrulaması henüz beklemektedir/);
+    assert.match(all, locale === "en" ? /legal identity and any required address are pending owner confirmation/ : /yasal kimliği ve gereken adresi sahip onayını beklemektedir/);
+    // No effective date or retention period has been invented.
+    assert.doesNotMatch(all, /effective as of|yürürlüğe girmiştir|retained for \d+|\d+ (days|months|years) after/i);
+  }
+});
+
+test("footer keeps clean legal labels, an adjacent draft notice and the Nomind attribution", () => {
+  for (const [locale, byline] of [["en", /A product by <a href="https:\/\/nomind\.tech\/"[^>]*>Nomind<\/a>/], ["tr", /Bir <a href="https:\/\/nomind\.tech\/"[^>]*>Nomind<\/a> (<!-- -->)?ürünü/]] as const) {
+    const html = renderToStaticMarkup(createElement(LegalPage, { locale, document: "terms", signedIn: false }));
+    const footer = html.slice(html.indexOf("<footer"));
+    assert.match(footer.replace(/<!-- -->/g, ""), byline);
+    assert.match(footer, locale === "en" ? /Draft legal documents: pending legal review/ : /Yasal metinler taslaktır/);
+    assert.doesNotMatch(footer, /\((draft|taslak)\)/i);
+    assert.ok(footer.includes("© 2026 Nomind"));
   }
 });

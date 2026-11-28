@@ -4,12 +4,14 @@ Implementation is ready for isolated evaluation, **not public launch approval**.
 
 ## Owner decisions required
 
-- Operator / controller identity, any required business or address details, monitored support and privacy channels, responsible person and escalation process. No invented email or contact form is provided.
+- Operator / controller identity, any required business or address details, monitored support and privacy channels, responsible person and escalation process. **Update 28 November 2026:** the owner supplied a public contact address, published as category-specific `mailto:` links (no form or backend) on `/…/contact`; the drafts describe AppRadar as developed and operated under the Nomind (nomind.tech) brand and set a minimum user age of 18. The brand is not the legal operator identity: that identity and any required address are **pending owner confirmation**. The owner visually approved the page designs; this is not legal approval. The pages remain drafts and `noindex`.
 - Legal review of the English and Turkish drafts at `/en/privacy`, `/en/terms`, `/en/contact` and their `/tr/…` equivalents. Confirm legal bases, rights/request procedures, processing locations, transfers, governing law, dispute/liability/termination terms, effective date and version. These are unresolved decisions, not compliance claims.
 - Actual hosting and email providers and regions; backup/log storage, access and erasure arrangements. Approve category- and provider-specific retention, including account, operational-log and backup periods. B4's technical 30-day pilot expiry is **not** approval of a legal retention policy.
 - Record reviewed storage, display, derived-use and redistribution permissions/basis per provider **and store**. Paying Apify or offering a free beta does not establish these rights. Keep all data-use and paid-execution gates unchanged until separately authorized.
 
-All legal/contact pages visibly say draft, show missing owner facts, have localized metadata and remain `noindex`. Footer links open the drafts. Removing draft status and approving publication are a later owner/legal-reviewed change; `noindex` is not access control.
+**Legal blockers still open (28 November 2026):** legal operator identity and any required address; legal review of both languages; legal bases; international transfer safeguards; confirmation of the production database region (the pooler endpoint suggests `eu-west-1`, Ireland; not independently verified) and other processing regions; retention periods; effective date, version and acceptance; presentation/enforcement of the 18+ requirement (the application has no age check); KVKK notice, VERBİS and application procedure; EU/UK representative assessment; governing law, disputes, liability and content notice procedures; store data usage rights; hosted verification of account deletion, sign-in settings and email delivery.
+
+All legal/contact pages visibly say draft, list open items by group, have localized metadata and remain `noindex`. Footer links use plain labels with an adjacent draft notice. Removing draft status and approving publication are a later owner/legal-reviewed change; `noindex` is not access control.
 
 ## Authentication setup
 

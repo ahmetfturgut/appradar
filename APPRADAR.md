@@ -750,7 +750,13 @@ Sahip tarafından tamamlanan **özel** production deployment kaydı. Bu bölüm 
 
 Sahip yerel ortamda görsel olarak onayladı. Çıkış yapılmamış header’daki birincil “Explore an example” / “Bir örneği inceleyin” CTA kaldırıldı (EN/TR, tüm responsive düzenler). Dil seçici ve Sign in korundu; giriş yapılmış kullanıcıda dashboard eylemi (`max-xl:hidden`) aynı. Hero ve diğer landing CTA’ları, içerik, renk, tipografi, bölümler ve auth davranışı değişmedi. Production güvenlik kısıtları etkilenmedi.
 
-## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
+### 6.34 Legal sayfalar ve Nomind son hali — 28 Kasım 2026
+
+Sahip Privacy, Terms, Contact sayfalarının tasarımını ve Nomind markalamasını görsel olarak onayladı (hukuki onay **değildir**). Onaylanan kararlar: ürün AppRadar, çatı marka Nomind (https://nomind.tech/), planlanan ürün alan adı `appradar.nomind.tech` (DNS/URL değişikliği yapılmadı), asgari yaş 18, iletişim `a.farukturgut@gmail.com`, footer “© 2026 Nomind” ve “A product by Nomind / Bir Nomind ürünü”. `/en|tr/privacy|terms|contact` aynı marka açıklamasını kullanır; Nomind’in şirket olmadığını vurgulayan tekrarlar kaldırıldı ve marka yasal işletmeci kimliği yerine kullanılmaz. Terms ve Privacy 18+ şartını içerir; uygulamada yaş kontrolü yoktur.
+
+Açıkça beklemede: yasal işletmeci kimliği ve gereken adres; hukuk incelemesi; hukuki dayanaklar; aktarım güvenceleri; üretim veritabanı bölgesi (pooler adresi `eu-west-1`/İrlanda düşündürüyor, bağımsız doğrulanmadı); saklama süreleri; yürürlük tarihi; hesap silmenin canlı ortam doğrulaması; giriş ve e-posta ayarlarının teyidi. Sayfalar taslak ve `noindex` kalır. Vercel Authentication, kapalı kayıt, kapalı katalog, kapalı ücretli toplama/ticari görüntüleme ve üçüncü taraf içerik kısıtları değişmedi.
+
+: POC doğrulama kapısı
 
 POC kodu da Bölüm 1'deki plan onayından sonra yazılır. Aşağıdaki eşikler öneridir ve onaylı plana alınmalıdır.
 

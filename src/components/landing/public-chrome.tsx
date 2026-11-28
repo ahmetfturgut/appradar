@@ -3,7 +3,7 @@ import Link from "next/link";
 import { dictionaries } from "../../lib/landing/dictionaries";
 import { landingHref, type LandingLocale } from "../../lib/landing/locale";
 import { legalDocuments, type LegalDocument } from "../../lib/landing/legal";
-import { LANDING_BRAND, landingAction } from "../../lib/landing/config";
+import { LANDING_BRAND, UMBRELLA_BRAND, landingAction } from "../../lib/landing/config";
 
 const container = "mx-auto max-w-6xl px-5 sm:px-8";
 const primary = "inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-xs hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
@@ -31,5 +31,18 @@ export function PublicHeader({ locale, signedIn, document }: { locale: LandingLo
 
 export function PublicFooter({ locale }: { locale: LandingLocale }) {
   const t = dictionaries[locale];
-  return <footer className="border-t"><div className={`${container} flex flex-col gap-6 py-8 text-sm text-muted-foreground sm:flex-row sm:items-start sm:justify-between`}><div className="max-w-xs"><span className="flex items-center gap-2 font-medium text-foreground"><Radar className="size-4 text-primary" aria-hidden="true" />{LANDING_BRAND.name}</span><p className="mt-3 text-xs/relaxed">{t.footer.description}</p></div><ul className="flex flex-wrap gap-x-5 gap-y-3 text-xs" aria-label={t.footer.legal}>{legalDocuments.map(document => <li key={document}><Link href={`/${locale}/${document}`} className="inline-flex min-h-11 items-center rounded hover:text-foreground" title={t.footer.unpublished}>{t.footer[document]} <span className="ml-1">({t.footer.pending})</span></Link></li>)}</ul></div></footer>;
+  const nomind = <a href={UMBRELLA_BRAND.url} rel="noopener" className="rounded font-medium underline underline-offset-4 hover:text-foreground">{UMBRELLA_BRAND.name}</a>;
+  return <footer className="border-t"><div className={`${container} flex flex-col gap-6 py-8 text-sm text-muted-foreground sm:flex-row sm:items-start sm:justify-between`}>
+    <div className="max-w-xs">
+      <span className="flex items-center gap-2 font-medium text-foreground"><Radar className="size-4 text-primary" aria-hidden="true" />{LANDING_BRAND.name}</span>
+      <p className="mt-3 text-xs/relaxed">{t.footer.description}</p>
+      {/* Word order differs: "A product by Nomind" / "Bir Nomind ürünü". */}
+      <p className="mt-3 text-xs">{locale === "tr" ? <>Bir {nomind} {t.footer.byline}</> : <>{t.footer.byline} {nomind}</>}</p>
+      <p className="mt-1 text-xs">{UMBRELLA_BRAND.copyright}</p>
+    </div>
+    <div className="sm:max-w-xs sm:text-right">
+      <nav aria-label={t.footer.legal}><ul className="flex flex-wrap gap-x-5 text-xs sm:justify-end">{legalDocuments.map(document => <li key={document}><Link href={`/${locale}/${document}`} className="inline-flex min-h-11 items-center rounded hover:text-foreground">{t.footer[document]}</Link></li>)}</ul></nav>
+      <p className="text-xs/relaxed">{t.footer.unpublished}</p>
+    </div>
+  </div></footer>;
 }
