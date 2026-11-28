@@ -746,6 +746,10 @@ Sahip tarafından tamamlanan **özel** production deployment kaydı. Bu bölüm 
 - Public signup, ticari katalog gösterimi, arama indeksleme ve toplama kapalı.
 - Public-launch engelleri değişmedi: ticari veri hakları; yasal belgeler; marka; hosting ticari-kullanım uygunluğu; özel SMTP; rate limit; yedek/geri yükleme; onaylı saklama.
 
+### 6.33 Landing header polish — 28 Kasım 2026
+
+Sahip yerel ortamda görsel olarak onayladı. Çıkış yapılmamış header’daki birincil “Explore an example” / “Bir örneği inceleyin” CTA kaldırıldı (EN/TR, tüm responsive düzenler). Dil seçici ve Sign in korundu; giriş yapılmış kullanıcıda dashboard eylemi (`max-xl:hidden`) aynı. Hero ve diğer landing CTA’ları, içerik, renk, tipografi, bölümler ve auth davranışı değişmedi. Production güvenlik kısıtları etkilenmedi.
+
 ## 7. Kodlamadan sonraki ilk teknik aşama: POC doğrulama kapısı
 
 POC kodu da Bölüm 1'deki plan onayından sonra yazılır. Aşağıdaki eşikler öneridir ve onaylı plana alınmalıdır.

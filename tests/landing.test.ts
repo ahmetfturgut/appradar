@@ -132,11 +132,22 @@ test("proxy supplies URL-based SSR language, persists preferences and preserves 
   }
 });
 
-test("header action is hidden below xl by a variant, not a conflicting base display utility", () => {
-  const html = renderToStaticMarkup(createElement(LandingPage, { locale: "en", signedIn: false }));
-  const header = html.slice(html.indexOf("<header"), html.indexOf("</header>"));
-  const action = header.match(/<a [^>]*href="\/en#market-check"[^>]*class="([^"]*bg-primary[^"]*)"/)?.[1] ?? header.match(/<a [^>]*class="([^"]*bg-primary[^"]*)"[^>]*href="\/en#market-check"/)?.[1];
-  assert.ok(action, "header action present");
-  assert.match(action, /\bmax-xl:hidden\b/);
-  assert.doesNotMatch(action, /(^|\s)hidden(\s|$)/);
+test("signed-out header keeps language and sign-in without the explore CTA; signed-in keeps dashboard action", () => {
+  for (const locale of ["en", "tr"] as const) {
+    const signedOut = renderToStaticMarkup(createElement(LandingPage, { locale, signedIn: false }));
+    const outHeader = signedOut.slice(signedOut.indexOf("<header"), signedOut.indexOf("</header>"));
+    assert.doesNotMatch(outHeader, /bg-primary[^"]*"[^>]*(?:Explore an example|Bir örneği inceleyin)|(?:Explore an example|Bir örneği inceleyin)[^<]*<\/a>/);
+    assert.doesNotMatch(outHeader, /href="\/(?:en|tr)#market-check"[^>]*bg-primary|bg-primary[^"]*"[^>]*href="\/(?:en|tr)#market-check"/);
+    assert.match(outHeader, /Sign in|Giriş yap/);
+    assert.match(outHeader, /EN/);
+    assert.match(outHeader, /TR/);
+
+    const signedIn = renderToStaticMarkup(createElement(LandingPage, { locale, signedIn: true }));
+    const inHeader = signedIn.slice(signedIn.indexOf("<header"), signedIn.indexOf("</header>"));
+    const action = inHeader.match(/<a [^>]*href="\/dashboard"[^>]*class="([^"]*bg-primary[^"]*)"/)?.[1]
+      ?? inHeader.match(/<a [^>]*class="([^"]*bg-primary[^"]*)"[^>]*href="\/dashboard"/)?.[1];
+    assert.ok(action, "signed-in dashboard action present");
+    assert.match(action, /\bmax-xl:hidden\b/);
+    assert.doesNotMatch(action, /(^|\s)hidden(\s|$)/);
+  }
 });
